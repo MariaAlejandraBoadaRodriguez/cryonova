@@ -10,11 +10,8 @@ import countries from "i18n-iso-countries";
 import { feature } from "topojson-client";
 
 const require = createRequire(import.meta.url);
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 countries.registerLocale(require("i18n-iso-countries/langs/es.json"));
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const topology = require("world-atlas/countries-110m.json");
 
 type Position = [number, number];
