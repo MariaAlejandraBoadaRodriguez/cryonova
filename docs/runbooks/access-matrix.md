@@ -16,6 +16,7 @@ written and tested; "Vercel" is where the app runs for users.
 | Vercel previous deploy | ERROR | `dpl_8hwC5UJXNgpYc1SaHJuXuGnS9js5`: `NEXT_NO_VERSION` (repo had no app) |
 | Vercel deployment protection | Vercel Authentication on `all_except_custom_domains` | All `*.vercel.app` URLs require a Vercel login; must be narrowed to previews for public access (decision log D-06) |
 | Vercel API from dev container | OK via `VERCEL_TOKEN` | `GET /v10/projects/{id}/env` → 200 (names only read) |
+| Vercel plan | Hobby | Runtime logs retained 1 h; `maxDuration` 300 s accepted; Deployment Protection change blocked for the agent (owner decision) |
 | Vercel MCP | Partial | Projects/deployments readable; listing env vars returns 403 |
 | Neon PostgreSQL | OK | PostgreSQL 18.7, database `neondb`, role `neondb_owner` (CREATEDB, CREATEROLE, not superuser), empty schema before migrations |
 | Neon access path in dev container | HTTPS only | Direct TCP 5432 impossible (no DNS); SQL-over-HTTP works through the endpoint host (`scripts/lib/dev-proxy.ts`) |

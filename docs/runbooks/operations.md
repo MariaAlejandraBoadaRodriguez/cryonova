@@ -18,6 +18,12 @@ Structured log events (all JSON, credentials and codes redacted by `src/lib/log.
 Useful queries (Vercel MCP `get_runtime_logs` or dashboard): `query: "run.failed"`, `query: "run.read.failed"`
 (per-source errors), `query: "ai.usage"` (spend), `level: ["error"]`.
 
+Plan limits observed (2026-11-14): the team is on Vercel **Hobby** — runtime logs are retained for 1 hour
+(queries beyond that return HTTP 400), and `maxDuration = 300` is accepted for route handlers (the 720-read
+production discovery run finished in one 146 s invocation). For longer retention, add a log drain or upgrade.
+Verified event on production: `agent.explain.ok` (run `55db4e8b…`, verified 51, unverified 0) at 22:50 UTC; no
+`error`-level records in the preceding 30 minutes.
+
 ## Alerts (to configure in Vercel; plan-dependent)
 
 | Alert | Condition | Action |
@@ -65,7 +71,7 @@ timestamp → point a preview's `DATABASE_URL` at it → `GET /api/health` and o
 ## Rollback
 
 1. Find the previous good production deployment: Vercel dashboard → Deployments (filter Production), or
-   `list_deployments` with `target=production`. Current: `dpl_ELqFefi37wBsR8jeYoLgouEuPX7a` (`9456ca5`, T+3h).
+   `list_deployments` with `target=production`. Current production: `dpl_9gV1rokYQeF6FBRkxnVskTuPCgjn` (`4250650`); previous: `dpl_4ZHUkRnmMBSuxnxDcKeGUCeKagbD` (`c6b3a5a`), then `dpl_ELqFefi37wBsR8jeYoLgouEuPX7a` (`9456ca5`, T+3h).
 2. Promote it: dashboard "Instant Rollback", or Vercel API `POST /v9/projects/{project}/rollback/{deploymentId}`.
 3. Schema: migrations are additive only, so the previous build runs on the newer schema. Never drop or rename
    columns in the same release that stops using them.
