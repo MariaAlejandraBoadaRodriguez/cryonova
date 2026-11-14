@@ -348,7 +348,7 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
               key={run.id}
               runId={run.id}
               initialLanguage={detectLanguage(run.question ?? draft.question)}
-              stored={run.explanation as { summary?: import("@/src/agent/explain").Explanation; followUps?: import("@/src/agent/explain").Explanation[] } | null}
+              stored={run.explanation as import("@/src/agent/explain-service").StoredExplanations | null}
             />
           </>
         )}

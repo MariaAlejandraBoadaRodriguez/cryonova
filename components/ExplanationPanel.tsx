@@ -26,21 +26,23 @@ function Verification({ e }: { e: Explanation }) {
   );
 }
 
-async function request(body: Record<string, unknown>): Promise<Explanation> {
-  const response = await fetch("/api/agent/explain", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(90_000),
-  });
+async function request(body: { runId: string; language: Language; chart: ChartKind; followUp?: string }): Promise<Explanation> {
+  const response = body.followUp
+    ? await fetch("/api/agent/explain", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(90_000),
+      })
+    : await fetch(`/api/runs/${body.runId}/explanation?language=${body.language}`, { cache: "no-store", signal: AbortSignal.timeout(90_000) });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error?.detail ?? data.error?.title ?? "The explanation could not be produced.");
   return data as Explanation;
 }
 
-export function ExplanationPanel({ runId, initialLanguage, stored }: { runId: string; initialLanguage: Language; stored?: { summary?: Explanation; followUps?: Explanation[] } | null }) {
+export function ExplanationPanel({ runId, initialLanguage, stored }: { runId: string; initialLanguage: Language; stored?: { summary?: Explanation; summaries?: Partial<Record<Language, Explanation>>; followUps?: Explanation[] } | null }) {
   const [language, setLanguage] = useState<Language>(stored?.summary?.language ?? initialLanguage);
-  const [summary, setSummary] = useState<Explanation | null>(stored?.summary && stored.summary.language === language ? stored.summary : null);
+  const [summary, setSummary] = useState<Explanation | null>(stored?.summaries?.[stored?.summary?.language ?? initialLanguage] ?? stored?.summary ?? null);
   const [followUps, setFollowUps] = useState<Explanation[]>(stored?.followUps ?? []);
   const [loading, setLoading] = useState(() => !(stored?.summary && stored.summary.language === (stored?.summary?.language ?? initialLanguage)));
   const [error, setError] = useState<string | null>(null);
