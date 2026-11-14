@@ -23,3 +23,14 @@ positive monthly anomalies: 21 months (2023-04 to 2024-12).
 |---|---|---|
 | 2026-11-14 19:58 | CMR granules `C2723754851-GES_DISC` 2005-01..2025-12 | 249 of 252 months (collection ends 2025-09), matching the Databricks evidence |
 | 2026-11-14 20:15 | `.das` and coordinate endpoints of 2005-01 granule | `precipitation` in mm/hr, fill -9999.9, lat -89.95..89.95, lon -179.95..179.95, lon-major |
+| 2026-11-14 21:18 | Executor (memory store), Colombia 2015-01..2016-12 | 24/24 months, 0 failed, 5.7 s; 5,124 cells per month (0.1° grid, every 2 cells); Jan 2015 = 5.68 mm/day |
+| 2026-11-14 21:25 | Production preview `/api/connectors/status` | MERRA-2 and IMERG `verified_live` (latest granules 2026-09 and 2025-09); ERA5 catalogue reachable with credentials; NOAA CDO token accepted |
+
+## AI checks on Vercel
+
+| When (UTC) | Deployment | Check | Result |
+|---|---|---|---|
+| 2026-11-14 21:10 | preview `d937e48` | `/api/health?deep=ai` | ok, `claude-sonnet-5-5`, 1.29 s |
+| 2026-11-14 21:11 | preview `dfa4410` | Explanation of production run `d82edcbd…` (EN) | Claude, 6.6 s, 1,942 in / 731 out tokens (~$0.012); **62/62 cited figures verified** |
+| 2026-11-14 21:12 | preview `dfa4410` | Same run (ES) | Claude, 6.6 s; **45/45 cited figures verified** |
+| 2026-11-14 21:26 | production `c6b3a5a` | `/api/health?deep=ai` | ok, `claude-sonnet-5-5`, 1.37 s |
