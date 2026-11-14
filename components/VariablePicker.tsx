@@ -29,6 +29,8 @@ export function VariablePicker({ selected, onChange }: { selected: string[]; onC
     return VARIABLES.filter((v) => ["merra2.T2M", "merra2.PRECTOTCORR", "imerg.precipitation", "merra2.QV2M", "merra2.GWETTOP", "merra2.TOTEXTTAU"].includes(v.key));
   }, [query, topic]);
 
+  const DISCOVERY_SET = ["merra2.T2M", "merra2.TS", "merra2.QV2M", "merra2.TQV", "merra2.SLP", "merra2.PRECTOTCORR", "merra2.EVAP", "merra2.GWETTOP", "merra2.SWGDN", "merra2.CLDTOT"];
+
   const toggle = (key: string) => {
     if (selected.includes(key)) onChange(selected.filter((k) => k !== key));
     else if (selected.length < MAX_VARIABLES) onChange([...selected, key]);
@@ -61,6 +63,12 @@ export function VariablePicker({ selected, onChange }: { selected: string[]; onC
         )}
       </div>
 
+      <div className="row">
+        <button type="button" className="btn btn-ghost btn-small" onClick={() => onChange([...new Set([...selected, ...DISCOVERY_SET])].slice(0, MAX_VARIABLES))} data-testid="discovery-set">
+          Add a discovery set (10 variables, 4 products)
+        </button>
+        <span className="field-help">For “which variables changed?” searches; results are ranked with multiple-comparison correction.</span>
+      </div>
       <div className="row" style={{ alignItems: "flex-end" }}>
         <div style={{ flex: "2 1 220px" }}>
           <label htmlFor={`${id}-q`}>Search the catalog</label>

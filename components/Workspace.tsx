@@ -17,6 +17,7 @@ import { ProposalCard } from "./AgentPanel";
 import { ExplanationPanel } from "./ExplanationPanel";
 import { PeriodPicker } from "./PeriodPicker";
 import { ErrorIcon, RegionPicker, type RegionValue } from "./RegionPicker";
+import { ResultActions } from "./ResultActions";
 import { ResultsView } from "./ResultsView";
 import { VariablePicker } from "./VariablePicker";
 
@@ -104,6 +105,17 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
     return { min: starts.length ? Math.max(...starts) : 1980, max: CURRENT_YEAR };
   }, [draft.variables]);
 
+  const hydrated = useRef(false);
+  const hydrateFrom = useCallback((data: PublicRun) => {
+    if (hydrated.current) return;
+    hydrated.current = true;
+    const parsed = SelectionSchema.safeParse(data.selection);
+    if (!parsed.success) return;
+    const sel = parsed.data;
+    setDraft((d) => (d.region.bbox ? d : { question: sel.question ?? "", region: { bbox: sel.region.bbox, name: sel.region.name, regionId: sel.region.regionId, source: sel.region.source }, start: sel.start, end: sel.end, variables: sel.variables, mode: sel.mode }));
+    setRegionVersion((v) => v + 1);
+  }, []);
+
   // Poll the run until it finishes. Each poll is short; the server resumes stalled runs.
   useEffect(() => {
     if (!runId) return;
@@ -121,6 +133,7 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
         if (response.ok) {
           const data = (await response.json()) as PublicRun;
           setRun(data);
+          hydrateFrom(data);
           if (TERMINAL_STATUSES.includes(data.status)) return;
         }
       } catch {
@@ -136,7 +149,7 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
       stopped = true;
       clearTimeout(timer);
     };
-  }, [runId]);
+  }, [runId, hydrateFrom]);
 
   const active = run !== null && !TERMINAL_STATUSES.includes(run.status);
   useEffect(() => {
@@ -344,6 +357,7 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
         {result && run && (run.status === "succeeded" || run.status === "partial") && (
           <>
             <ResultsView result={result} />
+            <ResultActions runId={run.id} />
             <ExplanationPanel
               key={run.id}
               runId={run.id}
