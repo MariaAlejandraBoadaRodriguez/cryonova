@@ -32,6 +32,9 @@ export function getDb(): NeonHttpDatabase<typeof schema> {
   if (!url) throw new Error("DATABASE_URL is not configured");
   if (!cached) {
     patchFetch();
+    // Opt-in for sandboxes whose egress allowlist only has the endpoint host;
+    // that host serves the same SQL-over-HTTP API. Unset on Vercel.
+    if (process.env.NEON_SQL_VIA_ENDPOINT_HOST === "1") neonConfig.fetchEndpoint = (host: string) => `https://${host}/sql`;
     cached = drizzle(neon(url), { schema });
   }
   return cached;
