@@ -1,0 +1,80 @@
+/**
+ * Catalog search over single words and phrases, in English and Spanish.
+ * Matching is accent- and case-insensitive. Both languages are always searched;
+ * the language only decides which names are shown.
+ */
+import { TOPICS, VARIABLES } from "./index";
+import type { CatalogVariable } from "./types";
+
+export function normalizeText(input: string): string {
+  return input
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9.\-\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokens(text: string): string[] {
+  return normalizeText(text)
+    .split(" ")
+    .filter((t) => t.length > 1);
+}
+
+export interface SearchHit {
+  variable: CatalogVariable;
+  score: number;
+  matched: string[];
+}
+
+export function searchCatalog(query: string, limit = 12): SearchHit[] {
+  const q = normalizeText(query);
+  if (!q) return [];
+  const queryTokens = new Set(tokens(q));
+  const hits: SearchHit[] = [];
+
+  for (const variable of VARIABLES) {
+    let score = 0;
+    const matched = new Set<string>();
+    const code = variable.dapName.replace(/^.*\//, "").toLowerCase();
+    if (queryTokens.has(code)) {
+      score += 10;
+      matched.add(variable.dapName);
+    }
+    for (const phrase of [...variable.phrases.en, ...variable.phrases.es]) {
+      const p = normalizeText(phrase);
+      if (q.includes(p) || (q.length >= 4 && p.includes(q))) {
+        score += 6;
+        matched.add(phrase);
+      }
+    }
+    for (const word of [...variable.words.en, ...variable.words.es]) {
+      const w = normalizeText(word);
+      if (queryTokens.has(w)) {
+        score += 3;
+        matched.add(word);
+      } else if (w.length >= 4 && [...queryTokens].some((t) => t.length >= 4 && (w.startsWith(t) || t.startsWith(w)))) {
+        score += 1;
+        matched.add(word);
+      }
+    }
+    for (const name of [variable.name.en, variable.name.es]) {
+      if (q.length >= 4 && normalizeText(name).includes(q)) {
+        score += 4;
+        matched.add(name);
+      }
+    }
+    for (const topic of TOPICS) {
+      if (!topic.variables.includes(variable.key)) continue;
+      const topicTerms = [...topic.words.en, ...topic.words.es, ...topic.phrases.en, ...topic.phrases.es].map(normalizeText);
+      if (topicTerms.some((t) => queryTokens.has(t) || q.includes(t))) {
+        score += 2;
+        matched.add(topic.title.en);
+      }
+    }
+    if (score > 0) hits.push({ variable, score, matched: [...matched] });
+  }
+
+  return hits.sort((a, b) => b.score - a.score || a.variable.key.localeCompare(b.variable.key)).slice(0, limit);
+}
