@@ -8,7 +8,7 @@ import { discover } from "@/src/analytics/discovery";
 import type { Explanation } from "@/src/agent/explain";
 import type { RunResult, VariableResult } from "@/src/jobs/types";
 import { decimalsFor, fmt, fmtBBox, fmtMonth, fmtP, fmtSigned } from "@/src/lib/format";
-import { coverageSentence, EVIDENCE_LABEL, evidenceOf, magnitudeSentence, regionLabel, trendSentence } from "./narrative";
+import { coverageSentence, EVIDENCE_LABEL, evidenceOf, magnitudeSentence, qValuesFor, regionLabel, trendSentence } from "./narrative";
 
 const PAGE: [number, number] = [595.28, 841.89];
 const MARGIN = 48;
@@ -236,11 +236,12 @@ export async function buildPdf(result: RunResult, options: PdfOptions = {}): Pro
   ]);
 
   w.heading("Findings");
+  const qValues = qValuesFor(result);
   for (const v of result.variables) {
     w.text(trendSentence(v, region), { size: 10, gap: 2 });
     const magnitude = magnitudeSentence(v);
     if (magnitude) w.text(magnitude, { size: 9, color: C.muted, gap: 2 });
-    w.text(`Evidence: ${EVIDENCE_LABEL[evidenceOf(v)]}. ${coverageSentence(v)}`, { size: 9, color: C.muted, gap: 8 });
+    w.text(`Evidence: ${EVIDENCE_LABEL[evidenceOf(v, qValues.get(v.key) ?? null)]}. ${coverageSentence(v)}`, { size: 9, color: C.muted, gap: 8 });
   }
 
   for (const v of result.variables) {

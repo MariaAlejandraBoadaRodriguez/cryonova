@@ -9,15 +9,15 @@ import { useMemo } from "react";
 import { getRegion } from "@/src/catalog/regions";
 import type { RunResult, VariableResult } from "@/src/jobs/types";
 import { fmt, fmtBBox, fmtBytes, fmtDuration, fmtMonth, fmtP, fmtSigned, fmtUtc } from "@/src/lib/format";
-import { coverageSentence, EVIDENCE_LABEL, evidenceOf, magnitudeSentence, regionLabel, trendSentence } from "@/src/reports/narrative";
+import { coverageSentence, EVIDENCE_LABEL, evidenceOf, magnitudeSentence, qValuesFor, regionLabel, trendSentence } from "@/src/reports/narrative";
 import { anomalyChart, decimalsOf, seasonalCycleChart, seriesChart } from "./charts";
 import { DiscoveryTable } from "./DiscoveryTable";
 import { Plot } from "./Plot";
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-function EvidenceBadge({ v }: { v: VariableResult }) {
-  const level = evidenceOf(v);
+function EvidenceBadge({ v, qValue }: { v: VariableResult; qValue: number | null }) {
+  const level = evidenceOf(v, qValue);
   const strong = level === "significant";
   return (
     <span className={strong ? "badge badge-strong" : "badge badge-neutral"}>
@@ -62,7 +62,7 @@ function VariableCard({ v, result, index }: { v: VariableResult; result: RunResu
         ) : (
           <div className="value">No trend estimate</div>
         )}
-        <EvidenceBadge v={v} />
+        <EvidenceBadge v={v} qValue={qValuesFor(result).get(v.key) ?? null} />
         <p style={{ margin: 0 }}>{trendSentence(v, region)}</p>
         {magnitude && <p className="muted" style={{ margin: 0 }}>{magnitude}</p>}
       </div>

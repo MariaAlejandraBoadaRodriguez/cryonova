@@ -4,6 +4,7 @@
  * provider is unavailable. Every figure comes from the structured result.
  */
 import { evidenceLevel, type EvidenceLevel, signalToNoise } from "@/src/analytics/analyze";
+import { benjaminiHochberg } from "@/src/analytics/stats";
 import type { RunResult, VariableResult } from "@/src/jobs/types";
 import { decimalsFor, fmt, fmtP, fmtSigned } from "@/src/lib/format";
 
@@ -75,4 +76,12 @@ export function deterministicSummary(result: RunResult): string[] {
 
 export function evidenceOf(v: VariableResult, qValue: number | null = null): EvidenceLevel {
   return evidenceLevel(v.analysis.trend, qValue);
+}
+
+/** Benjamini–Hochberg q-values per variable when a run tests more than one trend (else empty). */
+export function qValuesFor(result: Pick<RunResult, "variables">): Map<string, number> {
+  const tested = result.variables.filter((v) => v.analysis.trend.status === "ok");
+  if (tested.length < 2) return new Map();
+  const q = benjaminiHochberg(tested.map((v) => (v.analysis.trend.status === "ok" ? v.analysis.trend.pValue : 1)));
+  return new Map(tested.map((v, i) => [v.key, q[i] as number]));
 }

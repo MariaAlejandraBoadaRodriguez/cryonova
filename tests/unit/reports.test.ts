@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { discover } from "@/src/analytics/discovery";
+import { buildFacts } from "@/src/agent/explain";
+import { evidenceOf, qValuesFor } from "@/src/reports/narrative";
 import { monthsBetween } from "@/src/analytics/series";
 import { lookupInvestigation, saveInvestigation } from "@/src/db/investigations";
 import { buildResult } from "@/src/jobs/runner";
@@ -90,5 +92,19 @@ describe("saved investigations (memory store)", () => {
     expect((await lookupInvestigation(saved.code, "client-b")).status).toBe("throttled");
     expect((await lookupInvestigation(saved.code, "client-c")).status).toBe("found");
     delete process.env.CODE_LOOKUP_FAILURES_PER_10_MIN;
+  });
+});
+
+describe("multiple-comparison consistency", () => {
+  it("uses BH-corrected evidence in explanation facts and variable badges when several trends are tested", () => {
+    const result = syntheticResult();
+    const facts = buildFacts(result);
+    expect(facts.multipleComparison).toMatch(/Benjamini-Hochberg false discovery rate over 2 trends/);
+    const q = qValuesFor(result);
+    expect(q.size).toBe(2);
+    const t2m = result.variables.find((v) => v.key === "merra2.T2M")!;
+    expect(facts.variables.find((v) => v.key === "merra2.T2M")?.multipleComparisonQValue).not.toBeNull();
+    expect(evidenceOf(t2m, q.get(t2m.key) ?? null)).toBe(discover(result).rows.find((r) => r.key === "merra2.T2M")?.evidence);
+    expect(qValuesFor({ variables: result.variables.slice(0, 1) }).size).toBe(0);
   });
 });
