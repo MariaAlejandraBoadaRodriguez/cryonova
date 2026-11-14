@@ -5,7 +5,7 @@
  * explanation is built from the same facts.
  */
 import { z } from "zod";
-import { EVIDENCE_LABEL, evidenceOf, regionLabel } from "@/src/reports/narrative";
+import { EVIDENCE_LABEL, evidenceOf, qValuesFor, regionLabel } from "@/src/reports/narrative";
 import type { RunResult, VariableResult } from "@/src/jobs/types";
 import { decimalsFor, fmt, fmtMonth, fmtP, fmtSigned } from "@/src/lib/format";
 import { AGENT_BETAS, AI_EFFORT, agentModel, AgentUnavailableError, anthropicClient } from "./client";
@@ -40,7 +40,7 @@ export interface Explanation {
 
 const round = (value: number, decimals: number) => Number(value.toFixed(decimals));
 
-function variableFacts(v: VariableResult) {
+function variableFacts(v: VariableResult, qValue: number | null) {
   const a = v.analysis;
   const d = decimalsFor(v.unitGroup);
   const t = a.trend;
@@ -64,7 +64,8 @@ function variableFacts(v: VariableResult) {
             typicalYearToYearVariation: round(t.residualSd, d),
           }
         : { status: "insufficient", reason: t.reason },
-    evidence: EVIDENCE_LABEL[evidenceOf(v)],
+    multipleComparisonQValue: qValue === null ? null : qValue < 0.001 ? "< 0.001" : round(qValue, 3),
+    evidence: EVIDENCE_LABEL[evidenceOf(v, qValue)],
     stats: {
       periodMean: a.stats.mean === null ? null : round(a.stats.mean, d),
       lowestMonth: a.stats.min ? { month: a.stats.min.month, value: round(a.stats.min.value, d) } : null,
@@ -99,14 +100,16 @@ const CHART_DESCRIPTION: Record<ChartKind, string> = {
 };
 
 export function buildFacts(result: RunResult, chart: ChartKind = "series") {
+  const q = qValuesFor(result);
   return {
+    multipleComparison: q.size > 0 ? `Benjamini-Hochberg false discovery rate over ${q.size} trends; a trend is significant only if its q-value is below 0.05` : "single trend, no correction",
     region: regionLabel(result),
     bbox: result.region.bbox,
     period: { start: result.selection.start, end: result.selection.end },
     method: result.variables[0]?.analysis.method ?? "",
     regionalMean: "cosine-latitude weighted mean of valid grid cells; years need 12 valid months",
     chart: CHART_DESCRIPTION[chart],
-    variables: result.variables.map(variableFacts),
+    variables: result.variables.map((v) => variableFacts(v, q.get(v.key) ?? null)),
     sources: result.sources.map((s) => ({ product: `${s.collection} v${s.version}`, provider: s.provider, conceptId: s.conceptId, doi: s.doi, fetchedFrom: s.fetchedFrom, fetchedTo: s.fetchedTo, monthsRead: s.monthsRead })),
     warnings: result.warnings,
   };
@@ -119,6 +122,7 @@ Rules:
 - Write in the requested language (en = English, es = Spanish) with plain, precise sentences; 1 to 3 sentences per field.
 - chart: what the chart shows (series, axes, units, band). pattern: the pattern observed. change: how much it changed (trend per decade and fitted change over the period). uncertainty: the 95% interval, p-value, number of complete years, coverage and what they mean. source: products, versions and when the data were fetched. limitations: scope limits (regional mean, reanalysis or satellite estimates, gaps, a trend describes this period and does not prove a cause).
 - If the trend is insufficient or the interval includes zero, say so clearly instead of claiming a change.
+- When several trends were tested (multipleComparison in FACTS), call a trend statistically significant only when its "evidence" says so after the Benjamini-Hochberg correction; a p-value below 0.05 with a q-value at or above 0.05 is only nominal and must be described that way.
 - For a follow-up question, put the reply in "answer" using the same rules; otherwise set "answer" to an empty string.`;
 
 const ExplainSchema = z.object({
