@@ -37,3 +37,4 @@ positive monthly anomalies: 21 months (2023-04 to 2024-12).
 | 2026-11-14 21:12 | preview `dfa4410` | Same run (ES) | Claude, 6.6 s; **45/45 cited figures verified** |
 | 2026-11-14 21:26 | production `c6b3a5a` | `/api/health?deep=ai` | ok, `claude-sonnet-5-5`, 1.37 s |
 | 2026-11-14 21:29 | production `c6b3a5a` | Explanation of discovery run `55db4e8b…` (EN) | Claude, 6.2 s, 4,533 in / 897 out tokens (~$0.018); 46/46 figures verified. Found a wording gap: T2M was called "significant" although BH rates it nominal; fixed in PR #3 (run-level q-values in badges, PDF and AI facts). |
+| 2026-11-14 22:50 | production `4250650` (PR #3) | Same discovery run, interpretation regenerated after the fix | Claude, 7.0 s, 4,739 in / 940 out tokens (~$0.019); **51/51 figures verified**; T2M now described as "only nominally significant and not significant after Benjamini-Hochberg correction (q = 0.096)" |

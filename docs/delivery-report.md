@@ -8,8 +8,8 @@ Date: 2026-11-14 (UTC). Everything below was observed during this session; nothi
 |---|---|
 | Repository | https://github.com/MariaAlejandraBoadaRodriguez/cryonova (working branch `claude/fervent-carson-bixpbu`) |
 | Pull requests | [#1](https://github.com/MariaAlejandraBoadaRodriguez/cryonova/pull/1) T+3h (merged `9456ca5`), [#2](https://github.com/MariaAlejandraBoadaRodriguez/cryonova/pull/2) T+6h–T+15h (merged `c6b3a5a`), [#3](https://github.com/MariaAlejandraBoadaRodriguez/cryonova/pull/3) BH-consistency fix found in production verification |
-| Production | https://cryonova-maria-alejandra-boada-rodriguezs-projects.vercel.app → deployment `dpl_4ZHUkRnmMBSuxnxDcKeGUCeKagbD` from `master@c6b3a5a56aa2244185840d213ec0ddf8a1a10fcc` |
-| Previous production (rollback target) | `dpl_ELqFefi37wBsR8jeYoLgouEuPX7a` (`9456ca5`, T+3h) |
+| Production | https://cryonova-maria-alejandra-boada-rodriguezs-projects.vercel.app → deployment `dpl_9gV1rokYQeF6FBRkxnVskTuPCgjn` from `master@425065029577aeea958efb13b888c056ce19504e` (PR #3) |
+| Previous production (rollback targets) | `dpl_4ZHUkRnmMBSuxnxDcKeGUCeKagbD` (`c6b3a5a`, PR #2) and `dpl_ELqFefi37wBsR8jeYoLgouEuPX7a` (`9456ca5`, T+3h) |
 | Database | Neon `neondb` (PostgreSQL 18.7): migrations `0000_initial_schema` + `0001_ai_usage_client_key` (version 2); `cryonova_test` for integration and E2E |
 | CI | GitHub Actions on every push and PR: secret scan, lint, types, unit tests with coverage gate, build, pytest, browser tests — green on both merged heads |
 
@@ -19,7 +19,7 @@ Date: 2026-11-14 (UTC). Everything below was observed during this session; nothi
 |---|---|---|
 | T+3h First investigation | Done, verified in production | Run `d82edcbd…`: 240/240 MERRA-2 months, 58.9 s, +0.334 °C/decade (95% CI +0.044..+0.624, p = 0.024, n = 20) |
 | T+6h AI-guided investigation | Done | Claude planner + explainer; production `/api/health?deep=ai` ok; real explanation of the production run: 62/62 figures verified (EN), 45/45 (ES) |
-| T+9h Trend discovery | Done, verified in production | Run `55db4e8b…`: 4 variables from 3 products, 720/720 live reads in 146 s; BH over 4 trends (T2M nominal, q = 0.096; others inconclusive); AI interpretation 46/46 figures verified |
+| T+9h Trend discovery | Done, verified in production | Run `55db4e8b…`: 4 variables from 3 products, 720/720 live reads in 146 s; BH over 4 trends (T2M nominal, q = 0.096; others inconclusive). Production verification exposed a wording gap ("significant" before correction); fixed in PR #3 and re-verified: 51/51 figures, T2M described as nominal |
 | T+12h Shareable investigation | Done (locally verified end to end; production UI path awaits public access) | E2E: save → code → reopen in a separate browser → series CSV value equals the screen → PDF valid |
 | T+15h Second verified path | Done | GPM IMERG V07 live (24/24 months, 5.7 s; production status `verified_live`); ERA5 and NOAA credentials accepted, connectors pending |
 | T+18h Final polish | Partial | Mobile layout and axe checks pass; backup demo recording not produced |

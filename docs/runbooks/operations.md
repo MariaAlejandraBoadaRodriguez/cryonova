@@ -65,7 +65,7 @@ timestamp → point a preview's `DATABASE_URL` at it → `GET /api/health` and o
 ## Rollback
 
 1. Find the previous good production deployment: Vercel dashboard → Deployments (filter Production), or
-   `list_deployments` with `target=production`. Current: `dpl_ELqFefi37wBsR8jeYoLgouEuPX7a` (`9456ca5`, T+3h).
+   `list_deployments` with `target=production`. Current production: `dpl_9gV1rokYQeF6FBRkxnVskTuPCgjn` (`4250650`); previous: `dpl_4ZHUkRnmMBSuxnxDcKeGUCeKagbD` (`c6b3a5a`), then `dpl_ELqFefi37wBsR8jeYoLgouEuPX7a` (`9456ca5`, T+3h).
 2. Promote it: dashboard "Instant Rollback", or Vercel API `POST /v9/projects/{project}/rollback/{deploymentId}`.
 3. Schema: migrations are additive only, so the previous build runs on the newer schema. Never drop or rename
    columns in the same release that stops using them.
