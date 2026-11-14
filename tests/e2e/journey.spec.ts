@@ -65,3 +65,23 @@ test("keyboard users can pick a region and reach the run button", async ({ page 
   await page.getByRole("button", { name: "Apply coordinates" }).press("Enter");
   await expect(page.getByText(/Selected: Custom box/)).toBeVisible();
 });
+
+test("guided journey: question from the landing page becomes an editable proposal, a live run and a verified explanation", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop" || !process.env.LIVE_E2E, "Live provider journey: set LIVE_E2E=1 (desktop only).");
+  test.setTimeout(240_000);
+  await page.goto("/");
+  await page.getByLabel("Your question (English or Spanish)").fill("Did near-surface air temperature in Colombia change between 2012 and 2023?");
+  await page.getByRole("button", { name: "Start investigation" }).click();
+  await expect(page.getByTestId("proposal")).toBeVisible({ timeout: 120_000 });
+  await expect(page.getByTestId("proposal")).toContainText(/Ready to run|Lista para ejecutar/);
+  await expect(page.getByText(/Selected: Colombia/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Remove Near-surface air temperature (2 m)" }).first()).toBeVisible();
+  await page.getByTestId("run-button").click();
+  await expect(page.getByTestId("results")).toBeVisible({ timeout: 200_000 });
+  const explanation = page.getByTestId("explanation");
+  await expect(explanation).toContainText(/What the chart shows/, { timeout: 90_000 });
+  await expect(explanation).toContainText(/figures checked against the computed results/);
+  await explanation.getByRole("button", { name: "Español" }).click();
+  await expect(explanation).toContainText(/Qué muestra el gráfico/, { timeout: 90_000 });
+  await page.screenshot({ path: "docs/benchmarks/screenshots/t6-guided-desktop.png", fullPage: true });
+});
