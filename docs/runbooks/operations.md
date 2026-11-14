@@ -18,6 +18,12 @@ Structured log events (all JSON, credentials and codes redacted by `src/lib/log.
 Useful queries (Vercel MCP `get_runtime_logs` or dashboard): `query: "run.failed"`, `query: "run.read.failed"`
 (per-source errors), `query: "ai.usage"` (spend), `level: ["error"]`.
 
+Plan limits observed (2026-11-14): the team is on Vercel **Hobby** — runtime logs are retained for 1 hour
+(queries beyond that return HTTP 400), and `maxDuration = 300` is accepted for route handlers (the 720-read
+production discovery run finished in one 146 s invocation). For longer retention, add a log drain or upgrade.
+Verified event on production: `agent.explain.ok` (run `55db4e8b…`, verified 51, unverified 0) at 22:50 UTC; no
+`error`-level records in the preceding 30 minutes.
+
 ## Alerts (to configure in Vercel; plan-dependent)
 
 | Alert | Condition | Action |
