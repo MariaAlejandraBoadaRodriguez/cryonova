@@ -104,6 +104,7 @@ export const aiUsage = pgTable(
     ok: boolean("ok").notNull(),
     latencyMs: integer("latency_ms").notNull().default(0),
     error: text("error"),
+    clientKey: text("client_key"),
   },
-  (t) => [index("ai_usage_created_idx").on(t.createdAt)],
+  (t) => [index("ai_usage_created_idx").on(t.createdAt), index("ai_usage_client_created_idx").on(t.clientKey, t.createdAt)],
 );
