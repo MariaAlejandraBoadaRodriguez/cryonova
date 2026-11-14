@@ -31,6 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <nav aria-label="Main">
               <Link href="/investigate">New investigation</Link>
               <Link href="/#open-with-code">Open with code</Link>
+              <Link href="/sources">Data sources</Link>
             </nav>
           </div>
         </header>
