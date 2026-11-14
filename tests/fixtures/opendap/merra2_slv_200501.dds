@@ -1,0 +1,757 @@
+Dataset {
+    Float64 lon[lon = 576];
+    Int32 time[time = 1];
+    Float64 lat[lat = 361];
+    Grid {
+      Array:
+        Float32 Var_Q850[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_Q850;
+    Grid {
+      Array:
+        Float32 TROPT[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TROPT;
+    Grid {
+      Array:
+        Float32 TROPPB[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TROPPB;
+    Grid {
+      Array:
+        Float32 Var_V2M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_V2M;
+    Grid {
+      Array:
+        Float32 Var_TROPT[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TROPT;
+    Grid {
+      Array:
+        Float32 T2M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } T2M;
+    Grid {
+      Array:
+        Float32 Var_U2M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_U2M;
+    Grid {
+      Array:
+        Float32 TQL[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TQL;
+    Grid {
+      Array:
+        Float32 T500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } T500;
+    Grid {
+      Array:
+        Float32 TOX[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TOX;
+    Grid {
+      Array:
+        Float32 U2M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } U2M;
+    Grid {
+      Array:
+        Float32 U850[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } U850;
+    Grid {
+      Array:
+        Float32 PS[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } PS;
+    Grid {
+      Array:
+        Float32 V850[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } V850;
+    Grid {
+      Array:
+        Float32 Var_T250[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_T250;
+    Grid {
+      Array:
+        Float32 Var_QV10M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_QV10M;
+    Grid {
+      Array:
+        Float32 Var_U10M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_U10M;
+    Grid {
+      Array:
+        Float32 OMEGA500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } OMEGA500;
+    Grid {
+      Array:
+        Float32 H250[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } H250;
+    Grid {
+      Array:
+        Float32 Q250[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Q250;
+    Grid {
+      Array:
+        Float32 T2MDEW[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } T2MDEW;
+    Grid {
+      Array:
+        Float32 Var_TO3[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TO3;
+    Grid {
+      Array:
+        Float32 PBLTOP[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } PBLTOP;
+    Grid {
+      Array:
+        Float32 Var_V10M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_V10M;
+    Grid {
+      Array:
+        Float32 Var_H250[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_H250;
+    Grid {
+      Array:
+        Float32 CLDPRS[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } CLDPRS;
+    Grid {
+      Array:
+        Float32 Var_TOX[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TOX;
+    Grid {
+      Array:
+        Float32 Var_U850[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_U850;
+    Grid {
+      Array:
+        Float32 V50M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } V50M;
+    Grid {
+      Array:
+        Float32 Q500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Q500;
+    Grid {
+      Array:
+        Float32 Var_TQL[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TQL;
+    Grid {
+      Array:
+        Float32 Var_TQV[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TQV;
+    Grid {
+      Array:
+        Float32 DISPH[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } DISPH;
+    Grid {
+      Array:
+        Float32 Var_U50M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_U50M;
+    Grid {
+      Array:
+        Float32 Var_V50M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_V50M;
+    Grid {
+      Array:
+        Float32 Var_Q250[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_Q250;
+    Grid {
+      Array:
+        Float32 Var_T2M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_T2M;
+    Grid {
+      Array:
+        Float32 H1000[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } H1000;
+    Grid {
+      Array:
+        Float32 TO3[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TO3;
+    Grid {
+      Array:
+        Float32 Var_T850[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_T850;
+    Grid {
+      Array:
+        Float32 Var_QV2M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_QV2M;
+    Grid {
+      Array:
+        Float32 Var_PBLTOP[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_PBLTOP;
+    Grid {
+      Array:
+        Float32 TS[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TS;
+    Grid {
+      Array:
+        Float32 T10M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } T10M;
+    Grid {
+      Array:
+        Float32 TROPPT[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TROPPT;
+    Grid {
+      Array:
+        Float32 Var_H500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_H500;
+    Grid {
+      Array:
+        Float32 TQI[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TQI;
+    Grid {
+      Array:
+        Float32 SLP[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } SLP;
+    Grid {
+      Array:
+        Float32 Var_V850[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_V850;
+    Grid {
+      Array:
+        Float32 V250[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } V250;
+    Grid {
+      Array:
+        Float32 U250[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } U250;
+    Grid {
+      Array:
+        Float32 Var_DISPH[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_DISPH;
+    Grid {
+      Array:
+        Float32 Q850[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Q850;
+    Grid {
+      Array:
+        Float32 Var_SLP[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_SLP;
+    Grid {
+      Array:
+        Float32 Var_U250[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_U250;
+    Grid {
+      Array:
+        Float32 ZLCL[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } ZLCL;
+    Grid {
+      Array:
+        Float32 Var_TROPPV[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TROPPV;
+    Grid {
+      Array:
+        Float32 TQV[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TQV;
+    Grid {
+      Array:
+        Float32 Var_TQI[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TQI;
+    Grid {
+      Array:
+        Float32 V2M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } V2M;
+    Grid {
+      Array:
+        Float32 T250[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } T250;
+    Grid {
+      Array:
+        Float32 Var_CLDTMP[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_CLDTMP;
+    Grid {
+      Array:
+        Float32 TROPQ[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TROPQ;
+    Grid {
+      Array:
+        Float32 V10M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } V10M;
+    Grid {
+      Array:
+        Float32 Var_V500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_V500;
+    Grid {
+      Array:
+        Float32 H850[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } H850;
+    Grid {
+      Array:
+        Float32 Var_H850[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_H850;
+    Grid {
+      Array:
+        Float32 T850[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } T850;
+    Grid {
+      Array:
+        Float32 Var_H1000[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_H1000;
+    Grid {
+      Array:
+        Float32 Var_U500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_U500;
+    Grid {
+      Array:
+        Float32 Var_CLDPRS[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_CLDPRS;
+    Grid {
+      Array:
+        Float32 Var_T10M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_T10M;
+    Grid {
+      Array:
+        Float32 U50M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } U50M;
+    Grid {
+      Array:
+        Float32 U10M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } U10M;
+    Grid {
+      Array:
+        Float32 Var_Q500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_Q500;
+    Grid {
+      Array:
+        Float32 QV2M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } QV2M;
+    Grid {
+      Array:
+        Float32 Var_ZLCL[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_ZLCL;
+    Grid {
+      Array:
+        Float32 Var_T2MWET[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_T2MWET;
+    Grid {
+      Array:
+        Float32 CLDTMP[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } CLDTMP;
+    Grid {
+      Array:
+        Float32 Var_TROPPB[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TROPPB;
+    Grid {
+      Array:
+        Float32 TROPPV[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } TROPPV;
+    Grid {
+      Array:
+        Float32 Var_TROPQ[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TROPQ;
+    Grid {
+      Array:
+        Float32 Var_TROPPT[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TROPPT;
+    Grid {
+      Array:
+        Float32 Var_T500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_T500;
+    Grid {
+      Array:
+        Float32 H500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } H500;
+    Grid {
+      Array:
+        Float32 Var_OMEGA500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_OMEGA500;
+    Grid {
+      Array:
+        Float32 V500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } V500;
+    Grid {
+      Array:
+        Float32 T2MWET[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } T2MWET;
+    Grid {
+      Array:
+        Float32 U500[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } U500;
+    Grid {
+      Array:
+        Float32 Var_PS[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_PS;
+    Grid {
+      Array:
+        Float32 QV10M[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } QV10M;
+    Grid {
+      Array:
+        Float32 Var_V250[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_V250;
+    Grid {
+      Array:
+        Float32 Var_T2MDEW[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_T2MDEW;
+    Grid {
+      Array:
+        Float32 Var_TS[time = 1][lat = 361][lon = 576];
+      Maps:
+        Int32 time[time = 1];
+        Float64 lat[lat = 361];
+        Float64 lon[lon = 576];
+    } Var_TS;
+} MERRA2_300.tavgM_2d_slv_Nx.200501.nc4;

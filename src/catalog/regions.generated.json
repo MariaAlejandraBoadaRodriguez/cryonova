@@ -1,0 +1,3397 @@
+{
+ "source": "Natural Earth 110m via world-atlas@2.0.2; names via i18n-iso-countries@7.14.0",
+ "countries": [
+  {
+   "id": "country:AF",
+   "kind": "country",
+   "iso2": "AF",
+   "names": {
+    "en": "Afghanistan",
+    "es": "Afganistán"
+   },
+   "aliases": [
+    "AF",
+    "AFG"
+   ],
+   "bbox": {
+    "west": 60.53,
+    "south": 29.32,
+    "east": 75.16,
+    "north": 38.49
+   }
+  },
+  {
+   "id": "country:AL",
+   "kind": "country",
+   "iso2": "AL",
+   "names": {
+    "en": "Albania",
+    "es": "Albania"
+   },
+   "aliases": [
+    "AL",
+    "ALB"
+   ],
+   "bbox": {
+    "west": 19.31,
+    "south": 39.63,
+    "east": 21.02,
+    "north": 42.69
+   }
+  },
+  {
+   "id": "country:DZ",
+   "kind": "country",
+   "iso2": "DZ",
+   "names": {
+    "en": "Algeria",
+    "es": "Argelia"
+   },
+   "aliases": [
+    "DZ",
+    "DZA"
+   ],
+   "bbox": {
+    "west": -8.68,
+    "south": 19.06,
+    "east": 12,
+    "north": 37.12
+   }
+  },
+  {
+   "id": "country:AO",
+   "kind": "country",
+   "iso2": "AO",
+   "names": {
+    "en": "Angola",
+    "es": "Angola"
+   },
+   "aliases": [
+    "AO",
+    "AGO"
+   ],
+   "bbox": {
+    "west": 11.64,
+    "south": -17.93,
+    "east": 24.08,
+    "north": -4.44
+   }
+  },
+  {
+   "id": "country:AQ",
+   "kind": "country",
+   "iso2": "AQ",
+   "names": {
+    "en": "Antarctica",
+    "es": "Antártida"
+   },
+   "aliases": [
+    "AQ",
+    "ATA"
+   ],
+   "bbox": {
+    "west": -180,
+    "south": -85.61,
+    "east": 180,
+    "north": -63.27
+   }
+  },
+  {
+   "id": "country:AR",
+   "kind": "country",
+   "iso2": "AR",
+   "names": {
+    "en": "Argentina",
+    "es": "Argentina"
+   },
+   "aliases": [
+    "AR",
+    "ARG"
+   ],
+   "bbox": {
+    "west": -73.41,
+    "south": -55.25,
+    "east": -53.63,
+    "north": -21.83
+   }
+  },
+  {
+   "id": "country:AM",
+   "kind": "country",
+   "iso2": "AM",
+   "names": {
+    "en": "Armenia",
+    "es": "Armenia"
+   },
+   "aliases": [
+    "AM",
+    "ARM"
+   ],
+   "bbox": {
+    "west": 43.58,
+    "south": 38.74,
+    "east": 46.51,
+    "north": 41.25
+   }
+  },
+  {
+   "id": "country:AU",
+   "kind": "country",
+   "iso2": "AU",
+   "names": {
+    "en": "Australia",
+    "es": "Australia"
+   },
+   "aliases": [
+    "AU",
+    "AUS"
+   ],
+   "bbox": {
+    "west": 113.34,
+    "south": -43.64,
+    "east": 153.57,
+    "north": -10.67
+   }
+  },
+  {
+   "id": "country:AT",
+   "kind": "country",
+   "iso2": "AT",
+   "names": {
+    "en": "Austria",
+    "es": "Austria"
+   },
+   "aliases": [
+    "AT",
+    "AUT"
+   ],
+   "bbox": {
+    "west": 9.48,
+    "south": 46.43,
+    "east": 16.98,
+    "north": 49.04
+   }
+  },
+  {
+   "id": "country:AZ",
+   "kind": "country",
+   "iso2": "AZ",
+   "names": {
+    "en": "Azerbaijan",
+    "es": "Azerbaiyán"
+   },
+   "aliases": [
+    "AZ",
+    "AZE"
+   ],
+   "bbox": {
+    "west": 44.79,
+    "south": 38.27,
+    "east": 50.39,
+    "north": 41.86
+   }
+  },
+  {
+   "id": "country:BS",
+   "kind": "country",
+   "iso2": "BS",
+   "names": {
+    "en": "Bahamas",
+    "es": "Bahamas"
+   },
+   "aliases": [
+    "BS",
+    "BHS"
+   ],
+   "bbox": {
+    "west": -78.98,
+    "south": 23.71,
+    "east": -77,
+    "north": 27.04
+   }
+  },
+  {
+   "id": "country:BD",
+   "kind": "country",
+   "iso2": "BD",
+   "names": {
+    "en": "Bangladesh",
+    "es": "Bangladesh"
+   },
+   "aliases": [
+    "BD",
+    "BGD"
+   ],
+   "bbox": {
+    "west": 88.08,
+    "south": 20.67,
+    "east": 92.67,
+    "north": 26.45
+   }
+  },
+  {
+   "id": "country:BY",
+   "kind": "country",
+   "iso2": "BY",
+   "names": {
+    "en": "Belarus",
+    "es": "Bielorrusia"
+   },
+   "aliases": [
+    "BY",
+    "BLR"
+   ],
+   "bbox": {
+    "west": 23.2,
+    "south": 51.32,
+    "east": 32.69,
+    "north": 56.17
+   }
+  },
+  {
+   "id": "country:BE",
+   "kind": "country",
+   "iso2": "BE",
+   "names": {
+    "en": "Belgium",
+    "es": "Bélgica"
+   },
+   "aliases": [
+    "BE",
+    "BEL"
+   ],
+   "bbox": {
+    "west": 2.52,
+    "south": 49.53,
+    "east": 6.16,
+    "north": 51.47
+   }
+  },
+  {
+   "id": "country:BZ",
+   "kind": "country",
+   "iso2": "BZ",
+   "names": {
+    "en": "Belize",
+    "es": "Belice"
+   },
+   "aliases": [
+    "BZ",
+    "BLZ"
+   ],
+   "bbox": {
+    "west": -89.23,
+    "south": 15.89,
+    "east": -88.1,
+    "north": 18.5
+   }
+  },
+  {
+   "id": "country:BJ",
+   "kind": "country",
+   "iso2": "BJ",
+   "names": {
+    "en": "Benin",
+    "es": "Benin"
+   },
+   "aliases": [
+    "BJ",
+    "BEN"
+   ],
+   "bbox": {
+    "west": 0.77,
+    "south": 6.14,
+    "east": 3.8,
+    "north": 12.24
+   }
+  },
+  {
+   "id": "country:BT",
+   "kind": "country",
+   "iso2": "BT",
+   "names": {
+    "en": "Bhutan",
+    "es": "Bután"
+   },
+   "aliases": [
+    "BT",
+    "BTN"
+   ],
+   "bbox": {
+    "west": 88.82,
+    "south": 26.72,
+    "east": 92.11,
+    "north": 28.3
+   }
+  },
+  {
+   "id": "country:BO",
+   "kind": "country",
+   "iso2": "BO",
+   "names": {
+    "en": "Bolivia",
+    "es": "Bolivia"
+   },
+   "aliases": [
+    "BO",
+    "BOL"
+   ],
+   "bbox": {
+    "west": -69.59,
+    "south": -22.87,
+    "east": -57.5,
+    "north": -9.76
+   }
+  },
+  {
+   "id": "country:BA",
+   "kind": "country",
+   "iso2": "BA",
+   "names": {
+    "en": "Bosnia and Herzegovina",
+    "es": "Bosnia y Herzegovina"
+   },
+   "aliases": [
+    "Bosnia and Herz.",
+    "BA",
+    "BIH"
+   ],
+   "bbox": {
+    "west": 15.75,
+    "south": 42.65,
+    "east": 19.6,
+    "north": 45.23
+   }
+  },
+  {
+   "id": "country:BW",
+   "kind": "country",
+   "iso2": "BW",
+   "names": {
+    "en": "Botswana",
+    "es": "Botswana"
+   },
+   "aliases": [
+    "BW",
+    "BWA"
+   ],
+   "bbox": {
+    "west": 19.9,
+    "south": -26.83,
+    "east": 29.43,
+    "north": -17.66
+   }
+  },
+  {
+   "id": "country:BR",
+   "kind": "country",
+   "iso2": "BR",
+   "names": {
+    "en": "Brazil",
+    "es": "Brasil"
+   },
+   "aliases": [
+    "BR",
+    "BRA"
+   ],
+   "bbox": {
+    "west": -73.99,
+    "south": -33.77,
+    "east": -34.73,
+    "north": 5.24
+   }
+  },
+  {
+   "id": "country:BN",
+   "kind": "country",
+   "iso2": "BN",
+   "names": {
+    "en": "Brunei Darussalam",
+    "es": "Brunei Darussalam"
+   },
+   "aliases": [
+    "Brunei",
+    "BN",
+    "BRN"
+   ],
+   "bbox": {
+    "west": 114.21,
+    "south": 4.01,
+    "east": 115.45,
+    "north": 5.45
+   }
+  },
+  {
+   "id": "country:BG",
+   "kind": "country",
+   "iso2": "BG",
+   "names": {
+    "en": "Bulgaria",
+    "es": "Bulgaria"
+   },
+   "aliases": [
+    "BG",
+    "BGR"
+   ],
+   "bbox": {
+    "west": 22.38,
+    "south": 41.23,
+    "east": 28.56,
+    "north": 44.24
+   }
+  },
+  {
+   "id": "country:BF",
+   "kind": "country",
+   "iso2": "BF",
+   "names": {
+    "en": "Burkina Faso",
+    "es": "Burkina Faso"
+   },
+   "aliases": [
+    "BF",
+    "BFA"
+   ],
+   "bbox": {
+    "west": -5.47,
+    "south": 9.61,
+    "east": 2.18,
+    "north": 15.12
+   }
+  },
+  {
+   "id": "country:BI",
+   "kind": "country",
+   "iso2": "BI",
+   "names": {
+    "en": "Burundi",
+    "es": "Burundi"
+   },
+   "aliases": [
+    "BI",
+    "BDI"
+   ],
+   "bbox": {
+    "west": 29.03,
+    "south": -4.5,
+    "east": 30.75,
+    "north": -2.35
+   }
+  },
+  {
+   "id": "country:KH",
+   "kind": "country",
+   "iso2": "KH",
+   "names": {
+    "en": "Cambodia",
+    "es": "Camboya"
+   },
+   "aliases": [
+    "KH",
+    "KHM"
+   ],
+   "bbox": {
+    "west": 102.35,
+    "south": 10.49,
+    "east": 107.61,
+    "north": 14.57
+   }
+  },
+  {
+   "id": "country:CM",
+   "kind": "country",
+   "iso2": "CM",
+   "names": {
+    "en": "Cameroon",
+    "es": "Camerún"
+   },
+   "aliases": [
+    "CM",
+    "CMR"
+   ],
+   "bbox": {
+    "west": 8.49,
+    "south": 1.73,
+    "east": 16.01,
+    "north": 12.86
+   }
+  },
+  {
+   "id": "country:CA",
+   "kind": "country",
+   "iso2": "CA",
+   "names": {
+    "en": "Canada",
+    "es": "Canadá"
+   },
+   "aliases": [
+    "CA",
+    "CAN"
+   ],
+   "bbox": {
+    "west": -141,
+    "south": 41.67,
+    "east": -52.65,
+    "north": 83.23
+   }
+  },
+  {
+   "id": "country:CF",
+   "kind": "country",
+   "iso2": "CF",
+   "names": {
+    "en": "Central African Republic",
+    "es": "República Centroafricana"
+   },
+   "aliases": [
+    "Central African Rep.",
+    "CF",
+    "CAF"
+   ],
+   "bbox": {
+    "west": 14.46,
+    "south": 2.27,
+    "east": 27.37,
+    "north": 11.14
+   }
+  },
+  {
+   "id": "country:TD",
+   "kind": "country",
+   "iso2": "TD",
+   "names": {
+    "en": "Chad",
+    "es": "Chad"
+   },
+   "aliases": [
+    "TD",
+    "TCD"
+   ],
+   "bbox": {
+    "west": 13.54,
+    "south": 7.42,
+    "east": 23.89,
+    "north": 23.41
+   }
+  },
+  {
+   "id": "country:CL",
+   "kind": "country",
+   "iso2": "CL",
+   "names": {
+    "en": "Chile",
+    "es": "Chile"
+   },
+   "aliases": [
+    "CL",
+    "CHL"
+   ],
+   "bbox": {
+    "west": -75.65,
+    "south": -55.61,
+    "east": -66.96,
+    "north": -17.58
+   }
+  },
+  {
+   "id": "country:CO",
+   "kind": "country",
+   "iso2": "CO",
+   "names": {
+    "en": "Colombia",
+    "es": "Colombia"
+   },
+   "aliases": [
+    "CO",
+    "COL"
+   ],
+   "bbox": {
+    "west": -78.99,
+    "south": -4.3,
+    "east": -66.88,
+    "north": 12.44
+   }
+  },
+  {
+   "id": "country:CR",
+   "kind": "country",
+   "iso2": "CR",
+   "names": {
+    "en": "Costa Rica",
+    "es": "Costa Rica"
+   },
+   "aliases": [
+    "CR",
+    "CRI"
+   ],
+   "bbox": {
+    "west": -85.94,
+    "south": 8.22,
+    "east": -82.55,
+    "north": 11.22
+   }
+  },
+  {
+   "id": "country:CI",
+   "kind": "country",
+   "iso2": "CI",
+   "names": {
+    "en": "Cote d'Ivoire",
+    "es": "Costa de Marfil"
+   },
+   "aliases": [
+    "Côte d'Ivoire",
+    "Ivory Coast",
+    "CI",
+    "CIV"
+   ],
+   "bbox": {
+    "west": -8.6,
+    "south": 4.34,
+    "east": -2.56,
+    "north": 10.52
+   }
+  },
+  {
+   "id": "country:HR",
+   "kind": "country",
+   "iso2": "HR",
+   "names": {
+    "en": "Croatia",
+    "es": "Croacia"
+   },
+   "aliases": [
+    "HR",
+    "HRV"
+   ],
+   "bbox": {
+    "west": 13.66,
+    "south": 42.48,
+    "east": 19.39,
+    "north": 46.5
+   }
+  },
+  {
+   "id": "country:CU",
+   "kind": "country",
+   "iso2": "CU",
+   "names": {
+    "en": "Cuba",
+    "es": "Cuba"
+   },
+   "aliases": [
+    "CU",
+    "CUB"
+   ],
+   "bbox": {
+    "west": -84.97,
+    "south": 19.86,
+    "east": -74.18,
+    "north": 23.19
+   }
+  },
+  {
+   "id": "country:CY",
+   "kind": "country",
+   "iso2": "CY",
+   "names": {
+    "en": "Cyprus",
+    "es": "Chipre"
+   },
+   "aliases": [
+    "CY",
+    "CYP"
+   ],
+   "bbox": {
+    "west": 32.26,
+    "south": 34.57,
+    "east": 34,
+    "north": 35.17
+   }
+  },
+  {
+   "id": "country:CZ",
+   "kind": "country",
+   "iso2": "CZ",
+   "names": {
+    "en": "Czech Republic",
+    "es": "República Checa"
+   },
+   "aliases": [
+    "Czechia",
+    "CZ",
+    "CZE"
+   ],
+   "bbox": {
+    "west": 12.24,
+    "south": 48.56,
+    "east": 18.85,
+    "north": 51.12
+   }
+  },
+  {
+   "id": "country:CD",
+   "kind": "country",
+   "iso2": "CD",
+   "names": {
+    "en": "Democratic Republic of the Congo",
+    "es": "Congo (República Democrática del)"
+   },
+   "aliases": [
+    "Dem. Rep. Congo",
+    "Congo",
+    "CD",
+    "COD"
+   ],
+   "bbox": {
+    "west": 12.18,
+    "south": -13.26,
+    "east": 31.18,
+    "north": 5.26
+   }
+  },
+  {
+   "id": "country:DK",
+   "kind": "country",
+   "iso2": "DK",
+   "names": {
+    "en": "Denmark",
+    "es": "Dinamarca"
+   },
+   "aliases": [
+    "DK",
+    "DNK"
+   ],
+   "bbox": {
+    "west": 8.09,
+    "south": 54.8,
+    "east": 12.69,
+    "north": 57.73
+   }
+  },
+  {
+   "id": "country:DJ",
+   "kind": "country",
+   "iso2": "DJ",
+   "names": {
+    "en": "Djibouti",
+    "es": "Yibuti"
+   },
+   "aliases": [
+    "DJ",
+    "DJI"
+   ],
+   "bbox": {
+    "west": 41.66,
+    "south": 10.93,
+    "east": 43.32,
+    "north": 12.7
+   }
+  },
+  {
+   "id": "country:DO",
+   "kind": "country",
+   "iso2": "DO",
+   "names": {
+    "en": "Dominican Republic",
+    "es": "República Dominicana"
+   },
+   "aliases": [
+    "Dominican Rep.",
+    "DO",
+    "DOM"
+   ],
+   "bbox": {
+    "west": -71.94,
+    "south": 17.6,
+    "east": -68.32,
+    "north": 19.88
+   }
+  },
+  {
+   "id": "country:EC",
+   "kind": "country",
+   "iso2": "EC",
+   "names": {
+    "en": "Ecuador",
+    "es": "Ecuador"
+   },
+   "aliases": [
+    "EC",
+    "ECU"
+   ],
+   "bbox": {
+    "west": -80.97,
+    "south": -4.96,
+    "east": -75.23,
+    "north": 1.38
+   }
+  },
+  {
+   "id": "country:EG",
+   "kind": "country",
+   "iso2": "EG",
+   "names": {
+    "en": "Egypt",
+    "es": "Egipto"
+   },
+   "aliases": [
+    "EG",
+    "EGY"
+   ],
+   "bbox": {
+    "west": 24.7,
+    "south": 22,
+    "east": 36.87,
+    "north": 31.59
+   }
+  },
+  {
+   "id": "country:SV",
+   "kind": "country",
+   "iso2": "SV",
+   "names": {
+    "en": "El Salvador",
+    "es": "El Salvador"
+   },
+   "aliases": [
+    "SV",
+    "SLV"
+   ],
+   "bbox": {
+    "west": -90.1,
+    "south": 13.15,
+    "east": -87.72,
+    "north": 14.42
+   }
+  },
+  {
+   "id": "country:GQ",
+   "kind": "country",
+   "iso2": "GQ",
+   "names": {
+    "en": "Equatorial Guinea",
+    "es": "Guinea Ecuatorial"
+   },
+   "aliases": [
+    "Eq. Guinea",
+    "GQ",
+    "GNQ"
+   ],
+   "bbox": {
+    "west": 9.3,
+    "south": 1.01,
+    "east": 11.28,
+    "north": 2.28
+   }
+  },
+  {
+   "id": "country:ER",
+   "kind": "country",
+   "iso2": "ER",
+   "names": {
+    "en": "Eritrea",
+    "es": "Eritrea"
+   },
+   "aliases": [
+    "ER",
+    "ERI"
+   ],
+   "bbox": {
+    "west": 36.32,
+    "south": 12.46,
+    "east": 43.08,
+    "north": 18
+   }
+  },
+  {
+   "id": "country:EE",
+   "kind": "country",
+   "iso2": "EE",
+   "names": {
+    "en": "Estonia",
+    "es": "Estonia"
+   },
+   "aliases": [
+    "EE",
+    "EST"
+   ],
+   "bbox": {
+    "west": 23.34,
+    "south": 57.47,
+    "east": 28.13,
+    "north": 59.61
+   }
+  },
+  {
+   "id": "country:SZ",
+   "kind": "country",
+   "iso2": "SZ",
+   "names": {
+    "en": "Eswatini",
+    "es": "Esuatini"
+   },
+   "aliases": [
+    "eSwatini",
+    "SZ",
+    "SWZ"
+   ],
+   "bbox": {
+    "west": 30.68,
+    "south": -27.29,
+    "east": 32.07,
+    "north": -25.66
+   }
+  },
+  {
+   "id": "country:ET",
+   "kind": "country",
+   "iso2": "ET",
+   "names": {
+    "en": "Ethiopia",
+    "es": "Etiopía"
+   },
+   "aliases": [
+    "ET",
+    "ETH"
+   ],
+   "bbox": {
+    "west": 32.95,
+    "south": 3.42,
+    "east": 47.79,
+    "north": 14.96
+   }
+  },
+  {
+   "id": "country:FK",
+   "kind": "country",
+   "iso2": "FK",
+   "names": {
+    "en": "Falkland Islands (Malvinas)",
+    "es": "Islas Malvinas"
+   },
+   "aliases": [
+    "Falkland Is.",
+    "FK",
+    "FLK"
+   ],
+   "bbox": {
+    "west": -61.2,
+    "south": -52.3,
+    "east": -57.75,
+    "north": -51.1
+   }
+  },
+  {
+   "id": "country:FJ",
+   "kind": "country",
+   "iso2": "FJ",
+   "names": {
+    "en": "Fiji",
+    "es": "Fiji"
+   },
+   "aliases": [
+    "FJ",
+    "FJI"
+   ],
+   "bbox": {
+    "west": 177.29,
+    "south": -18.29,
+    "east": -179.79,
+    "north": -16.02
+   }
+  },
+  {
+   "id": "country:FI",
+   "kind": "country",
+   "iso2": "FI",
+   "names": {
+    "en": "Finland",
+    "es": "Finlandia"
+   },
+   "aliases": [
+    "FI",
+    "FIN"
+   ],
+   "bbox": {
+    "west": 20.64,
+    "south": 59.85,
+    "east": 31.52,
+    "north": 70.16
+   }
+  },
+  {
+   "id": "country:FR",
+   "kind": "country",
+   "iso2": "FR",
+   "names": {
+    "en": "France",
+    "es": "Francia"
+   },
+   "aliases": [
+    "FR",
+    "FRA"
+   ],
+   "bbox": {
+    "west": -54.52,
+    "south": 2.05,
+    "east": 9.56,
+    "north": 51.15
+   }
+  },
+  {
+   "id": "country:TF",
+   "kind": "country",
+   "iso2": "TF",
+   "names": {
+    "en": "French Southern Territories",
+    "es": "Tierras Australes Francesas"
+   },
+   "aliases": [
+    "Fr. S. Antarctic Lands",
+    "TF",
+    "ATF"
+   ],
+   "bbox": {
+    "west": 68.72,
+    "south": -49.77,
+    "east": 70.56,
+    "north": -48.62
+   }
+  },
+  {
+   "id": "country:GA",
+   "kind": "country",
+   "iso2": "GA",
+   "names": {
+    "en": "Gabon",
+    "es": "Gabón"
+   },
+   "aliases": [
+    "GA",
+    "GAB"
+   ],
+   "bbox": {
+    "west": 8.8,
+    "south": -3.98,
+    "east": 14.43,
+    "north": 2.33
+   }
+  },
+  {
+   "id": "country:GE",
+   "kind": "country",
+   "iso2": "GE",
+   "names": {
+    "en": "Georgia",
+    "es": "Georgia"
+   },
+   "aliases": [
+    "GE",
+    "GEO"
+   ],
+   "bbox": {
+    "west": 39.96,
+    "south": 41.06,
+    "east": 46.64,
+    "north": 43.55
+   }
+  },
+  {
+   "id": "country:DE",
+   "kind": "country",
+   "iso2": "DE",
+   "names": {
+    "en": "Germany",
+    "es": "Alemania"
+   },
+   "aliases": [
+    "DE",
+    "DEU"
+   ],
+   "bbox": {
+    "west": 5.99,
+    "south": 47.3,
+    "east": 15.02,
+    "north": 54.98
+   }
+  },
+  {
+   "id": "country:GH",
+   "kind": "country",
+   "iso2": "GH",
+   "names": {
+    "en": "Ghana",
+    "es": "Ghana"
+   },
+   "aliases": [
+    "GH",
+    "GHA"
+   ],
+   "bbox": {
+    "west": -3.24,
+    "south": 4.71,
+    "east": 1.06,
+    "north": 11.1
+   }
+  },
+  {
+   "id": "country:GR",
+   "kind": "country",
+   "iso2": "GR",
+   "names": {
+    "en": "Greece",
+    "es": "Grecia"
+   },
+   "aliases": [
+    "GR",
+    "GRC"
+   ],
+   "bbox": {
+    "west": 20.15,
+    "south": 34.92,
+    "east": 26.6,
+    "north": 41.83
+   }
+  },
+  {
+   "id": "country:GL",
+   "kind": "country",
+   "iso2": "GL",
+   "names": {
+    "en": "Greenland",
+    "es": "Groenlandia"
+   },
+   "aliases": [
+    "GL",
+    "GRL"
+   ],
+   "bbox": {
+    "west": -73.3,
+    "south": 60.04,
+    "east": -12.21,
+    "north": 83.65
+   }
+  },
+  {
+   "id": "country:GT",
+   "kind": "country",
+   "iso2": "GT",
+   "names": {
+    "en": "Guatemala",
+    "es": "Guatemala"
+   },
+   "aliases": [
+    "GT",
+    "GTM"
+   ],
+   "bbox": {
+    "west": -92.23,
+    "south": 13.74,
+    "east": -88.22,
+    "north": 17.82
+   }
+  },
+  {
+   "id": "country:GN",
+   "kind": "country",
+   "iso2": "GN",
+   "names": {
+    "en": "Guinea",
+    "es": "Guinea"
+   },
+   "aliases": [
+    "GN",
+    "GIN"
+   ],
+   "bbox": {
+    "west": -15.13,
+    "south": 7.31,
+    "east": -7.83,
+    "north": 12.59
+   }
+  },
+  {
+   "id": "country:GW",
+   "kind": "country",
+   "iso2": "GW",
+   "names": {
+    "en": "Guinea-Bissau",
+    "es": "Guinea Bissau"
+   },
+   "aliases": [
+    "GW",
+    "GNB"
+   ],
+   "bbox": {
+    "west": -16.68,
+    "south": 11.04,
+    "east": -13.7,
+    "north": 12.63
+   }
+  },
+  {
+   "id": "country:GY",
+   "kind": "country",
+   "iso2": "GY",
+   "names": {
+    "en": "Guyana",
+    "es": "Guyana"
+   },
+   "aliases": [
+    "GY",
+    "GUY"
+   ],
+   "bbox": {
+    "west": -61.41,
+    "south": 1.27,
+    "east": -56.54,
+    "north": 8.37
+   }
+  },
+  {
+   "id": "country:HT",
+   "kind": "country",
+   "iso2": "HT",
+   "names": {
+    "en": "Haiti",
+    "es": "Haití"
+   },
+   "aliases": [
+    "HT",
+    "HTI"
+   ],
+   "bbox": {
+    "west": -74.46,
+    "south": 18.03,
+    "east": -71.62,
+    "north": 19.92
+   }
+  },
+  {
+   "id": "country:HN",
+   "kind": "country",
+   "iso2": "HN",
+   "names": {
+    "en": "Honduras",
+    "es": "Honduras"
+   },
+   "aliases": [
+    "HN",
+    "HND"
+   ],
+   "bbox": {
+    "west": -89.35,
+    "south": 12.98,
+    "east": -83.15,
+    "north": 16.01
+   }
+  },
+  {
+   "id": "country:HU",
+   "kind": "country",
+   "iso2": "HU",
+   "names": {
+    "en": "Hungary",
+    "es": "Hungría"
+   },
+   "aliases": [
+    "HU",
+    "HUN"
+   ],
+   "bbox": {
+    "west": 16.2,
+    "south": 45.76,
+    "east": 22.71,
+    "north": 48.62
+   }
+  },
+  {
+   "id": "country:IS",
+   "kind": "country",
+   "iso2": "IS",
+   "names": {
+    "en": "Iceland",
+    "es": "Islandia"
+   },
+   "aliases": [
+    "IS",
+    "ISL"
+   ],
+   "bbox": {
+    "west": -24.33,
+    "south": 63.5,
+    "east": -13.61,
+    "north": 66.53
+   }
+  },
+  {
+   "id": "country:IN",
+   "kind": "country",
+   "iso2": "IN",
+   "names": {
+    "en": "India",
+    "es": "India"
+   },
+   "aliases": [
+    "IN",
+    "IND"
+   ],
+   "bbox": {
+    "west": 68.18,
+    "south": 7.97,
+    "east": 97.4,
+    "north": 35.49
+   }
+  },
+  {
+   "id": "country:ID",
+   "kind": "country",
+   "iso2": "ID",
+   "names": {
+    "en": "Indonesia",
+    "es": "Indonesia"
+   },
+   "aliases": [
+    "ID",
+    "IDN"
+   ],
+   "bbox": {
+    "west": 95.3,
+    "south": -10.36,
+    "east": 141.03,
+    "north": 5.48
+   }
+  },
+  {
+   "id": "country:IQ",
+   "kind": "country",
+   "iso2": "IQ",
+   "names": {
+    "en": "Iraq",
+    "es": "Iraq"
+   },
+   "aliases": [
+    "IQ",
+    "IRQ"
+   ],
+   "bbox": {
+    "west": 38.79,
+    "south": 29.1,
+    "east": 48.57,
+    "north": 37.39
+   }
+  },
+  {
+   "id": "country:IE",
+   "kind": "country",
+   "iso2": "IE",
+   "names": {
+    "en": "Ireland",
+    "es": "Irlanda"
+   },
+   "aliases": [
+    "IE",
+    "IRL"
+   ],
+   "bbox": {
+    "west": -9.98,
+    "south": 51.67,
+    "east": -6.03,
+    "north": 55.13
+   }
+  },
+  {
+   "id": "country:IR",
+   "kind": "country",
+   "iso2": "IR",
+   "names": {
+    "en": "Islamic Republic of Iran",
+    "es": "Irán"
+   },
+   "aliases": [
+    "Iran",
+    "República Islámica de Irán",
+    "IR",
+    "IRN"
+   ],
+   "bbox": {
+    "west": 44.11,
+    "south": 25.08,
+    "east": 63.32,
+    "north": 39.71
+   }
+  },
+  {
+   "id": "country:IL",
+   "kind": "country",
+   "iso2": "IL",
+   "names": {
+    "en": "Israel",
+    "es": "Israel"
+   },
+   "aliases": [
+    "IL",
+    "ISR"
+   ],
+   "bbox": {
+    "west": 34.27,
+    "south": 29.5,
+    "east": 35.84,
+    "north": 33.28
+   }
+  },
+  {
+   "id": "country:IT",
+   "kind": "country",
+   "iso2": "IT",
+   "names": {
+    "en": "Italy",
+    "es": "Italia"
+   },
+   "aliases": [
+    "IT",
+    "ITA"
+   ],
+   "bbox": {
+    "west": 6.75,
+    "south": 36.62,
+    "east": 18.48,
+    "north": 47.11
+   }
+  },
+  {
+   "id": "country:JM",
+   "kind": "country",
+   "iso2": "JM",
+   "names": {
+    "en": "Jamaica",
+    "es": "Jamaica"
+   },
+   "aliases": [
+    "JM",
+    "JAM"
+   ],
+   "bbox": {
+    "west": -78.34,
+    "south": 17.7,
+    "east": -76.2,
+    "north": 18.52
+   }
+  },
+  {
+   "id": "country:JP",
+   "kind": "country",
+   "iso2": "JP",
+   "names": {
+    "en": "Japan",
+    "es": "Japón"
+   },
+   "aliases": [
+    "JP",
+    "JPN"
+   ],
+   "bbox": {
+    "west": 129.41,
+    "south": 31.03,
+    "east": 145.54,
+    "north": 45.55
+   }
+  },
+  {
+   "id": "country:JO",
+   "kind": "country",
+   "iso2": "JO",
+   "names": {
+    "en": "Jordan",
+    "es": "Jordania"
+   },
+   "aliases": [
+    "JO",
+    "JOR"
+   ],
+   "bbox": {
+    "west": 34.92,
+    "south": 29.2,
+    "east": 39.2,
+    "north": 33.38
+   }
+  },
+  {
+   "id": "country:KZ",
+   "kind": "country",
+   "iso2": "KZ",
+   "names": {
+    "en": "Kazakhstan",
+    "es": "Kazajistán"
+   },
+   "aliases": [
+    "KZ",
+    "KAZ"
+   ],
+   "bbox": {
+    "west": 46.47,
+    "south": 40.66,
+    "east": 87.36,
+    "north": 55.38
+   }
+  },
+  {
+   "id": "country:KE",
+   "kind": "country",
+   "iso2": "KE",
+   "names": {
+    "en": "Kenya",
+    "es": "Kenia"
+   },
+   "aliases": [
+    "KE",
+    "KEN"
+   ],
+   "bbox": {
+    "west": 33.89,
+    "south": -4.68,
+    "east": 41.86,
+    "north": 5.51
+   }
+  },
+  {
+   "id": "country:kosovo",
+   "kind": "country",
+   "iso2": null,
+   "names": {
+    "en": "Kosovo",
+    "es": "Kosovo"
+   },
+   "aliases": [],
+   "bbox": {
+    "west": 20.07,
+    "south": 41.85,
+    "east": 21.78,
+    "north": 43.27
+   }
+  },
+  {
+   "id": "country:KW",
+   "kind": "country",
+   "iso2": "KW",
+   "names": {
+    "en": "Kuwait",
+    "es": "Kuwait"
+   },
+   "aliases": [
+    "KW",
+    "KWT"
+   ],
+   "bbox": {
+    "west": 46.57,
+    "south": 28.53,
+    "east": 48.42,
+    "north": 30.06
+   }
+  },
+  {
+   "id": "country:KG",
+   "kind": "country",
+   "iso2": "KG",
+   "names": {
+    "en": "Kyrgyzstan",
+    "es": "Kirguistán"
+   },
+   "aliases": [
+    "KG",
+    "KGZ"
+   ],
+   "bbox": {
+    "west": 69.46,
+    "south": 39.28,
+    "east": 80.26,
+    "north": 43.3
+   }
+  },
+  {
+   "id": "country:LA",
+   "kind": "country",
+   "iso2": "LA",
+   "names": {
+    "en": "Lao People's Democratic Republic",
+    "es": "República Democrática Popular de Lao"
+   },
+   "aliases": [
+    "Laos",
+    "LA",
+    "LAO"
+   ],
+   "bbox": {
+    "west": 100.12,
+    "south": 13.88,
+    "east": 107.56,
+    "north": 22.46
+   }
+  },
+  {
+   "id": "country:LV",
+   "kind": "country",
+   "iso2": "LV",
+   "names": {
+    "en": "Latvia",
+    "es": "Letonia"
+   },
+   "aliases": [
+    "LV",
+    "LVA"
+   ],
+   "bbox": {
+    "west": 21.06,
+    "south": 55.61,
+    "east": 28.18,
+    "north": 57.97
+   }
+  },
+  {
+   "id": "country:LB",
+   "kind": "country",
+   "iso2": "LB",
+   "names": {
+    "en": "Lebanon",
+    "es": "Líbano"
+   },
+   "aliases": [
+    "LB",
+    "LBN"
+   ],
+   "bbox": {
+    "west": 35.13,
+    "south": 33.09,
+    "east": 36.61,
+    "north": 34.65
+   }
+  },
+  {
+   "id": "country:LS",
+   "kind": "country",
+   "iso2": "LS",
+   "names": {
+    "en": "Lesotho",
+    "es": "Lesoto"
+   },
+   "aliases": [
+    "LS",
+    "LSO"
+   ],
+   "bbox": {
+    "west": 27,
+    "south": -30.64,
+    "east": 29.32,
+    "north": -28.65
+   }
+  },
+  {
+   "id": "country:LR",
+   "kind": "country",
+   "iso2": "LR",
+   "names": {
+    "en": "Liberia",
+    "es": "Liberia"
+   },
+   "aliases": [
+    "LR",
+    "LBR"
+   ],
+   "bbox": {
+    "west": -11.44,
+    "south": 4.36,
+    "east": -7.54,
+    "north": 8.54
+   }
+  },
+  {
+   "id": "country:LY",
+   "kind": "country",
+   "iso2": "LY",
+   "names": {
+    "en": "Libya",
+    "es": "Libia"
+   },
+   "aliases": [
+    "LY",
+    "LBY"
+   ],
+   "bbox": {
+    "west": 9.32,
+    "south": 19.58,
+    "east": 25.17,
+    "north": 33.14
+   }
+  },
+  {
+   "id": "country:LT",
+   "kind": "country",
+   "iso2": "LT",
+   "names": {
+    "en": "Lithuania",
+    "es": "Lituania"
+   },
+   "aliases": [
+    "LT",
+    "LTU"
+   ],
+   "bbox": {
+    "west": 21.06,
+    "south": 53.91,
+    "east": 26.59,
+    "north": 56.37
+   }
+  },
+  {
+   "id": "country:LU",
+   "kind": "country",
+   "iso2": "LU",
+   "names": {
+    "en": "Luxembourg",
+    "es": "Luxemburgo"
+   },
+   "aliases": [
+    "LU",
+    "LUX"
+   ],
+   "bbox": {
+    "west": 5.68,
+    "south": 49.44,
+    "east": 6.24,
+    "north": 50.13
+   }
+  },
+  {
+   "id": "country:MG",
+   "kind": "country",
+   "iso2": "MG",
+   "names": {
+    "en": "Madagascar",
+    "es": "Madagascar"
+   },
+   "aliases": [
+    "MG",
+    "MDG"
+   ],
+   "bbox": {
+    "west": 43.25,
+    "south": -25.6,
+    "east": 50.48,
+    "north": -12.04
+   }
+  },
+  {
+   "id": "country:MW",
+   "kind": "country",
+   "iso2": "MW",
+   "names": {
+    "en": "Malawi",
+    "es": "Malaui"
+   },
+   "aliases": [
+    "MW",
+    "MWI"
+   ],
+   "bbox": {
+    "west": 32.69,
+    "south": -16.8,
+    "east": 35.77,
+    "north": -9.23
+   }
+  },
+  {
+   "id": "country:MY",
+   "kind": "country",
+   "iso2": "MY",
+   "names": {
+    "en": "Malaysia",
+    "es": "Malasia"
+   },
+   "aliases": [
+    "MY",
+    "MYS"
+   ],
+   "bbox": {
+    "west": 100.09,
+    "south": 0.77,
+    "east": 119.18,
+    "north": 6.93
+   }
+  },
+  {
+   "id": "country:ML",
+   "kind": "country",
+   "iso2": "ML",
+   "names": {
+    "en": "Mali",
+    "es": "Malí"
+   },
+   "aliases": [
+    "ML",
+    "MLI"
+   ],
+   "bbox": {
+    "west": -12.17,
+    "south": 10.1,
+    "east": 4.27,
+    "north": 24.97
+   }
+  },
+  {
+   "id": "country:MR",
+   "kind": "country",
+   "iso2": "MR",
+   "names": {
+    "en": "Mauritania",
+    "es": "Mauritania"
+   },
+   "aliases": [
+    "MR",
+    "MRT"
+   ],
+   "bbox": {
+    "west": -17.06,
+    "south": 14.62,
+    "east": -4.92,
+    "north": 27.4
+   }
+  },
+  {
+   "id": "country:MX",
+   "kind": "country",
+   "iso2": "MX",
+   "names": {
+    "en": "Mexico",
+    "es": "México"
+   },
+   "aliases": [
+    "MX",
+    "MEX"
+   ],
+   "bbox": {
+    "west": -117.13,
+    "south": 14.54,
+    "east": -86.81,
+    "north": 32.72
+   }
+  },
+  {
+   "id": "country:MD",
+   "kind": "country",
+   "iso2": "MD",
+   "names": {
+    "en": "Moldova, Republic of",
+    "es": "Moldavia"
+   },
+   "aliases": [
+    "Moldova",
+    "MD",
+    "MDA"
+   ],
+   "bbox": {
+    "west": 26.62,
+    "south": 45.49,
+    "east": 30.03,
+    "north": 48.47
+   }
+  },
+  {
+   "id": "country:MN",
+   "kind": "country",
+   "iso2": "MN",
+   "names": {
+    "en": "Mongolia",
+    "es": "Mongolia"
+   },
+   "aliases": [
+    "MN",
+    "MNG"
+   ],
+   "bbox": {
+    "west": 87.75,
+    "south": 41.6,
+    "east": 119.77,
+    "north": 52.05
+   }
+  },
+  {
+   "id": "country:ME",
+   "kind": "country",
+   "iso2": "ME",
+   "names": {
+    "en": "Montenegro",
+    "es": "Montenegro"
+   },
+   "aliases": [
+    "ME",
+    "MNE"
+   ],
+   "bbox": {
+    "west": 18.45,
+    "south": 41.88,
+    "east": 20.34,
+    "north": 43.52
+   }
+  },
+  {
+   "id": "country:MA",
+   "kind": "country",
+   "iso2": "MA",
+   "names": {
+    "en": "Morocco",
+    "es": "Marruecos"
+   },
+   "aliases": [
+    "MA",
+    "MAR"
+   ],
+   "bbox": {
+    "west": -17.02,
+    "south": 21.42,
+    "east": -1.12,
+    "north": 35.76
+   }
+  },
+  {
+   "id": "country:MZ",
+   "kind": "country",
+   "iso2": "MZ",
+   "names": {
+    "en": "Mozambique",
+    "es": "Mozambique"
+   },
+   "aliases": [
+    "MZ",
+    "MOZ"
+   ],
+   "bbox": {
+    "west": 30.18,
+    "south": -26.74,
+    "east": 40.78,
+    "north": -10.32
+   }
+  },
+  {
+   "id": "country:MM",
+   "kind": "country",
+   "iso2": "MM",
+   "names": {
+    "en": "Myanmar",
+    "es": "Myanmar"
+   },
+   "aliases": [
+    "MM",
+    "MMR"
+   ],
+   "bbox": {
+    "west": 92.3,
+    "south": 9.93,
+    "east": 101.18,
+    "north": 28.34
+   }
+  },
+  {
+   "id": "country:n-cyprus",
+   "kind": "country",
+   "iso2": null,
+   "names": {
+    "en": "N. Cyprus",
+    "es": "N. Cyprus"
+   },
+   "aliases": [],
+   "bbox": {
+    "west": 32.73,
+    "south": 35,
+    "east": 34.58,
+    "north": 35.67
+   }
+  },
+  {
+   "id": "country:NA",
+   "kind": "country",
+   "iso2": "NA",
+   "names": {
+    "en": "Namibia",
+    "es": "Namibia"
+   },
+   "aliases": [
+    "NA",
+    "NAM"
+   ],
+   "bbox": {
+    "west": 11.73,
+    "south": -29.05,
+    "east": 25.08,
+    "north": -16.94
+   }
+  },
+  {
+   "id": "country:NP",
+   "kind": "country",
+   "iso2": "NP",
+   "names": {
+    "en": "Nepal",
+    "es": "Nepal"
+   },
+   "aliases": [
+    "NP",
+    "NPL"
+   ],
+   "bbox": {
+    "west": 80.09,
+    "south": 26.4,
+    "east": 88.17,
+    "north": 30.42
+   }
+  },
+  {
+   "id": "country:NL",
+   "kind": "country",
+   "iso2": "NL",
+   "names": {
+    "en": "Netherlands",
+    "es": "Países Bajos"
+   },
+   "aliases": [
+    "The Netherlands",
+    "Netherlands (Kingdom of the)",
+    "NL",
+    "NLD"
+   ],
+   "bbox": {
+    "west": 3.31,
+    "south": 50.8,
+    "east": 7.09,
+    "north": 53.51
+   }
+  },
+  {
+   "id": "country:NC",
+   "kind": "country",
+   "iso2": "NC",
+   "names": {
+    "en": "New Caledonia",
+    "es": "Nueva Caledonia"
+   },
+   "aliases": [
+    "NC",
+    "NCL"
+   ],
+   "bbox": {
+    "west": 164.03,
+    "south": -22.4,
+    "east": 167.12,
+    "north": -20.11
+   }
+  },
+  {
+   "id": "country:NZ",
+   "kind": "country",
+   "iso2": "NZ",
+   "names": {
+    "en": "New Zealand",
+    "es": "Nueva Zelanda"
+   },
+   "aliases": [
+    "NZ",
+    "NZL"
+   ],
+   "bbox": {
+    "west": 166.51,
+    "south": -46.64,
+    "east": 178.52,
+    "north": -34.45
+   }
+  },
+  {
+   "id": "country:NI",
+   "kind": "country",
+   "iso2": "NI",
+   "names": {
+    "en": "Nicaragua",
+    "es": "Nicaragua"
+   },
+   "aliases": [
+    "NI",
+    "NIC"
+   ],
+   "bbox": {
+    "west": -87.67,
+    "south": 10.73,
+    "east": -83.15,
+    "north": 15.02
+   }
+  },
+  {
+   "id": "country:NE",
+   "kind": "country",
+   "iso2": "NE",
+   "names": {
+    "en": "Niger",
+    "es": "Níger"
+   },
+   "aliases": [
+    "NE",
+    "NER"
+   ],
+   "bbox": {
+    "west": 0.3,
+    "south": 11.66,
+    "east": 15.9,
+    "north": 23.47
+   }
+  },
+  {
+   "id": "country:NG",
+   "kind": "country",
+   "iso2": "NG",
+   "names": {
+    "en": "Nigeria",
+    "es": "Nigeria"
+   },
+   "aliases": [
+    "NG",
+    "NGA"
+   ],
+   "bbox": {
+    "west": 2.69,
+    "south": 4.24,
+    "east": 14.58,
+    "north": 13.87
+   }
+  },
+  {
+   "id": "country:KP",
+   "kind": "country",
+   "iso2": "KP",
+   "names": {
+    "en": "North Korea",
+    "es": "República Popular Democrática de Corea"
+   },
+   "aliases": [
+    "KP",
+    "PRK"
+   ],
+   "bbox": {
+    "west": 124.26,
+    "south": 37.67,
+    "east": 130.78,
+    "north": 42.98
+   }
+  },
+  {
+   "id": "country:NO",
+   "kind": "country",
+   "iso2": "NO",
+   "names": {
+    "en": "Norway",
+    "es": "Noruega"
+   },
+   "aliases": [
+    "NO",
+    "NOR"
+   ],
+   "bbox": {
+    "west": 4.99,
+    "south": 58.08,
+    "east": 31.29,
+    "north": 80.66
+   }
+  },
+  {
+   "id": "country:OM",
+   "kind": "country",
+   "iso2": "OM",
+   "names": {
+    "en": "Oman",
+    "es": "Omán"
+   },
+   "aliases": [
+    "OM",
+    "OMN"
+   ],
+   "bbox": {
+    "west": 52,
+    "south": 16.65,
+    "east": 59.81,
+    "north": 26.4
+   }
+  },
+  {
+   "id": "country:PK",
+   "kind": "country",
+   "iso2": "PK",
+   "names": {
+    "en": "Pakistan",
+    "es": "Pakistán"
+   },
+   "aliases": [
+    "PK",
+    "PAK"
+   ],
+   "bbox": {
+    "west": 60.88,
+    "south": 23.69,
+    "east": 77.84,
+    "north": 37.13
+   }
+  },
+  {
+   "id": "country:PA",
+   "kind": "country",
+   "iso2": "PA",
+   "names": {
+    "en": "Panama",
+    "es": "Panamá"
+   },
+   "aliases": [
+    "PA",
+    "PAN"
+   ],
+   "bbox": {
+    "west": -82.96,
+    "south": 7.22,
+    "east": -77.24,
+    "north": 9.61
+   }
+  },
+  {
+   "id": "country:PG",
+   "kind": "country",
+   "iso2": "PG",
+   "names": {
+    "en": "Papua New Guinea",
+    "es": "Papua Nueva Guinea"
+   },
+   "aliases": [
+    "PG",
+    "PNG"
+   ],
+   "bbox": {
+    "west": 141,
+    "south": -10.65,
+    "east": 156.02,
+    "north": -2.5
+   }
+  },
+  {
+   "id": "country:PY",
+   "kind": "country",
+   "iso2": "PY",
+   "names": {
+    "en": "Paraguay",
+    "es": "Paraguay"
+   },
+   "aliases": [
+    "PY",
+    "PRY"
+   ],
+   "bbox": {
+    "west": -62.69,
+    "south": -27.55,
+    "east": -54.29,
+    "north": -19.34
+   }
+  },
+  {
+   "id": "country:CN",
+   "kind": "country",
+   "iso2": "CN",
+   "names": {
+    "en": "People's Republic of China",
+    "es": "China"
+   },
+   "aliases": [
+    "CN",
+    "CHN"
+   ],
+   "bbox": {
+    "west": 73.68,
+    "south": 18.2,
+    "east": 135.03,
+    "north": 53.46
+   }
+  },
+  {
+   "id": "country:PE",
+   "kind": "country",
+   "iso2": "PE",
+   "names": {
+    "en": "Peru",
+    "es": "Perú"
+   },
+   "aliases": [
+    "PE",
+    "PER"
+   ],
+   "bbox": {
+    "west": -81.41,
+    "south": -18.35,
+    "east": -68.67,
+    "north": -0.06
+   }
+  },
+  {
+   "id": "country:PH",
+   "kind": "country",
+   "iso2": "PH",
+   "names": {
+    "en": "Philippines",
+    "es": "Filipinas"
+   },
+   "aliases": [
+    "PH",
+    "PHL"
+   ],
+   "bbox": {
+    "west": 117.18,
+    "south": 5.58,
+    "east": 126.54,
+    "north": 18.51
+   }
+  },
+  {
+   "id": "country:PL",
+   "kind": "country",
+   "iso2": "PL",
+   "names": {
+    "en": "Poland",
+    "es": "Polonia"
+   },
+   "aliases": [
+    "PL",
+    "POL"
+   ],
+   "bbox": {
+    "west": 14.07,
+    "south": 49.03,
+    "east": 24.03,
+    "north": 54.85
+   }
+  },
+  {
+   "id": "country:PT",
+   "kind": "country",
+   "iso2": "PT",
+   "names": {
+    "en": "Portugal",
+    "es": "Portugal"
+   },
+   "aliases": [
+    "PT",
+    "PRT"
+   ],
+   "bbox": {
+    "west": -9.53,
+    "south": 36.84,
+    "east": -6.39,
+    "north": 42.28
+   }
+  },
+  {
+   "id": "country:PR",
+   "kind": "country",
+   "iso2": "PR",
+   "names": {
+    "en": "Puerto Rico",
+    "es": "Puerto Rico"
+   },
+   "aliases": [
+    "PR",
+    "PRI"
+   ],
+   "bbox": {
+    "west": -67.24,
+    "south": 17.95,
+    "east": -65.59,
+    "north": 18.52
+   }
+  },
+  {
+   "id": "country:QA",
+   "kind": "country",
+   "iso2": "QA",
+   "names": {
+    "en": "Qatar",
+    "es": "Catar"
+   },
+   "aliases": [
+    "QA",
+    "QAT"
+   ],
+   "bbox": {
+    "west": 50.74,
+    "south": 24.56,
+    "east": 51.61,
+    "north": 26.12
+   }
+  },
+  {
+   "id": "country:CG",
+   "kind": "country",
+   "iso2": "CG",
+   "names": {
+    "en": "Republic of the Congo",
+    "es": "Congo"
+   },
+   "aliases": [
+    "CG",
+    "COG"
+   ],
+   "bbox": {
+    "west": 11.09,
+    "south": -5.04,
+    "east": 18.45,
+    "north": 3.73
+   }
+  },
+  {
+   "id": "country:GM",
+   "kind": "country",
+   "iso2": "GM",
+   "names": {
+    "en": "Republic of The Gambia",
+    "es": "Gambia"
+   },
+   "aliases": [
+    "The Gambia",
+    "GM",
+    "GMB"
+   ],
+   "bbox": {
+    "west": -16.84,
+    "south": 13.13,
+    "east": -13.84,
+    "north": 13.88
+   }
+  },
+  {
+   "id": "country:RO",
+   "kind": "country",
+   "iso2": "RO",
+   "names": {
+    "en": "Romania",
+    "es": "Rumanía"
+   },
+   "aliases": [
+    "RO",
+    "ROU"
+   ],
+   "bbox": {
+    "west": 20.22,
+    "south": 43.69,
+    "east": 29.63,
+    "north": 48.22
+   }
+  },
+  {
+   "id": "country:RU",
+   "kind": "country",
+   "iso2": "RU",
+   "names": {
+    "en": "Russian Federation",
+    "es": "Rusia"
+   },
+   "aliases": [
+    "Russia",
+    "RU",
+    "RUS"
+   ],
+   "bbox": {
+    "west": 19.66,
+    "south": 41.15,
+    "east": -169.9,
+    "north": 81.25
+   }
+  },
+  {
+   "id": "country:RW",
+   "kind": "country",
+   "iso2": "RW",
+   "names": {
+    "en": "Rwanda",
+    "es": "Ruanda"
+   },
+   "aliases": [
+    "RW",
+    "RWA"
+   ],
+   "bbox": {
+    "west": 29.03,
+    "south": -2.92,
+    "east": 30.82,
+    "north": -1.14
+   }
+  },
+  {
+   "id": "country:SA",
+   "kind": "country",
+   "iso2": "SA",
+   "names": {
+    "en": "Saudi Arabia",
+    "es": "Arabia Saudita"
+   },
+   "aliases": [
+    "SA",
+    "SAU"
+   ],
+   "bbox": {
+    "west": 34.63,
+    "south": 16.35,
+    "east": 55.67,
+    "north": 32.16
+   }
+  },
+  {
+   "id": "country:SN",
+   "kind": "country",
+   "iso2": "SN",
+   "names": {
+    "en": "Senegal",
+    "es": "Senegal"
+   },
+   "aliases": [
+    "SN",
+    "SEN"
+   ],
+   "bbox": {
+    "west": -17.62,
+    "south": 12.33,
+    "east": -11.47,
+    "north": 16.6
+   }
+  },
+  {
+   "id": "country:RS",
+   "kind": "country",
+   "iso2": "RS",
+   "names": {
+    "en": "Serbia",
+    "es": "Serbia"
+   },
+   "aliases": [
+    "RS",
+    "SRB"
+   ],
+   "bbox": {
+    "west": 18.83,
+    "south": 42.25,
+    "east": 22.98,
+    "north": 46.17
+   }
+  },
+  {
+   "id": "country:SL",
+   "kind": "country",
+   "iso2": "SL",
+   "names": {
+    "en": "Sierra Leone",
+    "es": "Sierra Leona"
+   },
+   "aliases": [
+    "SL",
+    "SLE"
+   ],
+   "bbox": {
+    "west": -13.25,
+    "south": 6.79,
+    "east": -10.23,
+    "north": 10.05
+   }
+  },
+  {
+   "id": "country:SK",
+   "kind": "country",
+   "iso2": "SK",
+   "names": {
+    "en": "Slovakia",
+    "es": "Eslovaquia"
+   },
+   "aliases": [
+    "SK",
+    "SVK"
+   ],
+   "bbox": {
+    "west": 16.88,
+    "south": 47.76,
+    "east": 22.56,
+    "north": 49.57
+   }
+  },
+  {
+   "id": "country:SI",
+   "kind": "country",
+   "iso2": "SI",
+   "names": {
+    "en": "Slovenia",
+    "es": "Eslovenia"
+   },
+   "aliases": [
+    "SI",
+    "SVN"
+   ],
+   "bbox": {
+    "west": 13.7,
+    "south": 45.45,
+    "east": 16.57,
+    "north": 46.85
+   }
+  },
+  {
+   "id": "country:SB",
+   "kind": "country",
+   "iso2": "SB",
+   "names": {
+    "en": "Solomon Islands",
+    "es": "Islas Salomón"
+   },
+   "aliases": [
+    "Solomon Is.",
+    "SB",
+    "SLB"
+   ],
+   "bbox": {
+    "west": 156.49,
+    "south": -10.83,
+    "east": 162.4,
+    "north": -6.6
+   }
+  },
+  {
+   "id": "country:SO",
+   "kind": "country",
+   "iso2": "SO",
+   "names": {
+    "en": "Somalia",
+    "es": "Somalia"
+   },
+   "aliases": [
+    "SO",
+    "SOM"
+   ],
+   "bbox": {
+    "west": 40.98,
+    "south": -1.68,
+    "east": 51.13,
+    "north": 12.02
+   }
+  },
+  {
+   "id": "country:somaliland",
+   "kind": "country",
+   "iso2": null,
+   "names": {
+    "en": "Somaliland",
+    "es": "Somaliland"
+   },
+   "aliases": [],
+   "bbox": {
+    "west": 42.56,
+    "south": 8,
+    "east": 48.95,
+    "north": 11.46
+   }
+  },
+  {
+   "id": "country:ZA",
+   "kind": "country",
+   "iso2": "ZA",
+   "names": {
+    "en": "South Africa",
+    "es": "Sudáfrica"
+   },
+   "aliases": [
+    "ZA",
+    "ZAF"
+   ],
+   "bbox": {
+    "west": 16.35,
+    "south": -34.82,
+    "east": 32.83,
+    "north": -22.09
+   }
+  },
+  {
+   "id": "country:KR",
+   "kind": "country",
+   "iso2": "KR",
+   "names": {
+    "en": "South Korea",
+    "es": "República de Corea"
+   },
+   "aliases": [
+    "Korea, Republic of",
+    "Republic of Korea",
+    "KR",
+    "KOR"
+   ],
+   "bbox": {
+    "west": 126.12,
+    "south": 34.39,
+    "east": 129.47,
+    "north": 38.61
+   }
+  },
+  {
+   "id": "country:SS",
+   "kind": "country",
+   "iso2": "SS",
+   "names": {
+    "en": "South Sudan",
+    "es": "Sudán del Sur"
+   },
+   "aliases": [
+    "S. Sudan",
+    "SS",
+    "SSD"
+   ],
+   "bbox": {
+    "west": 23.89,
+    "south": 3.51,
+    "east": 35.3,
+    "north": 12.25
+   }
+  },
+  {
+   "id": "country:ES",
+   "kind": "country",
+   "iso2": "ES",
+   "names": {
+    "en": "Spain",
+    "es": "España"
+   },
+   "aliases": [
+    "ES",
+    "ESP"
+   ],
+   "bbox": {
+    "west": -9.39,
+    "south": 35.95,
+    "east": 3.04,
+    "north": 43.75
+   }
+  },
+  {
+   "id": "country:LK",
+   "kind": "country",
+   "iso2": "LK",
+   "names": {
+    "en": "Sri Lanka",
+    "es": "Sri Lanka"
+   },
+   "aliases": [
+    "LK",
+    "LKA"
+   ],
+   "bbox": {
+    "west": 79.7,
+    "south": 5.97,
+    "east": 81.79,
+    "north": 9.82
+   }
+  },
+  {
+   "id": "country:PS",
+   "kind": "country",
+   "iso2": "PS",
+   "names": {
+    "en": "State of Palestine",
+    "es": "Palestina"
+   },
+   "aliases": [
+    "Palestine",
+    "PS",
+    "PSE"
+   ],
+   "bbox": {
+    "west": 34.93,
+    "south": 31.35,
+    "east": 35.55,
+    "north": 32.53
+   }
+  },
+  {
+   "id": "country:SD",
+   "kind": "country",
+   "iso2": "SD",
+   "names": {
+    "en": "Sudan",
+    "es": "Sudán"
+   },
+   "aliases": [
+    "SD",
+    "SDN"
+   ],
+   "bbox": {
+    "west": 21.94,
+    "south": 8.23,
+    "east": 38.41,
+    "north": 22
+   }
+  },
+  {
+   "id": "country:SR",
+   "kind": "country",
+   "iso2": "SR",
+   "names": {
+    "en": "Suriname",
+    "es": "Suriname"
+   },
+   "aliases": [
+    "SR",
+    "SUR"
+   ],
+   "bbox": {
+    "west": -58.04,
+    "south": 1.82,
+    "east": -53.96,
+    "north": 6.03
+   }
+  },
+  {
+   "id": "country:SE",
+   "kind": "country",
+   "iso2": "SE",
+   "names": {
+    "en": "Sweden",
+    "es": "Suecia"
+   },
+   "aliases": [
+    "SE",
+    "SWE"
+   ],
+   "bbox": {
+    "west": 11.03,
+    "south": 55.36,
+    "east": 23.9,
+    "north": 69.11
+   }
+  },
+  {
+   "id": "country:CH",
+   "kind": "country",
+   "iso2": "CH",
+   "names": {
+    "en": "Switzerland",
+    "es": "Suiza"
+   },
+   "aliases": [
+    "CH",
+    "CHE"
+   ],
+   "bbox": {
+    "west": 6.02,
+    "south": 45.78,
+    "east": 10.44,
+    "north": 47.83
+   }
+  },
+  {
+   "id": "country:SY",
+   "kind": "country",
+   "iso2": "SY",
+   "names": {
+    "en": "Syrian Arab Republic",
+    "es": "República Árabe Siria"
+   },
+   "aliases": [
+    "Syria",
+    "SY",
+    "SYR"
+   ],
+   "bbox": {
+    "west": 35.7,
+    "south": 32.31,
+    "east": 42.35,
+    "north": 37.23
+   }
+  },
+  {
+   "id": "country:TW",
+   "kind": "country",
+   "iso2": "TW",
+   "names": {
+    "en": "Taiwan, Province of China",
+    "es": "Taiwán"
+   },
+   "aliases": [
+    "Taiwan",
+    "TW",
+    "TWN"
+   ],
+   "bbox": {
+    "west": 120.11,
+    "south": 21.97,
+    "east": 121.95,
+    "north": 25.3
+   }
+  },
+  {
+   "id": "country:TJ",
+   "kind": "country",
+   "iso2": "TJ",
+   "names": {
+    "en": "Tajikistan",
+    "es": "Tayikistán"
+   },
+   "aliases": [
+    "TJ",
+    "TJK"
+   ],
+   "bbox": {
+    "west": 67.44,
+    "south": 36.74,
+    "east": 74.98,
+    "north": 40.96
+   }
+  },
+  {
+   "id": "country:TH",
+   "kind": "country",
+   "iso2": "TH",
+   "names": {
+    "en": "Thailand",
+    "es": "Tailandia"
+   },
+   "aliases": [
+    "TH",
+    "THA"
+   ],
+   "bbox": {
+    "west": 97.38,
+    "south": 5.69,
+    "east": 105.59,
+    "north": 20.42
+   }
+  },
+  {
+   "id": "country:MK",
+   "kind": "country",
+   "iso2": "MK",
+   "names": {
+    "en": "The Republic of North Macedonia",
+    "es": "Macedonia del Norte"
+   },
+   "aliases": [
+    "Macedonia",
+    "North Macedonia",
+    "MK",
+    "MKD"
+   ],
+   "bbox": {
+    "west": 20.46,
+    "south": 40.84,
+    "east": 22.95,
+    "north": 42.32
+   }
+  },
+  {
+   "id": "country:TL",
+   "kind": "country",
+   "iso2": "TL",
+   "names": {
+    "en": "Timor-Leste",
+    "es": "Timor-Leste"
+   },
+   "aliases": [
+    "TL",
+    "TLS"
+   ],
+   "bbox": {
+    "west": 124.97,
+    "south": -9.39,
+    "east": 127.34,
+    "north": -8.27
+   }
+  },
+  {
+   "id": "country:TG",
+   "kind": "country",
+   "iso2": "TG",
+   "names": {
+    "en": "Togo",
+    "es": "Togo"
+   },
+   "aliases": [
+    "TG",
+    "TGO"
+   ],
+   "bbox": {
+    "west": -0.05,
+    "south": 5.93,
+    "east": 1.87,
+    "north": 11.02
+   }
+  },
+  {
+   "id": "country:TT",
+   "kind": "country",
+   "iso2": "TT",
+   "names": {
+    "en": "Trinidad and Tobago",
+    "es": "Trinidad y Tobago"
+   },
+   "aliases": [
+    "TT",
+    "TTO"
+   ],
+   "bbox": {
+    "west": -61.95,
+    "south": 10,
+    "east": -60.9,
+    "north": 10.89
+   }
+  },
+  {
+   "id": "country:TN",
+   "kind": "country",
+   "iso2": "TN",
+   "names": {
+    "en": "Tunisia",
+    "es": "Túnez"
+   },
+   "aliases": [
+    "TN",
+    "TUN"
+   ],
+   "bbox": {
+    "west": 7.53,
+    "south": 30.31,
+    "east": 11.49,
+    "north": 37.35
+   }
+  },
+  {
+   "id": "country:TR",
+   "kind": "country",
+   "iso2": "TR",
+   "names": {
+    "en": "Türkiye",
+    "es": "Turquía"
+   },
+   "aliases": [
+    "Turkey",
+    "TR",
+    "TUR"
+   ],
+   "bbox": {
+    "west": 26.04,
+    "south": 35.82,
+    "east": 44.79,
+    "north": 42.14
+   }
+  },
+  {
+   "id": "country:TM",
+   "kind": "country",
+   "iso2": "TM",
+   "names": {
+    "en": "Turkmenistan",
+    "es": "Turkmenistán"
+   },
+   "aliases": [
+    "TM",
+    "TKM"
+   ],
+   "bbox": {
+    "west": 52.5,
+    "south": 35.27,
+    "east": 66.55,
+    "north": 42.75
+   }
+  },
+  {
+   "id": "country:UG",
+   "kind": "country",
+   "iso2": "UG",
+   "names": {
+    "en": "Uganda",
+    "es": "Uganda"
+   },
+   "aliases": [
+    "UG",
+    "UGA"
+   ],
+   "bbox": {
+    "west": 29.58,
+    "south": -1.44,
+    "east": 35.04,
+    "north": 4.25
+   }
+  },
+  {
+   "id": "country:UA",
+   "kind": "country",
+   "iso2": "UA",
+   "names": {
+    "en": "Ukraine",
+    "es": "Ucrania"
+   },
+   "aliases": [
+    "UA",
+    "UKR"
+   ],
+   "bbox": {
+    "west": 22.08,
+    "south": 45.29,
+    "east": 40.08,
+    "north": 52.33
+   }
+  },
+  {
+   "id": "country:AE",
+   "kind": "country",
+   "iso2": "AE",
+   "names": {
+    "en": "United Arab Emirates",
+    "es": "Emiratos Árabes Unidos"
+   },
+   "aliases": [
+    "UAE",
+    "AE",
+    "ARE"
+   ],
+   "bbox": {
+    "west": 51.58,
+    "south": 22.5,
+    "east": 56.4,
+    "north": 26.06
+   }
+  },
+  {
+   "id": "country:GB",
+   "kind": "country",
+   "iso2": "GB",
+   "names": {
+    "en": "United Kingdom",
+    "es": "Reino Unido"
+   },
+   "aliases": [
+    "UK",
+    "Great Britain",
+    "GB",
+    "GBR"
+   ],
+   "bbox": {
+    "west": -7.57,
+    "south": 49.96,
+    "east": 1.68,
+    "north": 58.63
+   }
+  },
+  {
+   "id": "country:TZ",
+   "kind": "country",
+   "iso2": "TZ",
+   "names": {
+    "en": "United Republic of Tanzania",
+    "es": "Tanzania"
+   },
+   "aliases": [
+    "TZ",
+    "TZA"
+   ],
+   "bbox": {
+    "west": 29.34,
+    "south": -11.72,
+    "east": 40.32,
+    "north": -0.95
+   }
+  },
+  {
+   "id": "country:US",
+   "kind": "country",
+   "iso2": "US",
+   "names": {
+    "en": "United States of America",
+    "es": "Estados Unidos"
+   },
+   "aliases": [
+    "United States",
+    "USA",
+    "U.S.A.",
+    "US",
+    "U.S."
+   ],
+   "bbox": {
+    "west": -171.79,
+    "south": 18.92,
+    "east": -66.97,
+    "north": 71.36
+   }
+  },
+  {
+   "id": "country:UY",
+   "kind": "country",
+   "iso2": "UY",
+   "names": {
+    "en": "Uruguay",
+    "es": "Uruguay"
+   },
+   "aliases": [
+    "UY",
+    "URY"
+   ],
+   "bbox": {
+    "west": -58.43,
+    "south": -34.95,
+    "east": -53.21,
+    "north": -30.11
+   }
+  },
+  {
+   "id": "country:UZ",
+   "kind": "country",
+   "iso2": "UZ",
+   "names": {
+    "en": "Uzbekistan",
+    "es": "Uzbekistán"
+   },
+   "aliases": [
+    "UZ",
+    "UZB"
+   ],
+   "bbox": {
+    "west": 55.93,
+    "south": 37.15,
+    "east": 73.05,
+    "north": 45.59
+   }
+  },
+  {
+   "id": "country:VU",
+   "kind": "country",
+   "iso2": "VU",
+   "names": {
+    "en": "Vanuatu",
+    "es": "Vanuatu"
+   },
+   "aliases": [
+    "VU",
+    "VUT"
+   ],
+   "bbox": {
+    "west": 166.63,
+    "south": -16.6,
+    "east": 167.85,
+    "north": -14.63
+   }
+  },
+  {
+   "id": "country:VE",
+   "kind": "country",
+   "iso2": "VE",
+   "names": {
+    "en": "Venezuela",
+    "es": "Venezuela"
+   },
+   "aliases": [
+    "VE",
+    "VEN"
+   ],
+   "bbox": {
+    "west": -73.31,
+    "south": 0.72,
+    "east": -59.76,
+    "north": 12.16
+   }
+  },
+  {
+   "id": "country:VN",
+   "kind": "country",
+   "iso2": "VN",
+   "names": {
+    "en": "Vietnam",
+    "es": "Vietnam"
+   },
+   "aliases": [
+    "VN",
+    "VNM"
+   ],
+   "bbox": {
+    "west": 102.17,
+    "south": 8.6,
+    "east": 109.34,
+    "north": 23.35
+   }
+  },
+  {
+   "id": "country:EH",
+   "kind": "country",
+   "iso2": "EH",
+   "names": {
+    "en": "Western Sahara",
+    "es": "Sahara Occidental"
+   },
+   "aliases": [
+    "W. Sahara",
+    "EH",
+    "ESH"
+   ],
+   "bbox": {
+    "west": -17.06,
+    "south": 21,
+    "east": -8.66,
+    "north": 27.66
+   }
+  },
+  {
+   "id": "country:YE",
+   "kind": "country",
+   "iso2": "YE",
+   "names": {
+    "en": "Yemen",
+    "es": "Yemen"
+   },
+   "aliases": [
+    "YE",
+    "YEM"
+   ],
+   "bbox": {
+    "west": 42.61,
+    "south": 12.59,
+    "east": 53.11,
+    "north": 19
+   }
+  },
+  {
+   "id": "country:ZM",
+   "kind": "country",
+   "iso2": "ZM",
+   "names": {
+    "en": "Zambia",
+    "es": "Zambia"
+   },
+   "aliases": [
+    "ZM",
+    "ZMB"
+   ],
+   "bbox": {
+    "west": 21.89,
+    "south": -17.96,
+    "east": 33.49,
+    "north": -8.24
+   }
+  },
+  {
+   "id": "country:ZW",
+   "kind": "country",
+   "iso2": "ZW",
+   "names": {
+    "en": "Zimbabwe",
+    "es": "Zimbabue"
+   },
+   "aliases": [
+    "ZW",
+    "ZWE"
+   ],
+   "bbox": {
+    "west": 25.26,
+    "south": -22.27,
+    "east": 32.85,
+    "north": -15.51
+   }
+  }
+ ]
+}
