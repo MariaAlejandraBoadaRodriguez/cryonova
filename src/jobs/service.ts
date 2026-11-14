@@ -16,6 +16,7 @@ export function publicRun(run: RunRow) {
     status: run.status,
     mode: run.mode,
     question: run.question,
+    selection: run.selection,
     createdAt: run.createdAt.toISOString(),
     startedAt: run.startedAt?.toISOString() ?? null,
     finishedAt: run.finishedAt?.toISOString() ?? null,

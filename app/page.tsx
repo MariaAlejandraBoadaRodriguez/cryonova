@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { OpenWithCode } from "@/components/OpenWithCode";
 
 const EXAMPLES = [
   "Did near-surface air temperature in Colombia change between 2005 and 2024?",
@@ -55,7 +56,8 @@ export default function Home() {
             </section>
             <section className="card stack" id="open-with-code" aria-labelledby="open-title">
               <h2 id="open-title">Open with code</h2>
-              <p className="muted">Saved investigations can be reopened with their code. Saving is being enabled in the next release.</p>
+              <p className="muted">Enter the code you received when saving. No sign-up, read-only.</p>
+              <OpenWithCode />
             </section>
           </div>
         </div>

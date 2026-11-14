@@ -11,8 +11,13 @@ import type { PublicRun } from "@/src/jobs/service";
 import { SelectionSchema, type Selection } from "@/src/jobs/selection";
 import { TERMINAL_STATUSES, type RunResult } from "@/src/jobs/types";
 import { fmtDuration } from "@/src/lib/format";
+import { detectLanguage } from "@/src/agent/language";
+import type { Proposal } from "@/src/agent/proposal";
+import { ProposalCard } from "./AgentPanel";
+import { ExplanationPanel } from "./ExplanationPanel";
 import { PeriodPicker } from "./PeriodPicker";
 import { ErrorIcon, RegionPicker, type RegionValue } from "./RegionPicker";
+import { ResultActions } from "./ResultActions";
 import { ResultsView } from "./ResultsView";
 import { VariablePicker } from "./VariablePicker";
 
@@ -70,7 +75,12 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<{ title: string; detail?: string } | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const [proposal, setProposal] = useState<Proposal | null>(null);
+  const [proposing, setProposing] = useState(false);
+  const [proposalError, setProposalError] = useState<string | null>(null);
+  const [regionVersion, setRegionVersion] = useState(0);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const autoProposed = useRef(false);
 
   const update = useCallback((patch: Partial<Draft>) => {
     setDraft((d) => ({ ...d, ...patch }));
@@ -95,6 +105,17 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
     return { min: starts.length ? Math.max(...starts) : 1980, max: CURRENT_YEAR };
   }, [draft.variables]);
 
+  const hydrated = useRef(false);
+  const hydrateFrom = useCallback((data: PublicRun) => {
+    if (hydrated.current) return;
+    hydrated.current = true;
+    const parsed = SelectionSchema.safeParse(data.selection);
+    if (!parsed.success) return;
+    const sel = parsed.data;
+    setDraft((d) => (d.region.bbox ? d : { question: sel.question ?? "", region: { bbox: sel.region.bbox, name: sel.region.name, regionId: sel.region.regionId, source: sel.region.source }, start: sel.start, end: sel.end, variables: sel.variables, mode: sel.mode }));
+    setRegionVersion((v) => v + 1);
+  }, []);
+
   // Poll the run until it finishes. Each poll is short; the server resumes stalled runs.
   useEffect(() => {
     if (!runId) return;
@@ -112,6 +133,7 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
         if (response.ok) {
           const data = (await response.json()) as PublicRun;
           setRun(data);
+          hydrateFrom(data);
           if (TERMINAL_STATUSES.includes(data.status)) return;
         }
       } catch {
@@ -127,7 +149,7 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
       stopped = true;
       clearTimeout(timer);
     };
-  }, [runId]);
+  }, [runId, hydrateFrom]);
 
   const active = run !== null && !TERMINAL_STATUSES.includes(run.status);
   useEffect(() => {
@@ -142,6 +164,48 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
     else url.searchParams.delete("run");
     window.history.replaceState(null, "", url.toString());
   }, [runId]);
+
+  const propose = useCallback(async (question: string) => {
+    if (question.trim().length < 3) return;
+    setProposing(true);
+    setProposalError(null);
+    try {
+      const response = await fetch("/api/agent/plan", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ question }),
+        signal: AbortSignal.timeout(120_000),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setProposalError(data.error?.detail ?? data.error?.title ?? "The proposal could not be produced.");
+        return;
+      }
+      const next = data as Proposal;
+      setProposal(next);
+      const sel = next.selection;
+      setDraft((d) => ({
+        ...d,
+        region: sel.region ? { bbox: sel.region.bbox, name: sel.region.name, regionId: sel.region.regionId, source: "agent" } : d.region,
+        start: sel.start,
+        end: sel.end,
+        variables: sel.variables.length > 0 ? sel.variables : d.variables,
+        mode: "guided",
+      }));
+      setIdempotencyKey(crypto.randomUUID());
+      setRegionVersion((v) => v + 1);
+    } catch {
+      setProposalError("The research agent could not be reached. You can still build the selection manually.");
+    } finally {
+      setProposing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (autoProposed.current || !initialQuestion.trim() || initialRunId) return;
+    autoProposed.current = true;
+    void propose(initialQuestion);
+  }, [initialQuestion, initialRunId, propose]);
 
   const submit = async () => {
     if (!validation.ok) return;
@@ -193,10 +257,23 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
             placeholder="Did near-surface air temperature in Colombia change between 2005 and 2024?"
             onChange={(e) => update({ question: e.target.value })}
           />
+          <div className="row">
+            <button type="button" className="btn btn-secondary" onClick={() => propose(draft.question)} disabled={proposing || draft.question.trim().length < 3} data-testid="propose-button">
+              {proposing ? "Proposing…" : "Propose variables, region and period"}
+            </button>
+            <span className="field-help">The research agent proposes an editable selection; nothing runs until you press Run.</span>
+          </div>
+          {proposing && <p role="status">Searching the catalog, resolving the region and checking live coverage…</p>}
+          {proposalError && (
+            <p className="alert alert-error" role="alert">
+              <ErrorIcon /> {proposalError}
+            </p>
+          )}
+          {proposal && <ProposalCard proposal={proposal} />}
         </div>
         <div className="card">
           <p className="step-label">2 · Region</p>
-          <RegionPicker value={draft.region} onChange={(region) => update({ region })} />
+          <RegionPicker key={regionVersion} value={draft.region} onChange={(region) => update({ region })} />
         </div>
         <div className="card stack">
           <p className="step-label">3 · Period</p>
@@ -277,7 +354,18 @@ export function Workspace({ initialQuestion, initialRunId }: { initialQuestion: 
             </div>
           </div>
         )}
-        {result && (run?.status === "succeeded" || run?.status === "partial") && <ResultsView result={result} />}
+        {result && run && (run.status === "succeeded" || run.status === "partial") && (
+          <>
+            <ResultsView result={result} />
+            <ResultActions runId={run.id} />
+            <ExplanationPanel
+              key={run.id}
+              runId={run.id}
+              initialLanguage={detectLanguage(run.question ?? draft.question)}
+              stored={run.explanation as import("@/src/agent/explain-service").StoredExplanations | null}
+            />
+          </>
+        )}
       </section>
     </div>
   );

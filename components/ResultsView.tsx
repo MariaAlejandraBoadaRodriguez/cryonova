@@ -11,6 +11,7 @@ import type { RunResult, VariableResult } from "@/src/jobs/types";
 import { fmt, fmtBBox, fmtBytes, fmtDuration, fmtMonth, fmtP, fmtSigned, fmtUtc } from "@/src/lib/format";
 import { coverageSentence, EVIDENCE_LABEL, evidenceOf, magnitudeSentence, regionLabel, trendSentence } from "@/src/reports/narrative";
 import { anomalyChart, decimalsOf, seasonalCycleChart, seriesChart } from "./charts";
+import { DiscoveryTable } from "./DiscoveryTable";
 import { Plot } from "./Plot";
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -284,6 +285,7 @@ export function ResultsView({ result }: { result: RunResult }) {
           </div>
         </div>
       )}
+      {result.variables.length > 1 && <DiscoveryTable result={result} />}
       {result.variables.map((v, i) => (
         <VariableCard key={v.key} v={v} result={result} index={i} />
       ))}
