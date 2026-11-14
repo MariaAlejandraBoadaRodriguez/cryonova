@@ -26,7 +26,7 @@ test("workspace is accessible and starts with no selection", async ({ page }) =>
 });
 
 test("manual journey: region by name, period, variable, live run, chart and provenance", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop", "The live run is exercised once, on desktop.");
+  test.skip(testInfo.project.name !== "desktop" || !process.env.LIVE_E2E, "Live provider journey: set LIVE_E2E=1 (desktop only).");
   test.setTimeout(240_000);
   await page.goto("/investigate");
   await page.getByLabel("Region by name").fill("Colombia");
