@@ -5,13 +5,11 @@
  */
 import { findRegionsInText } from "@/src/catalog/regions";
 import { searchCatalog } from "@/src/catalog/search";
-import { lastCompleteYear, type Language, type RawProposal } from "./proposal";
+import { lastCompleteYear, type RawProposal } from "./proposal";
 
-const SPANISH = /[¿¡ñáéíóú]|\b(el|la|los|las|en|entre|desde|hasta|cambi[oó]|lluvia|temperatura|humedad|suelo|cu[aá]nto|c[oó]mo|qu[eé]|hay|regi[oó]n)\b/i;
+import { detectLanguage } from "./language";
 
-export function detectLanguage(text: string): Language {
-  return SPANISH.test(text) ? "es" : "en";
-}
+export { detectLanguage };
 
 export function yearsInText(text: string): number[] {
   const max = lastCompleteYear() + 1;

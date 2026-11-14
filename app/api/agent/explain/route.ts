@@ -74,6 +74,9 @@ export async function POST(request: Request) {
       }
     }
   }
+  if (body.followUp && explanation.source === "rules" && !explanation.answer) {
+    explanation = { ...explanation, sections: null, answer: `${explanation.aiStatus ?? "AI is unavailable."} Free-form questions need the AI assistant; the interpretation above and the tables answer the main points.` };
+  }
   const next: StoredExplanations = body.followUp
     ? { ...stored, followUps: [...(stored.followUps ?? []), explanation].slice(-10) }
     : { ...stored, summary: explanation };

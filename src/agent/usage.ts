@@ -14,7 +14,7 @@ import { estimateCostUsd, type TokenUsage } from "./pricing";
 export const AI_REQUESTS_PER_HOUR_PER_CLIENT = 20;
 
 interface UsageRecord {
-  kind: "plan" | "explain" | "ask";
+  kind: "plan" | "explain" | "ask" | "health";
   model: string;
   usage: TokenUsage;
   ok: boolean;
