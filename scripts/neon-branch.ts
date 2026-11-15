@@ -89,11 +89,14 @@ async function ensure(name: string, githubEnv: boolean): Promise<void> {
   const direct = await connectionUri(branch.id, false);
   if (githubEnv) {
     const file = env("GITHUB_ENV");
-    // Masks first, so the values never appear in the job log.
-    console.log(`::add-mask::${pooled}`);
-    console.log(`::add-mask::${direct}`);
-    for (const part of [new URL(pooled).password, new URL(direct).password]) if (part) console.log(`::add-mask::${part}`);
-    appendFileSync(file, `BRANCH_DATABASE_URL=${pooled}\nBRANCH_DATABASE_URL_UNPOOLED=${direct}\nNEON_BRANCH_ID=${branch.id}\nNEON_BRANCH_CREATED=${created}\n`);
+    // In GitHub Actions, mask first so the values never appear in the job log.
+    // Elsewhere nothing is printed: the values only go to the file.
+    if (process.env.GITHUB_ACTIONS === "true") {
+      console.log(`::add-mask::${pooled}`);
+      console.log(`::add-mask::${direct}`);
+      for (const part of [new URL(pooled).password, new URL(direct).password]) if (part) console.log(`::add-mask::${part}`);
+    }
+    appendFileSync(file, `BRANCH_DATABASE_URL=${pooled}\nBRANCH_DATABASE_URL_UNPOOLED=${direct}\nNEON_BRANCH_ID=${branch.id}\nNEON_BRANCH_CREATED=${created}\n`, { mode: 0o600 });
   }
   console.log(JSON.stringify({ ok: true, branch: branch.name, branchId: branch.id, created, host: new URL(direct).host }));
 }

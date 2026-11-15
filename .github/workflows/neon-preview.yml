@@ -51,6 +51,10 @@ jobs:
           TEST_DATABASE_URL: ${{ env.BRANCH_DATABASE_URL }}
       - name: Point this branch's Vercel previews at the Neon branch
         run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ]; then
+            echo "::error title=Missing Actions secrets::Add VERCEL_TOKEN and VERCEL_ORG_ID as repository Actions secrets so previews use the PR's Neon branch; until then previews keep the default preview DATABASE_URL."
+            exit 1
+          fi
           if [ "$NEON_BRANCH_CREATED" = "true" ] || [ "${{ github.event.action }}" = "opened" ] || [ "${{ github.event.action }}" = "reopened" ]; then
             # The first preview was built before these variables existed: redeploy it once.
             npx tsx scripts/vercel-preview-env.ts set --branch "${{ github.head_ref }}" --redeploy --sha "${{ github.event.pull_request.head.sha }}"

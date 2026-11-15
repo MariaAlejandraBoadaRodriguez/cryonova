@@ -1,7 +1,7 @@
 /**
  * Points a Git branch's Vercel preview deployments at its Neon branch (used by CI).
  *
- *   npx tsx scripts/vercel-preview-env.ts set --branch <git-branch> [--redeploy --sha <commit>]
+ *   npx tsx scripts/vercel-preview-env.ts set --branch <git-branch> [--redeploy --sha <commit> [--no-wait]]
  *   npx tsx scripts/vercel-preview-env.ts unset --branch <git-branch>
  *
  * `set` upserts branch-scoped preview variables DATABASE_URL and
@@ -91,8 +91,12 @@ async function set(branch: string): Promise<void> {
     const built = await waitForDeployment(sha, 12 * 60_000);
     out.builtDeployment = { id: built.uid, state: built.state ?? built.readyState };
     const redeploy = await vercel<{ id: string; url: string }>(`/v13/deployments`, { method: "POST", body: JSON.stringify({ name: "cryonova", deploymentId: built.uid }) });
-    const ready = await waitForReady(redeploy.id, 12 * 60_000);
-    out.redeployment = { id: redeploy.id, url: `https://${ready.url ?? redeploy.url}` };
+    if (process.argv.includes("--no-wait")) {
+      out.redeployment = { id: redeploy.id, url: `https://${redeploy.url}`, state: "building" };
+    } else {
+      const ready = await waitForReady(redeploy.id, 12 * 60_000);
+      out.redeployment = { id: redeploy.id, url: `https://${ready.url ?? redeploy.url}` };
+    }
   }
   console.log(JSON.stringify(out));
 }
