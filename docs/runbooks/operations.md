@@ -70,6 +70,24 @@ timestamp → point a preview's `DATABASE_URL` at it → `GET /api/health` and o
 
 ## Rollback
 
+### Rollback point before the UX fixes (recorded 2026-11-15 14:24 UTC)
+
+| Item | Value |
+|---|---|
+| Production deployment | `dpl_6sE7oDaH51z3axWueF2kFZgXmqMm` (`cryonova-bo38o8309-maria-alejandra-boada-rodriguezs-projects.vercel.app`) |
+| `master` SHA | `cc8cd5edaf4009eb69a6d4503c896dc10607978c` |
+| Production URL | https://cryonova-pi.vercel.app (`/api/health`: commit `cc8cd5e`, database migration 3) |
+| Saved investigations used for the reopen check | `303ae4f6-9653-443a-b028-7aee81ce1ce7` (run `d82edcbd…`, MERRA-2 example) and `e16e7553-5f03-4471-98d6-2d75730d847a` (run `b256473b…`, GLDAS); codes kept out of the repository |
+
+To return production to this point:
+
+- Dashboard: Vercel → project `cryonova` → Deployments → `dpl_6sE7oDaH51z3axWueF2kFZgXmqMm` → ⋯ → **Instant Rollback** (Hobby allows rolling back to a previous production deployment; after a rollback, new `master` deployments are not promoted automatically until you promote one or undo the rollback).
+- CLI: `vercel rollback dpl_6sE7oDaH51z3axWueF2kFZgXmqMm --scope maria-alejandra-boada-rodriguezs-projects`
+- API: `POST https://api.vercel.com/v9/projects/prj_x0sz6KFTyucW2ad8VY0ofaxGHbNZ/rollback/dpl_6sE7oDaH51z3axWueF2kFZgXmqMm?teamId=team_k8JMHqW1mHccz5fD9Z5Toi1b` with `Authorization: Bearer $VERCEL_TOKEN`
+- Then check `/api/health` reports commit `cc8cd5e`, run the smoke journey, and revert the offending merge on `master` through a PR.
+
+### General procedure
+
 1. Find the previous good production deployment: Vercel dashboard → Deployments (filter Production), or
    `list_deployments` with `target=production`. Current production: `dpl_9gV1rokYQeF6FBRkxnVskTuPCgjn` (`4250650`); previous: `dpl_4ZHUkRnmMBSuxnxDcKeGUCeKagbD` (`c6b3a5a`), then `dpl_ELqFefi37wBsR8jeYoLgouEuPX7a` (`9456ca5`, T+3h).
 2. Promote it: dashboard "Instant Rollback", or Vercel API `POST /v9/projects/{project}/rollback/{deploymentId}`.

@@ -8,7 +8,7 @@ import { getDerived } from "@/src/catalog/derived";
 import { getRegion } from "@/src/catalog/regions";
 import type { Selection } from "@/src/jobs/selection";
 import { validateBBox } from "@/src/providers/grid";
-import type { PlanDraft } from "./plan";
+import { type PlanDraft, workingTitle } from "./plan";
 
 const YM = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -16,7 +16,11 @@ type SetupSource = Pick<Selection, "variables" | "start" | "end" | "region" | "d
 
 export function setupHref(selection: SetupSource): string {
   const params = new URLSearchParams();
-  if (selection.question) params.set("q", selection.question.slice(0, 600));
+  // A generated working title is left out, so the reopened setup keeps generating it from the (possibly edited) selection.
+  const knownRegion = selection.region.regionId && getRegion(selection.region.regionId) ? selection.region.regionId : null;
+  const location: PlanDraft["location"] = knownRegion ? { mode: "country", regionId: knownRegion, customBBox: null } : { mode: "custom", regionId: null, customBBox: selection.region.bbox };
+  const generated = workingTitle({ variables: selection.variables, start: selection.start, end: selection.end, location });
+  if (selection.question && selection.question !== generated) params.set("q", selection.question.slice(0, 600));
   params.set("vars", selection.variables.join(","));
   if (selection.derived && selection.derived.length > 0) params.set("derived", selection.derived.join(","));
   params.set("start", selection.start);

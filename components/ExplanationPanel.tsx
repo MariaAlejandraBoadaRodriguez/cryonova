@@ -4,9 +4,12 @@
  * Interpretation of a finished run. Explanations come only from the run's
  * computed facts; every cited figure is checked and the result is shown.
  * Always in English (D-35); older non-English summaries are not shown.
+ * "Ask about a chart" sends the selected chart with the question (or that
+ * chart's default question when the box is empty) and shows the answer.
  */
 import { useEffect, useState } from "react";
-import type { ChartKind, Explanation } from "@/src/agent/explain";
+import { askAboutChart, CHART_KINDS, CHART_LABELS, type ChartKind, chartQuestion, DEFAULT_QUESTIONS, isChartKind, MAX_QUESTION_LENGTH } from "@/src/agent/ask-chart";
+import type { Explanation } from "@/src/agent/explain";
 import { englishSummary, type StoredExplanations } from "@/src/agent/stored-explanations";
 import { ErrorIcon } from "./icons";
 
@@ -24,18 +27,40 @@ function Verification({ e }: { e: Explanation }) {
   );
 }
 
-async function request(body: { runId: string; chart: ChartKind; followUp?: string }): Promise<Explanation> {
-  const response = body.followUp
-    ? await fetch("/api/agent/explain", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(90_000),
-      })
-    : await fetch(`/api/runs/${body.runId}/explanation`, { cache: "no-store", signal: AbortSignal.timeout(90_000) });
+/** The run's summary interpretation (series chart), always in English. */
+async function request(body: { runId: string }): Promise<Explanation> {
+  const response = await fetch(`/api/runs/${body.runId}/explanation`, { cache: "no-store", signal: AbortSignal.timeout(90_000) });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error?.detail ?? data.error?.title ?? "The explanation could not be produced.");
   return data as Explanation;
+}
+
+/** One answered question about a chart, with its source, AI status and figure check. */
+function ChartAnswer({ f }: { f: Explanation }) {
+  const label = CHART_LABELS[isChartKind(f.chart) ? f.chart : "series"].en;
+  return (
+    <article className="stack" data-testid="ask-chart-answer" data-chart={f.chart} data-source={f.source} style={{ borderTop: "1px solid var(--border)", paddingTop: 10 }}>
+      <p style={{ margin: 0 }}>
+        <span className="badge badge-neutral">{label}</span> <strong>{f.followUp}</strong>
+      </p>
+      {f.aiError ? (
+        <p className="alert alert-error" data-testid="ask-chart-ai-error" style={{ margin: 0 }}>
+          <ErrorIcon /> The AI assistant failed: {f.aiError} The automatic answer below is built from the chart&apos;s data; the charts and tables above remain available.
+        </p>
+      ) : f.source === "rules" && f.aiStatus ? (
+        <p className="alert alert-info" style={{ margin: 0 }}>
+          {f.aiStatus}
+        </p>
+      ) : null}
+      <p style={{ margin: 0, whiteSpace: "pre-line" }} data-testid="ask-chart-answer-text">
+        {f.answer}
+      </p>
+      <div className="row">
+        <span className={f.source === "ai" ? "badge badge-strong" : "badge badge-neutral"}>{f.source === "ai" ? `Claude · ${f.ai?.model}` : "Automatic answer (no AI)"}</span>
+        <Verification e={f} />
+      </div>
+    </article>
+  );
 }
 
 export function ExplanationPanel({ runId, stored }: { runId: string; stored?: StoredExplanations | null }) {
@@ -46,12 +71,13 @@ export function ExplanationPanel({ runId, stored }: { runId: string; stored?: St
   const [error, setError] = useState<string | null>(null);
   const [question, setQuestion] = useState("");
   const [chart, setChart] = useState<ChartKind>("series");
-  const [asking, setAsking] = useState(false);
+  const [asking, setAsking] = useState<ChartKind | null>(null);
+  const [askError, setAskError] = useState<string | null>(null);
 
   useEffect(() => {
     if (summary) return;
     let cancelled = false;
-    request({ runId, chart: "series" })
+    request({ runId })
       .then((e) => !cancelled && setSummary(e))
       .catch((e: Error) => !cancelled && setError(e.message))
       .finally(() => !cancelled && setLoading(false));
@@ -62,17 +88,20 @@ export function ExplanationPanel({ runId, stored }: { runId: string; stored?: St
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // An empty box asks the selected chart's default question, so every option answers on Ask.
   const ask = async () => {
-    if (question.trim().length < 2) return;
-    setAsking(true);
+    if (asking) return;
+    const selected = chart;
+    setAsking(selected);
+    setAskError(null);
     try {
-      const e = await request({ runId, chart, followUp: question.trim() });
+      const e = await askAboutChart({ runId, chart: selected, followUp: chartQuestion(selected, question) });
       setFollowUps((list) => [...list, e]);
       setQuestion("");
     } catch (e) {
-      setError((e as Error).message);
+      setAskError((e as Error).message);
     } finally {
-      setAsking(false);
+      setAsking(null);
     }
   };
 
@@ -112,28 +141,39 @@ export function ExplanationPanel({ runId, stored }: { runId: string; stored?: St
           )}
         </>
       )}
-      <div className="stack">
+      <div className="stack" data-testid="ask-chart">
         <label htmlFor="followup">Ask about a chart</label>
+        <p id="followup-help" className="field-help" style={{ margin: 0 }}>
+          Pick a chart and press Ask, or type your own question about it.
+        </p>
         <div className="row">
-          <select aria-label="Chart" value={chart} onChange={(e) => setChart(e.target.value as ChartKind)} style={{ maxWidth: 200 }}>
-            <option value="series">Series and trend</option>
-            <option value="anomalies">Monthly anomalies</option>
-            <option value="seasonal">Seasonal cycle</option>
+          <select aria-label="Chart" data-testid="ask-chart-select" value={chart} disabled={asking !== null} onChange={(e) => isChartKind(e.target.value) && setChart(e.target.value)} style={{ maxWidth: 200 }}>
+            {CHART_KINDS.map((kind) => (
+              <option key={kind} value={kind}>
+                {CHART_LABELS[kind].en}
+              </option>
+            ))}
           </select>
-          <input id="followup" type="text" maxLength={400} value={question} placeholder="How much did it change in the last decade?" onChange={(e) => setQuestion(e.target.value)} onKeyDown={(e) => e.key === "Enter" && ask()} style={{ flex: "1 1 220px" }} />
-          <button type="button" className="btn btn-secondary btn-small" onClick={ask} disabled={asking || question.trim().length < 2}>
-            {asking ? "…" : "Ask"}
+          <input id="followup" data-testid="ask-chart-input" type="text" maxLength={MAX_QUESTION_LENGTH} value={question} placeholder={DEFAULT_QUESTIONS[chart]} aria-describedby="followup-help" onChange={(e) => setQuestion(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void ask()} style={{ flex: "1 1 220px" }} />
+          <button type="button" className="btn btn-secondary btn-small" data-testid="ask-chart-button" onClick={() => void ask()} disabled={asking !== null} aria-busy={asking !== null}>
+            {asking ? "Asking…" : "Ask"}
           </button>
         </div>
-        {followUps.map((f, i) => (
-          <div key={i} className="stack" style={{ borderTop: "1px solid var(--border)", paddingTop: 10 }}>
-            <p style={{ margin: 0 }}>
-              <strong>{f.followUp}</strong>
-            </p>
-            <p style={{ margin: 0 }}>{f.answer}</p>
-            <Verification e={f} />
-          </div>
-        ))}
+        {asking && (
+          <p role="status" className="muted" data-testid="ask-chart-loading" style={{ margin: 0 }}>
+            Asking about the {CHART_LABELS[asking].en.toLowerCase()} chart… This can take up to a minute.
+          </p>
+        )}
+        {askError && (
+          <p className="alert alert-error" role="alert" data-testid="ask-chart-error">
+            <ErrorIcon /> No answer about the chart: {askError} The charts and tables above remain available.
+          </p>
+        )}
+        <div className="stack" aria-live="polite">
+          {followUps.map((f, i) => (
+            <ChartAnswer key={i} f={f} />
+          ))}
+        </div>
       </div>
     </section>
   );
