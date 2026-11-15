@@ -28,13 +28,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <header className="site-header on-dark">
           <div className="inner">
             <Link href="/" className="brand" aria-label="Cryonova, Earth Trend Detective: new investigation">
-              {/* eslint-disable-next-line @next/next/no-img-element -- static SVG brand asset from the approved prototype */}
-              <img className="brand-logo" src="/brand/space-apps-logo.svg" width={561} height={221} alt="NASA Space Apps Challenge" />
-              {/* eslint-disable-next-line @next/next/no-img-element -- static SVG brand asset from the approved prototype */}
-              <img className="brand-mark-small" src="/brand/space-apps-mark.svg" width={222} height={222} alt="" />
               <span className="brand-text" aria-hidden="true">
                 <span className="brand-title">Cryonova</span>
-                <span className="brand-sub">/ Earth Trend Detective</span>
+                <span className="brand-sub">· Earth Trend Detective</span>
               </span>
             </Link>
             <SiteNav />

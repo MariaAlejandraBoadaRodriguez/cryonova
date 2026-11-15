@@ -70,6 +70,17 @@ timestamp → point a preview's `DATABASE_URL` at it → `GET /api/health` and o
 
 ## Rollback
 
+### Rollback point before the AI-disclosure fix (recorded 2026-11-15 16:12 UTC)
+
+| Item | Value |
+|---|---|
+| Production deployment | `dpl_ENGrCHUmW379JQ5S4GS85WVTx4xt` (all six UX fixes, verified by the production smoke at 15:27 UTC) |
+| `master` SHA | `cc51eff2cbc132e5701af98fe813be2ca484c440` |
+
+To return production to this point: Vercel → project `cryonova` → Deployments → `dpl_ENGrCHUmW379JQ5S4GS85WVTx4xt` →
+⋯ → **Instant Rollback**, or `vercel rollback dpl_ENGrCHUmW379JQ5S4GS85WVTx4xt --scope maria-alejandra-boada-rodriguezs-projects`.
+The change adds no migration, so no database step is needed.
+
 ### Rollback point before the UX fixes (recorded 2026-11-15 14:24 UTC)
 
 | Item | Value |

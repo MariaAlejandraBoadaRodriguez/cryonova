@@ -33,6 +33,16 @@ without an account, and CSV and PDF exports come from the same stored result.
 | CSV (results, monthly series) and vector PDF report | `src/reports/` , `app/api/exports` |
 | Connector status: live probes that read one real value where possible, plus the last real value each connector returned (`connector_checks`) | `src/providers/status.ts`, `/sources`, `/api/connectors/status` |
 
+## Use of AI
+
+- **Code:** written with AI coding assistance (Claude, by Anthropic).
+- **Image:** the pixel-art detective guide is AI-generated; the app shows the caption "AI-generated image" directly
+  under it wherever it appears.
+- **Numbers:** every number Cryonova shows (values, trends, intervals, p-values) is computed by its analysis code from
+  the source data: NASA Earth science data, plus Copernicus ERA5 and NOAA station records when those sources are
+  selected. No number comes from AI. The assistant only proposes an editable setup and explains computed results in
+  words, and the figures it cites are checked against the computed result.
+
 ## Architecture
 
 ```mermaid
@@ -135,5 +145,5 @@ averaged data on single levels (Copernicus C3S/ECMWF, doi:10.24381/cds.f17050d7,
 Copernicus Climate Change Service information); NOAA NCEI Global Summary of the Month (doi:10.7289/V5QV3JJ5)
 through the CDO web services. HDF5/NetCDF-4 files are read with h5wasm (NIST, public domain; HDF5 licence). Country
 boxes and borders from Natural Earth (public domain) via `world-atlas`. Globe texture: NASA Visible Earth Blue
-Marble (public domain), from the `three-globe` package (MIT). NASA Space Apps Challenge logo, detective artwork
-and orbit pattern come from the approved prototype.
+Marble (public domain), from the `three-globe` package (MIT). The detective artwork (AI-generated) and the orbit
+pattern come from the approved prototype; the app shows no NASA or Space Apps logo.
