@@ -65,7 +65,7 @@ export function AssistantPanel({ value, asking, thread, contextLine, onChange, o
           </p>
         )}
         {thread.length > 0 && (
-          <div className="ws-thread" role="log" aria-live="polite" aria-label="Conversation with the research assistant">
+          <div className="ws-thread" role="log" aria-live="polite" aria-label="Conversation with the research assistant" tabIndex={0}>
             {thread.map((m) => (
               <div key={m.id} className={`ws-msg ${m.role === "user" ? "ws-msg-user" : "ws-msg-assistant"}`}>
                 {m.badge && <span className="ws-msg-badge">{m.badge}</span>}
