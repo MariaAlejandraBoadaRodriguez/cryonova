@@ -1,0 +1,74 @@
+name: Neon preview branch
+
+# Every pull request gets its own Neon branch (a copy-on-write fork of the
+# production database), migrated to the PR's schema and tested; the PR's
+# Vercel preview deployments use it instead of the production database.
+# The branch and the branch-scoped Vercel variables are removed when the PR
+# closes. Connection strings are masked and never printed.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: neon-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+env:
+  NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+  NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: prj_x0sz6KFTyucW2ad8VY0ofaxGHbNZ
+  NEON_BRANCH: preview/pr-${{ github.event.pull_request.number }}
+
+jobs:
+  branch:
+    name: Neon branch, migrations, integration tests and preview wiring
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Create or reuse the PR's Neon branch
+        run: npx tsx scripts/neon-branch.ts ensure "$NEON_BRANCH" --github-env
+      - name: Apply migrations to the branch
+        run: npm run db:migrate
+        env:
+          DATABASE_URL_UNPOOLED: ${{ env.BRANCH_DATABASE_URL_UNPOOLED }}
+      - name: Integration tests against the branch
+        run: npm run test:integration
+        env:
+          TEST_DATABASE_URL: ${{ env.BRANCH_DATABASE_URL }}
+      - name: Point this branch's Vercel previews at the Neon branch
+        run: |
+          if [ "$NEON_BRANCH_CREATED" = "true" ] || [ "${{ github.event.action }}" = "opened" ] || [ "${{ github.event.action }}" = "reopened" ]; then
+            # The first preview was built before these variables existed: redeploy it once.
+            npx tsx scripts/vercel-preview-env.ts set --branch "${{ github.head_ref }}" --redeploy --sha "${{ github.event.pull_request.head.sha }}"
+          else
+            npx tsx scripts/vercel-preview-env.ts set --branch "${{ github.head_ref }}"
+          fi
+
+  cleanup:
+    name: Delete the PR's Neon branch and preview variables
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scripts/vercel-preview-env.ts unset --branch "${{ github.head_ref }}"
+      - run: npx tsx scripts/neon-branch.ts delete "$NEON_BRANCH"
