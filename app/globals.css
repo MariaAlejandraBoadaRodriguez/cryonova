@@ -973,7 +973,7 @@ code,
 .ws-area-setup select,
 .ws-area-setup input[type="search"],
 .ws-area-setup input[type="number"],
-.ws-area-assistant input[type="text"] {
+.ws-area-assistant textarea {
   width: 100%;
   min-width: 0;
   min-height: 36px;
@@ -992,8 +992,16 @@ code,
 }
 
 .ws-area-setup input::placeholder,
-.ws-area-assistant input::placeholder {
+.ws-area-assistant textarea::placeholder {
   color: #a9bbe0;
+}
+
+/* The question grows from 1 to 4 lines (AutoGrowTextarea sets the height), then scrolls. */
+.ws-area-assistant textarea {
+  display: block;
+  padding: 7px 8px;
+  line-height: 1.5;
+  resize: none;
 }
 
 .ws-pair {
@@ -1280,7 +1288,31 @@ code,
 .ws-ask {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
   gap: 8px;
+}
+
+/* One short line under the question: where the proposal went, or why there is none. */
+.ws-ask-note {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.ws-ack {
+  color: #dbe6ff;
+}
+
+.ws-ack span {
+  color: var(--sa-yellow);
+}
+
+.ws-ack a {
+  color: #fff;
+  font-weight: 600;
+}
+
+.ws-ask-note.alert {
+  padding: 8px 10px;
 }
 
 .ws-btn {
@@ -1343,56 +1375,6 @@ code,
   text-decoration: underline;
   min-height: 32px;
   padding: 4px 6px;
-}
-
-.ws-context {
-  max-width: 560px;
-  margin: 6px auto 0;
-}
-
-.ws-thread {
-  max-width: 560px;
-  margin: 8px auto 0;
-  max-height: 168px;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.ws-msg {
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-.ws-msg-user {
-  align-self: flex-end;
-  max-width: 90%;
-  padding: 5px 10px;
-  border-radius: 8px;
-  background: rgb(7 23 63 / 75%);
-  border: 1px solid var(--sa-yonder);
-}
-
-.ws-msg-assistant {
-  align-self: flex-start;
-  border-left: 3px solid var(--sa-yellow);
-  padding: 2px 0 2px 9px;
-}
-
-.ws-msg ul {
-  margin: 4px 0 0;
-  padding-left: 18px;
-  color: #dbe6ff;
-}
-
-.ws-msg-badge {
-  font-weight: 700;
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--sa-yellow);
-  margin-right: 6px;
 }
 
 .ws-area-globe {
@@ -1561,6 +1543,61 @@ code,
   color: var(--sa-electric);
 }
 
+/* The assistant's latest proposal, at the top of the right panel, in body-size text. */
+.proposal-card {
+  border-left: 4px solid var(--sa-neon);
+  line-height: 1.5;
+}
+
+.proposal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.proposal-card .proposal-head h3 {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.proposal-card p {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.proposal-details {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: #3b5368;
+  font-size: 13.5px;
+}
+
+.proposal-card .proposal-followup {
+  margin-top: 8px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  background: var(--warn-bg);
+}
+
+.proposal-card .proposal-working {
+  color: #3b5368;
+}
+
+.proposal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 10px;
+}
+
+.proposal-applied {
+  font-size: 13px;
+  color: #3b5368;
+}
+
 .guide-why {
   display: block;
   font-size: 12.5px;
@@ -1724,9 +1761,11 @@ code,
   margin: 8px 0 4px;
 }
 
+/* Sized to the whole question by AutoGrowTextarea: no inner scrollbar. */
 .plan textarea {
+  display: block;
   width: 100%;
-  min-height: 60px;
+  min-height: 0;
   padding: 6px 8px;
   border: 1px solid #9fb3cf;
   border-radius: 6px;
@@ -1735,6 +1774,8 @@ code,
   font: inherit;
   font-weight: 700;
   font-size: 15px;
+  line-height: 1.5;
+  resize: none;
 }
 
 .plan dl {
