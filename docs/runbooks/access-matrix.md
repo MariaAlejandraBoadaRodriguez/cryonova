@@ -1,9 +1,59 @@
 # Access matrix
 
-Checked on 2026-11-14 (UTC) from the Claude Code cloud environment `CRYONOVA`
+First checked on 2026-11-14 (UTC); credentials re-verified on 2026-11-15 from the Claude Code cloud environment `CRYONOVA`
 (network policy: limited, exact-host allowlist). Values of secrets were never
 printed; only presence and length were checked. "Dev container" is where code is
 written and tested; "Vercel" is where the app runs for users.
+
+## Credential probes (2026-11-15)
+
+`npx tsx scripts/probe-credentials.ts` sends one minimal authenticated request
+per credential, each with a 60 s deadline (`AbortSignal.timeout(60_000)`), and
+prints only the verdict, HTTP status, host and latency. It never prints a value,
+prefix or length. Run from the dev container on 2026-11-15 05:48 UTC; the whole
+probe took 2 s.
+
+| Credential | Probe (one request, redirects not followed) | HTTP | Verdict | Latency |
+|---|---|---|---|---|
+| `DATABASE_URL` | Neon SQL `select 1` (pooled endpoint) | 200 | ok, database `neondb` | 488 ms |
+| `DATABASE_URL_UNPOOLED` | Neon SQL `select 1` (direct endpoint) | 200 | ok, database `neondb` | 479 ms |
+| `EARTHDATA_TOKEN` | Cloud OPeNDAP DDS, MERRA-2 `M2TMNXSLV` granule 2010-06 | 200 | ok | 1,478 ms |
+| `EARTHDATA_TOKEN` | Cloud OPeNDAP DDS, GLDAS `GLDAS_NOAH025_M` 2.1 granule 2010-06 | 200 | ok | 1,498 ms |
+| `EARTHDATA_TOKEN` | OB.DAAC cloud file (TEA) for SeaWiFS 2000-06 monthly chlor_a | 303 | ok: signed CloudFront link issued, so the OB.DAAC app approval is active | 1,876 ms |
+| `EARTHDATA_TOKEN` | OB.DAAC OPeNDAP DDS (`oceandata.sci.gsfc.nasa.gov`) | 429 | rate limited from this sandbox (not an auth failure); the app falls back to the cloud file | 365 ms |
+| `EARTHDATA_TOKEN` | Harmony capabilities for GLDAS (`harmony.earthdata.nasa.gov`) | 200 | ok, Giovanni services listed | 1,071 ms |
+| `NOAA_CDO_TOKEN` | CDO web services v2 `/datasets?limit=1` | 200 | ok | 534 ms |
+| `CDSAPI_KEY` + `CDSAPI_URL` | CDS retrieve API `/retrieve/v1/jobs?limit=1` | 200 | ok | 1,059 ms |
+| `CDSAPI_KEY` + `CDSAPI_URL` | CDS `/profiles/v1/account/licences` | 200 | ok; accepted licences: `cc-by`, `data-protection-privacy-statement`, `terms-of-use-cds` | 650 ms |
+| `NEON_API_KEY` + `NEON_PROJECT_ID` | Neon API `GET /api/v2/projects/{id}` | 200 | ok | 442 ms |
+| `VERCEL_TOKEN` + `VERCEL_ORG_ID` | Vercel API `GET /v9/projects/cryonova` | 200 | ok | 511 ms |
+| `ANTHROPIC_API_KEY` | Anthropic `GET /v1/models?limit=1` | — | not run: set in the environment settings (listed by name), but the session runtime does not pass it to the shell. It is verified on Vercel instead, where the agent uses it | — |
+
+Notes:
+
+- The GES DISC hydro1 OPeNDAP server (`hydro1.gesdisc.eosdis.nasa.gov`) reset
+  connections from this sandbox; GLDAS is read through Cloud OPeNDAP
+  (`opendap.earthdata.nasa.gov`, collection `C1342986036-GES_DISC`) instead.
+- OB.DAAC's legacy `getfile` endpoint answered 416 to a ranged request, so the
+  probe now checks the cloud-file (TEA) route the app uses.
+- Signed download links (CloudFront for OB.DAAC and Harmony, the ECMWF object
+  store for CDS) are fetched **without** credentials. Credentials are only sent
+  to the host that issues the link; redirects are never followed with an
+  `Authorization` header.
+
+### Asynchronous test jobs (2026-11-15)
+
+Submitted once each and then checked in separate calls of at most 30 s, at most
+one check every 2 minutes (no command waits on a job).
+
+| Job | Provider job ID | Submitted (UTC) | Status | Real value obtained |
+|---|---|---|---|---|
+| ERA5 monthly `2m_temperature`, 2010-06, Colombia box, NetCDF | `6606ae41-09b3-4fbd-af83-32c684b0d9d7` | 05:30 | successful | NetCDF-4, 31,298 B; `t2m` 68 × 49 cells in K |
+| ERA5 monthly `2m_temperature`, 2010-06, Colombia box, GRIB | `7fc63848-a4fc-44db-88ad-e2c137d62923` | 05:31:44 | accepted (queued), last checked 05:47:45 | — |
+| ERA5 monthly, 10 variables, 2010-06, Colombia box, NetCDF (unit metadata) | `3895ff53-a006-4649-8ca9-bce28c29908a` | 05:47:46 | accepted | — |
+| Harmony / Giovanni area average, GLDAS 0–10 cm soil moisture, 2010, Colombia box, CSV | `90c61434-4582-409d-aa6a-3c7a67fe6c2c` | 05:32:00 | successful (12 s) | 2010-06: 36.234146 kg m⁻² |
+| Harmony / Giovanni area average, IMERG precipitation, 2010, Colombia box, CSV | `d2ea801d-6285-442a-b1d9-b5ed9ad0253a` | 05:47:47 | submitted | — |
+| Harmony / Giovanni point time series, GLDAS | `df08b22d-c875-40d7-92c4-a268701d2c18` | 05:31 | successful, but the result link points to the Giovanni API, which needs an interactive Earthdata Login (HTML login page returned); not usable server-side | — |
 
 ## Repository and platforms
 
@@ -31,13 +81,15 @@ written and tested; "Vercel" is where the app runs for users.
 | `ANTHROPIC_API_KEY` | configured in environment settings but **not exposed to the shell** | present (sensitive) | agent (server only) |
 | `ANTHROPIC_MODEL` | present (`claude-sonnet-5-5`) | present (sensitive) | agent |
 | `EARTHDATA_TOKEN` | present (EDL bearer token) | present (sensitive) | MERRA-2, IMERG via OPeNDAP |
-| `CDSAPI_URL`, `CDSAPI_KEY` | absent | present (sensitive) | Copernicus ERA5 connector |
-| `NOAA_CDO_TOKEN` | absent | present (sensitive) | NOAA CDO connector |
+| `CDSAPI_URL`, `CDSAPI_KEY` | present (since 2026-11-15) | present (sensitive) | Copernicus ERA5 connector |
+| `NOAA_CDO_TOKEN` | present (since 2026-11-15) | present (sensitive) | NOAA CDO connector |
+| `NEON_API_KEY`, `NEON_PROJECT_ID` | present (since 2026-11-15) | n/a (GitHub Actions secrets) | per-PR Neon branches in CI |
 | `VERCEL_TOKEN`, `VERCEL_ORG_ID` | present | n/a | deployment automation |
 | `EARTHDATA_USERNAME/PASSWORD` | absent | absent | not needed (bearer token) |
 
-Consequence: AI, ERA5 and NOAA can only be verified from the deployed app
-(`/api/connectors/status`), not from the dev container.
+Since 2026-11-15 ERA5 and NOAA are verified from the dev container as well;
+the Anthropic key is still only exercised on Vercel (see the probe table above).
+The same credentials are stored as GitHub Actions secrets for CI.
 
 ## Network (dev container)
 
@@ -57,7 +109,14 @@ CONNECT). The owner approved this exact-host allowlist on 2026-11-14:
 | `api.vercel.com` | Vercel REST API | 200 |
 | `cryonova-maria-alejandra-boada-rodriguezs-projects.vercel.app` | production smoke tests | reachable |
 | `api.c-8.us-east-2.aws.neon.tech` | Neon driver default HTTP host | **refused (not allowlisted)**; worked around with the endpoint host |
-| `cds.climate.copernicus.eu`, `harmony.earthdata.nasa.gov`, `tile.openstreetmap.org` | ERA5, Harmony, map tiles | refused (not allowlisted); tiles load from the user's browser in production |
+| `cds.climate.copernicus.eu` | ERA5 retrieve API (allowlisted 2026-11-15) | 200 |
+| `object-store.os-api.cci2.ecmwf.int` | ERA5 result downloads (signed, no credentials sent) | 200 |
+| `harmony.earthdata.nasa.gov` | Harmony / Giovanni services (allowlisted 2026-11-15) | 200 |
+| `dqzb5lcolc8fj.cloudfront.net` | Harmony result downloads (signed, no credentials sent) | 200 |
+| `obdaac-tea.earthdatacloud.nasa.gov`, `dwgofd1fffpxv.cloudfront.net` | OB.DAAC cloud files and their signed links | 303 then 200 |
+| `api.giovanni.earthdata.nasa.gov` | Giovanni API | reachable, but requires interactive Earthdata Login; not used |
+| `console.neon.tech` | Neon API (branches) | 200 |
+| `tile.openstreetmap.org` | map tiles | not needed: the globe and maps use bundled assets only |
 
 ## Live reads verified from the dev container
 
