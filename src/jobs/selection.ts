@@ -69,6 +69,10 @@ export const SelectionSchema = z
         ctx.addIssue({ code: "custom", path: ["end"], message: `${key} is declared until ${coverage.end}.` });
       }
     }
+    if (s.region.bbox.west > s.region.bbox.east) {
+      const blocked = [...new Set(s.variables.map((key) => collectionOf(getVariable(key)!)).filter((c) => c.access === "cds" || c.access === "harmony").map((c) => c.shortName))];
+      if (blocked.length > 0) ctx.addIssue({ code: "custom", path: ["region"], message: `${blocked.join(", ")} cannot read an area that crosses the 180° meridian; split it into two areas.` });
+    }
     const months = monthsBetween(s.start, s.end).length;
     const collections = new Set(s.variables.map((key) => getVariable(key)!.collection)).size;
     if (months * collections > MAX_PROVIDER_READS) {

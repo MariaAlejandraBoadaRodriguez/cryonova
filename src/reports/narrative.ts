@@ -69,8 +69,9 @@ export function deterministicSummary(result: RunResult): string[] {
     if (magnitude) lines.push(magnitude);
     lines.push(coverageSentence(v));
   }
-  const sources = result.sources.map((s) => `${s.collection} v${s.version}`).join(", ");
-  lines.push(`Values were read live from NASA Earthdata (${sources}) between ${result.sources[0]?.fetchedFrom?.slice(0, 16).replace("T", " ") ?? "—"} and ${result.sources[0]?.fetchedTo?.slice(0, 16).replace("T", " ") ?? "—"} UTC.`);
+  const sources = result.sources.map((s) => s.label ?? `${s.collection} v${s.version}`).join(", ");
+  const served = [...new Set(result.sources.map((s) => s.servedBy ?? "NASA Earthdata"))].join(", ");
+  lines.push(`Values were read live from ${served} (${sources}) between ${result.sources[0]?.fetchedFrom?.slice(0, 16).replace("T", " ") ?? "—"} and ${result.sources[0]?.fetchedTo?.slice(0, 16).replace("T", " ") ?? "—"} UTC.`);
   return lines;
 }
 

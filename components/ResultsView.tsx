@@ -13,6 +13,7 @@ import { coverageSentence, EVIDENCE_LABEL, evidenceOf, magnitudeSentence, qValue
 import { anomalyChart, decimalsOf, seasonalCycleChart, seriesChart } from "./charts";
 import { DiscoveryTable } from "./DiscoveryTable";
 import { Plot } from "./Plot";
+import { StationPanel } from "./StationPanel";
 import { TableWrap } from "./TableWrap";
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -280,16 +281,19 @@ export function VariableAnalyses({ v, result }: { v: VariableResult; result: Run
 
 /** One variable: main finding and its analyses. The dashboard's primary variable shows only the analyses here. */
 export function VariableCard({ v, result, index, showMain = true }: { v: VariableResult; result: RunResult; index: number; showMain?: boolean }) {
+  const label = result.sources.find((s) => s.collection === v.collection)?.label ?? `${v.product} v${v.version}`;
+  const hasSeries = v.analysis.coverage.monthsValid > 0;
   return (
     <article className="card" aria-labelledby={`var-${index}`} data-testid={`variable-${v.key}`}>
       <p className="step-label">
-        {v.product} v{v.version} · {v.dapName.replace(/^.*\//, "")}
+        {label} · {v.dapName.replace(/^.*\//, "")}
       </p>
       <h3 id={`var-${index}`}>
         {v.name.en} · {regionLabel(result)}
       </h3>
-      {showMain && <MainFinding v={v} result={result} />}
-      <VariableAnalyses v={v} result={result} />
+      {showMain && hasSeries && <MainFinding v={v} result={result} />}
+      {v.geometry === "stations" && <StationPanel v={v} result={result} />}
+      {hasSeries ? <VariableAnalyses v={v} result={result} /> : <p className="muted">No regional series for this variable (see the notes on coverage).</p>}
     </article>
   );
 }
@@ -338,7 +342,11 @@ export function ProvenancePanel({ result }: { result: RunResult }) {
           {fmtMonth(result.selection.start)} – {fmtMonth(result.selection.end)}
         </dd>
         <dt>Method</dt>
-        <dd>{result.variables[0]?.analysis.method}. Regional values are cosine-latitude weighted means of valid grid cells; years need 12 valid months.</dd>
+        <dd>
+          {result.variables[0]?.analysis.method}. Gridded values are cosine-latitude weighted means of valid grid cells; years need 12 valid months.
+          {result.sources.some((s) => s.kind === "service") ? " Giovanni variables use the area average computed by NASA Giovanni." : ""}
+          {result.sources.some((s) => s.kind === "stations") ? " Station variables use the mean of the reporting stations (point data)." : ""}
+        </dd>
         <dt>Timings</dt>
         <dd>
           discovery {fmtDuration(result.timings.discoveryMs)} · reads {fmtDuration(result.timings.readWallMs)} wall ({result.timings.concurrency} workers) · analysis {fmtDuration(result.timings.analysisMs)} · total{" "}
@@ -350,16 +358,22 @@ export function ProvenancePanel({ result }: { result: RunResult }) {
       {result.sources.map((s) => (
         <details key={s.collection} open>
           <summary>
-            {s.collection} v{s.version} — {s.provider}
+            {s.label ?? `${s.collection} v${s.version}`} — {s.provider}
           </summary>
           <dl className="kv">
             <dt>Product</dt>
             <dd>{s.title}</dd>
-            <dt>CMR collection</dt>
+            <dt>{/^C\d+-/.test(s.conceptId) ? "CMR collection" : "Provider dataset"}</dt>
             <dd>
-              <a href={`https://cmr.earthdata.nasa.gov/search/concepts/${s.conceptId}.html`} target="_blank" rel="noreferrer">
-                {s.conceptId}
-              </a>
+              {/^C\d+-/.test(s.conceptId) ? (
+                <a href={`https://cmr.earthdata.nasa.gov/search/concepts/${s.conceptId}.html`} target="_blank" rel="noreferrer">
+                  {s.conceptId}
+                </a>
+              ) : (
+                <a href={s.landingPage} target="_blank" rel="noreferrer">
+                  {s.conceptId}
+                </a>
+              )}
               {s.doi && (
                 <>
                   {" "}
@@ -374,20 +388,57 @@ export function ProvenancePanel({ result }: { result: RunResult }) {
             <dd>
               {s.monthsRead} of {s.monthsRequested} months read · {s.monthsFailed} failed · {s.monthsMissing} not published · {fmtBytes(s.bytes)}
             </dd>
-            <dt>Granules</dt>
-            <dd className="mono">
-              {s.firstGranule ?? "—"} → {s.lastGranule ?? "—"}
-            </dd>
+            {s.jobs && s.jobs.length > 0 ? (
+              <>
+                <dt>Provider job{s.jobs.length === 1 ? "" : "s"}</dt>
+                <dd>
+                  {s.jobs.map((j) => (
+                    <div key={j.jobRef ?? j.submittedAt} className="mono">
+                      {j.jobRef ?? "—"} · {j.status} · submitted {fmtUtc(j.submittedAt)} · ready {fmtUtc(j.completedAt)} · {j.checks} status check{j.checks === 1 ? "" : "s"}
+                    </div>
+                  ))}
+                </dd>
+              </>
+            ) : s.kind === "stations" ? (
+              <>
+                <dt>Stations read</dt>
+                <dd>{s.stations?.length ?? 0} stations with the best record inside the area</dd>
+              </>
+            ) : (
+              <>
+                <dt>Granules</dt>
+                <dd className="mono">
+                  {s.firstGranule ?? "—"} → {s.lastGranule ?? "—"}
+                </dd>
+              </>
+            )}
             <dt>Fetched</dt>
             <dd>
               {fmtUtc(s.fetchedFrom)} → {fmtUtc(s.fetchedTo)} (median read {fmtDuration(s.readMs.median)}, p95 {fmtDuration(s.readMs.p95)})
             </dd>
-            <dt>Grid window</dt>
-            <dd>
-              {s.window.cells} cells per month at {s.window.resolution}
-              {s.window.stride > 1 ? `, every ${s.window.stride} cells` : ""} · lat index {s.window.lat.start}–{s.window.lat.stop} · lon pieces{" "}
-              {s.window.lon.map((p) => `${p.start}–${p.stop}`).join(" + ")}
-            </dd>
+            {s.kind === "stations" ? (
+              <>
+                <dt>Regional mean</dt>
+                <dd>
+                  {s.window.cells} of {s.window.nativeCells} stations had enough months to enter the regional mean
+                </dd>
+              </>
+            ) : s.kind === "service" ? (
+              <>
+                <dt>Area average</dt>
+                <dd>Computed by NASA Giovanni over the selected box from the {s.window.resolution} grid ({s.window.nativeCells} grid cells)</dd>
+              </>
+            ) : (
+              <>
+                <dt>Grid window</dt>
+                <dd>
+                  {s.window.cells} cells per month at {s.window.resolution}
+                  {s.window.stride > 1 ? `, every ${s.window.stride} cells` : ""}
+                  {s.window.lon.length > 0 ? ` · lat index ${s.window.lat.start}–${s.window.lat.stop} · lon pieces ${s.window.lon.map((p) => `${p.start}–${p.stop}`).join(" + ")}` : ""}
+                  {s.readsVia ? ` · ${s.readsVia.opendap} months as OPeNDAP subsets, ${s.readsVia.cloudFile} from full monthly files` : ""}
+                </dd>
+              </>
+            )}
             <dt>Access</dt>
             <dd>{s.access}</dd>
             <dt>Example request</dt>

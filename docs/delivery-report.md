@@ -66,3 +66,28 @@ Pull request: MariaAlejandraBoadaRodriguez/cryonova#5 (branch `feat/three-column
   - `/api/catalog`: 65 variables, 33 topics, 12 derived series.
   - Texture served as `image/jpeg` by the app.
   - Live run `c8963321-efb5-4af0-81fa-2db6ae2d0fc4` (Colombia 2015–2024, TS, T2M and derived TS−T2M): 120 of 120 months read in 38 s. The derived series equals TS − T2M month by month (2015-01: 24.8197 − 24.6454 = 0.1744 °C); trend +0.067 °C/decade (95% CI +0.002 to +0.132).
+
+## All connectors (GLDAS, SeaWiFS, ERA5, NOAA, Giovanni) and per-PR Neon branches
+
+Request: verify every credential, integrate the five pending sources with real values, add their variables to the catalog with live-verified units and coverage, show each connector's real status on `/sources`, use per-preview Neon branches in CI. Pull request: MariaAlejandraBoadaRodriguez/cryonova#6 (branch `feat/all-connectors`). Observed on 2026-11-15 (UTC).
+
+- **Credentials.** `scripts/probe-credentials.ts`: one probe per credential, each with a 60 s deadline, verdicts only. Every credential was accepted (results in `docs/runbooks/access-matrix.md`). `ANTHROPIC_API_KEY` is not passed to the session shell, so it was verified on the preview instead: `/api/health?deep=ai` answered OK (`claude-sonnet-5-5`, 1.0 s).
+- **Catalog.** 28 new variables and 5 new topics; all 92 variables match live metadata (`docs/benchmarks/catalog-verification.md`).
+- **Asynchronous providers.** CDS and Harmony jobs are stored in `provider_jobs` and advanced by client polling with short checks (D-29). CDS queue waits that day ranged from 13 s to 61 min.
+- **SeaWiFS.** OB.DAAC OPeNDAP answered HTTP 429 to every request, from this sandbox and from Vercel. SeaWiFS reads therefore use the cloud-file fallback, capped at 12 months per run; the plan warns for longer ranges (D-30).
+- **Per-PR Neon branch.** `neon-preview.yml` created `preview/pr-6` (`br-delicate-butterfly-bdxu8otw`), applied the migrations, and passed the integration tests 2/2 against it.
+  - The Vercel wiring step stops because the repository has no `VERCEL_TOKEN` / `VERCEL_ORG_ID` Actions secrets; only the Neon secrets are set.
+  - For this PR, the same script was run from the dev container: the branch-scoped preview variables were set and the preview redeployed (`dpl_5AzRvZXmqyYECANG49Ro2s2qzou8`).
+  - The preview's `/api/health` reports migration 3 (production: 2), so the preview uses the branch, not production.
+
+### Preview verification (Vercel, database `preview/pr-6`, commit `07425b5`)
+
+| Connector | `/sources` probe on Vercel | Live run | Real value | Months | Bytes | Time |
+|---|---|---|---|---|---|---|
+| GLDAS (Cloud OPeNDAP) | Verified live (33.758 kg/m², Bogotá area, 2026-07) | `8a64fd3d-9f1c-4c0b-832b-d231b7dac308` | Soil moisture 0–10 cm, Colombia box, 2010-06: **36.2341 kg/m²** | 12/12 | 332,940 B | 3.6 s |
+| SeaWiFS (OB.DAAC) | Reachable (OPeNDAP 429) | `1bb9a0e4-26e9-44aa-a12b-9b3f3d95854c` | chlor_a, Colombian Pacific, 2000-06: **0.3359 mg/m³** | 12/12 (all as full cloud files) | 159,058,723 B | 48.8 s, 1 invocation |
+| ERA5 (Copernicus CDS job) | Reachable (account and 3 licences) | `a9eecd7b-d1ec-40cf-97ad-98b9dd362f96` | 2 m temperature, Colombia box, 2010-06: **24.5469 °C** (total precipitation 11.10 mm/day) | 12/12 | 192,410 B | 2.4 s (CDS served the cached result of an identical request) |
+| NOAA CDO (GSOM stations) | Verified live (Denver Central Park TAVG 2025-12: 5.2 °C) | `a7c9be8c-871a-4f06-9640-b7767ec1a49d` | Station-mean TAVG, Colorado Front Range, 2005-06: **16.71 °C** (8 stations) | 120/120 | 307,971 B | 6.0 s |
+| Giovanni via Harmony (GLDAS) | Reachable (Giovanni services listed) | `066cc153-3d50-4d1c-b8da-dfb97cf01298` | Area average 0–10 cm, 2010-06: **36.2341 kg/m²** (equal to the OPeNDAP-based run) | 12/12 | 547 B | 37 s, 2 invocations |
+| Giovanni via Harmony (IMERG) | — | `df4dea1a-db6d-40c4-a15f-018c008a1003` | Area-average precipitation, 2010-06: **10.1168 mm/day** | 12/12 | 557 B | 37 s, 2 invocations |
+| MERRA-2, GPM IMERG | Verified live (21.082 °C; 5.410 mm/day) | — | (unchanged connectors) | — | — | — |

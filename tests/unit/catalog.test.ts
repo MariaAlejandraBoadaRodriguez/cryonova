@@ -83,8 +83,14 @@ describe("catalog", () => {
     ["temperatura del aire", "merra2.T2M"],
     ["near-surface air temperature", "merra2.T2M"],
     ["T2M", "merra2.T2M"],
-    ["soil moisture", "merra2.GWETTOP"],
-    ["humedad del suelo", "merra2.GWETTOP"],
+    // GLDAS (a dedicated land-surface model, added 2026-11-15) is the best match for soil moisture.
+    ["soil moisture", "gldas.SoilMoi0_10cm_inst"],
+    ["humedad del suelo", "gldas.SoilMoi0_10cm_inst"],
+    ["surface soil wetness", "merra2.GWETTOP"],
+    ["ocean chlorophyll", "seawifs.chlor_a"],
+    ["clorofila", "seawifs.chlor_a"],
+    ["weather stations temperature", "noaa.TAVG"],
+    ["era5 temperature", "era5.t2m"],
     ["ozone layer", "merra2.TO3"],
     ["polvo del sahara", "merra2.DUEXTTAU"],
   ])("finds %s", (query, key) => {

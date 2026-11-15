@@ -1,11 +1,40 @@
+import { ERA5_COLLECTIONS, ERA5_VARIABLES } from "./era5";
+import { GIOVANNI_COLLECTIONS, GIOVANNI_VARIABLES } from "./giovanni";
+import { GLDAS_COLLECTIONS, GLDAS_VARIABLES } from "./gldas";
 import { IMERG_COLLECTIONS, IMERG_VARIABLES } from "./imerg";
 import { MERRA2_COLLECTIONS, MERRA2_VARIABLES } from "./merra2";
+import { NOAA_COLLECTIONS, NOAA_VARIABLES } from "./noaa";
+import { SEAWIFS_COLLECTIONS, SEAWIFS_VARIABLES } from "./seawifs";
 import { DERIVED } from "./derived";
 import { TOPICS } from "./topics";
 import type { CatalogVariable, CollectionSpec, Topic } from "./types";
 
-export const COLLECTIONS: Record<string, CollectionSpec> = { ...MERRA2_COLLECTIONS, ...IMERG_COLLECTIONS };
-export const VARIABLES: CatalogVariable[] = [...MERRA2_VARIABLES, ...IMERG_VARIABLES];
+export const COLLECTIONS: Record<string, CollectionSpec> = {
+  ...MERRA2_COLLECTIONS,
+  ...IMERG_COLLECTIONS,
+  ...GLDAS_COLLECTIONS,
+  ...SEAWIFS_COLLECTIONS,
+  ...ERA5_COLLECTIONS,
+  ...NOAA_COLLECTIONS,
+  ...GIOVANNI_COLLECTIONS,
+};
+export const VARIABLES: CatalogVariable[] = [...MERRA2_VARIABLES, ...IMERG_VARIABLES, ...GLDAS_VARIABLES, ...SEAWIFS_VARIABLES, ...ERA5_VARIABLES, ...NOAA_VARIABLES, ...GIOVANNI_VARIABLES];
+
+export function accessOf(collection: CollectionSpec): NonNullable<CollectionSpec["access"]> {
+  return collection.access ?? "opendap";
+}
+
+/** Organisation serving the data, for provenance text. */
+export function servedBy(collection: CollectionSpec): string {
+  return collection.servedBy ?? "NASA Earthdata";
+}
+
+/** "M2TMNXSLV v5.12.4", or "ERA5_SL_MONTHLY (CDS)" when the version is not a number. */
+export function productLabel(collection: Pick<CollectionSpec, "shortName" | "version">): string {
+  return /^\d[\w.]*$/.test(collection.version) ? `${collection.shortName} v${collection.version}` : `${collection.shortName} (${collection.version})`;
+}
+
+const GEOGRAPHIC: Record<string, string> = { land: "Global, land cells only", ocean: "Global, ocean cells only", global: "Global" };
 export { TOPICS };
 
 const BY_KEY = new Map(VARIABLES.map((v) => [v.key, v]));
@@ -56,7 +85,10 @@ export function publicCatalog() {
         productTitle: c.title,
         fieldCount: c.fieldCount,
         resolution: c.grid.resolutionLabel,
-        coverage: { temporal: c.temporal, geographic: v.domain === "land" ? "Global, land cells only" : "Global" },
+        coverage: { temporal: c.temporal, geographic: v.geometry === "stations" ? "Weather stations inside the area" : (GEOGRAPHIC[v.domain] ?? "Global") },
+        access: accessOf(c),
+        servedBy: servedBy(c),
+        geometry: v.geometry ?? "grid",
         words: v.words,
         phrases: v.phrases,
       };

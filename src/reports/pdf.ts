@@ -229,7 +229,7 @@ export async function buildPdf(result: RunResult, options: PdfOptions = {}): Pro
     ["Region", `${region} - ${fmtBBox(result.region.bbox)}`],
     ["Period", `${fmtMonth(result.selection.start)} to ${fmtMonth(result.selection.end)}`],
     ["Variables", result.variables.map((v) => `${v.name.en} (${v.product} v${v.version}, ${v.dapName.replace(/^.*\//, "")})`).join("; ")],
-    ["Data fetched", `${result.sources[0]?.fetchedFrom?.replace("T", " ").slice(0, 19) ?? "-"} to ${result.sources[0]?.fetchedTo?.replace("T", " ").slice(0, 19) ?? "-"} UTC (live from NASA Earthdata)`],
+    ["Data fetched", `${result.sources[0]?.fetchedFrom?.replace("T", " ").slice(0, 19) ?? "-"} to ${result.sources[0]?.fetchedTo?.replace("T", " ").slice(0, 19) ?? "-"} UTC (live from ${[...new Set(result.sources.map((s) => s.servedBy ?? "NASA Earthdata"))].join(", ")})`],
     ["Run ID", result.runId],
     ...(options.investigationId ? ([["Investigation ID", options.investigationId]] as Array<[string, string]>) : []),
     ...(options.code ? ([["Retrieval code", `${options.code} (open read-only at Cryonova -> Open with code)`]] as Array<[string, string]>) : []),
@@ -284,7 +284,14 @@ export async function buildPdf(result: RunResult, options: PdfOptions = {}): Pro
   w.heading("Method, coverage and provenance");
   w.text(`${result.variables[0]?.analysis.method ?? ""}. Regional values are cosine-latitude weighted means of valid grid cells. A year enters the trend only with 12 valid months; at least 10 complete years are required.`, { size: 9 });
   for (const s of result.sources) {
-    w.text(`${s.collection} v${s.version} (${s.conceptId}): ${s.monthsRead} of ${s.monthsRequested} months read, ${s.monthsFailed} failed, ${s.monthsMissing} unpublished; ${s.window.cells} cells per month at ${s.window.resolution}${s.window.stride > 1 ? `, every ${s.window.stride} cells` : ""}; granules ${s.firstGranule ?? "-"} to ${s.lastGranule ?? "-"}.`, { size: 9 });
+    const where =
+      s.kind === "stations"
+        ? `${s.window.cells} of ${s.window.nativeCells} stations in the regional mean`
+        : s.kind === "service"
+          ? "area average computed by NASA Giovanni"
+          : `${s.window.cells} cells per month at ${s.window.resolution}${s.window.stride > 1 ? `, every ${s.window.stride} cells` : ""}`;
+    const refs = s.jobs?.length ? `provider job ${s.jobs.map((j) => j.jobRef).join(", ")}` : `granules ${s.firstGranule ?? "-"} to ${s.lastGranule ?? "-"}`;
+    w.text(`${s.label ?? `${s.collection} v${s.version}`} (${s.conceptId}): ${s.monthsRead} of ${s.monthsRequested} months read, ${s.monthsFailed} failed, ${s.monthsMissing} unpublished; ${where}; ${refs}.`, { size: 9 });
   }
   for (const warning of result.warnings) w.text(`Note: ${warning}`, { size: 9, color: C.muted });
 

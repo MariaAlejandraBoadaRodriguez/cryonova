@@ -58,9 +58,52 @@ export const runSamples = pgTable(
     attempts: integer("attempts").notNull().default(0),
     error: text("error"),
     fetchedAt: timestamp("fetched_at", { withTimezone: true }),
+    /** How the value was obtained when there is more than one path (e.g. "opendap" or "cloud-file" for OB.DAAC). */
+    via: text("via"),
   },
   (t) => [primaryKey({ columns: [t.runId, t.collection, t.month] }), index("run_samples_status_idx").on(t.runId, t.status)],
 );
+
+/**
+ * Provider-side work for a run that is not a month-by-month OPeNDAP read: an
+ * asynchronous job (Copernicus CDS, NASA Harmony) or a NOAA station selection.
+ * Submitted once, then checked with short requests on later invocations
+ * (client polling), so no request waits for the provider.
+ */
+export const providerJobs = pgTable(
+  "provider_jobs",
+  {
+    runId: uuid("run_id")
+      .notNull()
+      .references(() => runs.id, { onDelete: "cascade" }),
+    collection: text("collection").notNull(),
+    jobKey: text("job_key").notNull(),
+    provider: text("provider").notNull(),
+    jobRef: text("job_ref"),
+    status: text("status").notNull(),
+    request: jsonb("request"),
+    meta: jsonb("meta"),
+    message: text("message"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }).notNull().defaultNow(),
+    checkedAt: timestamp("checked_at", { withTimezone: true }),
+    nextCheckAt: timestamp("next_check_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    checks: integer("checks").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.runId, t.collection, t.jobKey] }), index("provider_jobs_status_idx").on(t.status, t.nextCheckAt)],
+);
+
+/** The last real value each connector returned (from a run or a live probe), shown on /sources. */
+export const connectorChecks = pgTable("connector_checks", {
+  connector: text("connector").primaryKey(),
+  checkedAt: timestamp("checked_at", { withTimezone: true }).notNull().defaultNow(),
+  ok: boolean("ok").notNull(),
+  value: doublePrecision("value"),
+  units: text("units"),
+  label: text("label"),
+  detail: jsonb("detail"),
+  runId: uuid("run_id"),
+});
 
 /** A saved, read-only copy of a run, retrievable by its random code. */
 export const investigations = pgTable("investigations", {

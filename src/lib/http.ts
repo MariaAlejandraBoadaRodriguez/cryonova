@@ -107,12 +107,18 @@ function retryAfterMs(response: Response): number | undefined {
  * Performs a request under a policy and parses the body inside the attempt.
  * Throws ProviderError with a classified kind on final failure.
  */
+export interface RequestOptions {
+  /** Statuses treated as success besides 2xx (e.g. 3xx when redirects are not followed). */
+  accept?: (status: number) => boolean;
+}
+
 export async function requestWithPolicy<T>(
   url: string,
   init: RequestInit,
   policy: RequestPolicy,
   parse: (response: Response) => Promise<T>,
   fetchImpl: FetchLike = fetch,
+  options: RequestOptions = {},
 ): Promise<RequestResult<T>> {
   const host = hostOf(url);
   const started = Date.now();
@@ -129,7 +135,7 @@ export async function requestWithPolicy<T>(
 
     try {
       const response = await fetchImpl(url, { ...init, signal });
-      if (!response.ok) {
+      if (!response.ok && !options.accept?.(response.status)) {
         const kind = classifyStatus(response.status);
         // Drain a small part of the body for diagnostics, without secrets.
         const detail = (await response.text().catch(() => "")).slice(0, 160).replace(/\s+/g, " ");
@@ -167,3 +173,22 @@ export async function requestWithPolicy<T>(
 export const parseJson = <T>(response: Response): Promise<T> => response.json() as Promise<T>;
 export const parseBytes = async (response: Response): Promise<Uint8Array> => new Uint8Array(await response.arrayBuffer());
 export const parseText = (response: Response): Promise<string> => response.text();
+
+/**
+ * Asks a host for a redirect without following it and returns the Location.
+ * Used for signed download links: credentials go only to the host that issues
+ * the link, and the signed link itself is then fetched without credentials.
+ */
+export async function redirectLocation(url: string, headers: Record<string, string>, policy: RequestPolicy, fetchImpl: FetchLike = fetch): Promise<RequestResult<string>> {
+  const host = hostOf(url);
+  const result = await requestWithPolicy(url, { headers, redirect: "manual" }, policy, async (response) => {
+    await response.body?.cancel().catch(() => undefined);
+    return response.headers.get("location") ?? "";
+  }, fetchImpl, { accept: (status) => status >= 300 && status < 400 });
+  if (!result.value || result.status < 300) throw new ProviderError("bad_response", `${host} did not issue a download link (HTTP ${result.status})`, host, result.attempts, result.status);
+  const location = new URL(result.value, url).toString();
+  if (/^https:\/\/urs\.earthdata\.nasa\.gov\//.test(location)) {
+    throw new ProviderError("unauthorized", `${host} redirected to Earthdata Login: the token or the data provider's application approval was not accepted`, host, result.attempts, result.status);
+  }
+  return { ...result, value: location };
+}

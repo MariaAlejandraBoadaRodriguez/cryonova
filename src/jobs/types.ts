@@ -22,6 +22,10 @@ export interface RunProgress {
   invocations?: number;
   timings?: Partial<RunTimings>;
   message?: string;
+  /** While provider jobs are queued: the run is not resumed before this time (ISO). */
+  waitUntil?: string;
+  /** Provider jobs this run waits on, for the progress view. */
+  jobs?: Array<{ collection: string; provider: string; jobRef: string | null; status: string; message: string | null; submittedAt: string; checks: number }>;
 }
 
 export interface RunRow {
@@ -71,6 +75,7 @@ export interface SampleRow {
   attempts: number;
   error: string | null;
   fetchedAt: Date | null;
+  via?: string | null;
 }
 
 export interface RunTimings {
@@ -108,6 +113,36 @@ export interface SourceProvenance {
   readMs: { median: number; p95: number; max: number };
   window: { lat: IndexRange; lon: IndexRange[]; cells: number; nativeCells: number; stride: number; snapped: boolean; resolution: string };
   access: string;
+  /** grid = Cryonova averaged the cells; service = the provider computed the area average; stations = point observations. */
+  kind?: "grid" | "service" | "stations";
+  /** Organisation serving the data (NASA Earthdata, Copernicus Climate Data Store, NOAA NCEI…). */
+  servedBy?: string;
+  /** "M2TMNXSLV v5.12.4" or "ERA5_SL_MONTHLY (CDS)". */
+  label?: string;
+  /** Asynchronous provider jobs behind this source. */
+  jobs?: Array<{ provider: string; jobRef: string | null; status: string; submittedAt: string; completedAt: string | null; checks: number; message: string | null }>;
+  /** OB.DAAC: months read as OPeNDAP subsets vs. full cloud files. */
+  readsVia?: { opendap: number; cloudFile: number };
+  /** NOAA: stations considered for the area. */
+  stations?: Array<{ id: string; name: string; lat: number; lon: number; elevation: number | null }>;
+}
+
+export interface StationResult {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  elevation: number | null;
+  monthsValid: number;
+  /** Mean over the station's valid months, in display units. */
+  mean: number | null;
+  usedInRegionalMean: boolean;
+  trendPerDecade: number | null;
+  trendPValue: number | null;
+  firstMonth: string | null;
+  lastMonth: string | null;
+  /** Monthly values in display units (null = no report). */
+  monthly: Array<{ month: string; value: number | null }>;
 }
 
 export interface VariableResult {
@@ -123,6 +158,9 @@ export interface VariableResult {
   unitGroup: string;
   aggregation: string;
   analysis: VariableAnalysis;
+  geometry?: "grid" | "stations";
+  /** Station data: one entry per station considered. */
+  stations?: StationResult[];
 }
 
 export interface RunResult {

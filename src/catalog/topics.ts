@@ -9,13 +9,17 @@
  * about differences or wind vectors carry derived series.
  *
  * The remaining entries extend the catalog with live-verified collections the
- * prototype did not cover (flux, land, radiation, aerosols, GPM IMERG).
+ * prototype did not cover (flux, land, radiation, aerosols, GPM IMERG, and
+ * since 2026-11-15 GLDAS, SeaWiFS, ERA5, NOAA stations and Giovanni).
  * Differences are recorded in docs/decision-log.md (D-21).
  */
 import type { AnalysisKind, Topic } from "./types";
 
 const ALL: AnalysisKind[] = ["monthly_series", "annual_trend", "seasonal_cycle", "monthly_anomalies", "annual_ranking", "period_comparison", "seasonal_trends", "positive_streaks"];
-const COUNTS: Record<string, number> = { M2TMNXSLV: 94, M2TMNXFLX: 92, M2TMNXLND: 100, M2TMNXRAD: 72, M2TMNXAER: 100, GPM_3IMERGM: 11 };
+const COUNTS: Record<string, number> = {
+  M2TMNXSLV: 94, M2TMNXFLX: 92, M2TMNXLND: 100, M2TMNXRAD: 72, M2TMNXAER: 100, GPM_3IMERGM: 11,
+  GLDAS_NOAH025_M: 36, SeaWiFS_L3m_CHL: 2, ERA5_SL_MONTHLY: 10, NOAA_GSOM: 93, GIOVANNI_GLDAS_NOAH025_M: 1, GIOVANNI_GPM_3IMERGM: 1,
+};
 const LAST_COMPLETE_YEAR = new Date().getUTCFullYear() - 1;
 
 type TopicInput = Omit<Topic, "fieldCount" | "suggestedPeriod" | "extraAnalyses" | "derived" | "origin"> & { derived?: string[]; firstYear?: number; lastMonth?: string };
@@ -198,4 +202,30 @@ export const TOPICS: Topic[] = [
     title: { en: "Aerosols and dust", es: "Aerosoles y polvo" },
     question: { en: "Is the air getting hazier, and how much of the change is dust?", es: "¿Se vuelve el aire más turbio y cuánto del cambio se debe al polvo?" },
     words: { en: ["aerosol", "dust"], es: ["aerosoles", "polvo"] }, phrases: { en: ["air pollution"], es: ["contaminacion del aire"] } }),
+  // ---- Extensions from the connectors added on 2026-11-15 (GLDAS, SeaWiFS, ERA5, NOAA, Giovanni) ----
+  topic("extension", { id: "soil-moisture", collections: ["GLDAS_NOAH025_M"], variables: ["gldas.SoilMoi0_10cm_inst", "gldas.RootMoist_inst"], suggestedYears: 20, firstYear: 2000,
+    title: { en: "Soil moisture", es: "Humedad del suelo" },
+    question: { en: "Are the soils drying out, at the surface and in the root zone?", es: "¿Se están secando los suelos, en la superficie y en la zona radicular?" },
+    words: { en: ["soil", "moisture", "drought", "drying"], es: ["suelo", "humedad", "sequia", "secando"] },
+    phrases: { en: ["soil moisture", "agricultural drought"], es: ["humedad del suelo", "sequia agricola"] } }),
+  topic("extension", { id: "ocean-chlorophyll", collections: ["SeaWiFS_L3m_CHL"], variables: ["seawifs.chlor_a"], suggestedYears: 12, firstYear: 1998, lastMonth: "2010-12",
+    title: { en: "Ocean chlorophyll (1998–2010)", es: "Clorofila del océano (1998–2010)" },
+    question: { en: "Did ocean chlorophyll change during the SeaWiFS mission?", es: "¿Cambió la clorofila del océano durante la misión SeaWiFS?" },
+    words: { en: ["chlorophyll", "phytoplankton", "ocean", "seawifs"], es: ["clorofila", "fitoplancton", "oceano", "seawifs"] },
+    phrases: { en: ["ocean chlorophyll", "ocean color"], es: ["clorofila del oceano", "color del oceano"] } }),
+  topic("extension", { id: "reanalysis-agreement", collections: ["ERA5_SL_MONTHLY", "M2TMNXSLV"], variables: ["era5.t2m", "merra2.T2M"], suggestedYears: 20,
+    title: { en: "ERA5 and MERRA-2 temperature", es: "Temperatura en ERA5 y MERRA-2" },
+    question: { en: "Do ERA5 and MERRA-2 agree on the near-surface warming?", es: "¿Coinciden ERA5 y MERRA-2 en el calentamiento cerca de la superficie?" },
+    words: { en: ["era5", "merra", "reanalysis", "agree"], es: ["era5", "merra", "reanalisis", "coinciden"] },
+    phrases: { en: ["era5 versus merra-2", "two reanalyses"], es: ["era5 frente a merra-2", "dos reanalisis"] } }),
+  topic("extension", { id: "station-observations", collections: ["NOAA_GSOM"], variables: ["noaa.TAVG", "noaa.PRCP"], suggestedYears: 20,
+    title: { en: "Weather-station observations", es: "Observaciones de estaciones meteorológicas" },
+    question: { en: "What do the weather stations in the area show for temperature and rainfall?", es: "¿Qué muestran las estaciones meteorológicas del área en temperatura y lluvia?" },
+    words: { en: ["station", "stations", "observed", "noaa"], es: ["estacion", "estaciones", "observado", "noaa"] },
+    phrases: { en: ["weather stations", "station observations"], es: ["estaciones meteorologicas", "observaciones de estaciones"] } }),
+  topic("extension", { id: "giovanni-crosscheck", collections: ["GLDAS_NOAH025_M", "GIOVANNI_GLDAS_NOAH025_M"], variables: ["gldas.SoilMoi0_10cm_inst", "giovanni.GLDAS_SoilMoi0_10cm"], suggestedYears: 20, firstYear: 2000,
+    title: { en: "Cross-check with NASA Giovanni", es: "Contraste con NASA Giovanni" },
+    question: { en: "Does NASA Giovanni's area average match Cryonova's for surface soil moisture?", es: "¿Coincide el promedio de área de NASA Giovanni con el de Cryonova para la humedad superficial del suelo?" },
+    words: { en: ["giovanni", "cross-check", "compare"], es: ["giovanni", "contraste", "comparar"] },
+    phrases: { en: ["giovanni cross-check", "compare with giovanni"], es: ["contraste con giovanni"] } }),
 ];

@@ -73,8 +73,25 @@ export function searchCatalog(query: string, limit = 12): SearchHit[] {
         matched.add(topic.title.en);
       }
     }
+    // Naming a source ("era5", "noaa", "giovanni"…) prefers that source's variables.
+    if (score > 0 && (SOURCE_WORDS[variable.source] ?? []).some((w) => queryTokens.has(w))) score += 5;
+    // Giovanni entries are an alternative access path (cross-check), never the first suggestion.
+    if (variable.source === "giovanni") score = Math.floor(score * 0.75);
     if (score > 0) hits.push({ variable, score, matched: [...matched] });
   }
 
-  return hits.sort((a, b) => b.score - a.score || a.variable.key.localeCompare(b.variable.key)).slice(0, limit);
+  return hits.sort((a, b) => b.score - a.score || (SOURCE_RANK[a.variable.source] ?? 9) - (SOURCE_RANK[b.variable.source] ?? 9) || a.variable.key.localeCompare(b.variable.key)).slice(0, limit);
 }
+
+const SOURCE_WORDS: Record<string, string[]> = {
+  merra2: ["merra", "merra-2", "merra2"],
+  imerg: ["imerg", "gpm"],
+  gldas: ["gldas", "noah"],
+  seawifs: ["seawifs"],
+  era5: ["era5", "copernicus", "ecmwf"],
+  noaa: ["noaa", "ghcn", "gsom", "station", "stations", "estacion", "estaciones"],
+  giovanni: ["giovanni", "harmony"],
+};
+
+/** Tie-breaker between equally good matches: the long-standing NASA products first, cross-check paths last. */
+const SOURCE_RANK: Record<string, number> = { merra2: 0, imerg: 1, gldas: 2, era5: 3, seawifs: 4, noaa: 5, giovanni: 6 };

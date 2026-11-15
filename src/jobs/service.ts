@@ -30,8 +30,15 @@ export function publicRun(run: RunRow) {
 
 export type PublicRun = ReturnType<typeof publicRun>;
 
+/**
+ * True when nobody is executing the run and it should be resumed. A run that
+ * waits on provider jobs (CDS, Harmony) is only resumed once its next status
+ * check is due, so frequent client polls do not turn into provider requests.
+ */
 export function isStalled(run: RunRow, now = new Date()): boolean {
-  return (run.status === "queued" || run.status === "running") && !run.cancelRequested && (!run.leaseUntil || run.leaseUntil < now);
+  const waitUntil = run.progress?.waitUntil ? Date.parse(run.progress.waitUntil) : Number.NaN;
+  const waiting = Number.isFinite(waitUntil) && waitUntil > now.getTime();
+  return (run.status === "queued" || run.status === "running") && !run.cancelRequested && (!run.leaseUntil || run.leaseUntil < now) && !waiting;
 }
 
 export async function startRun(
