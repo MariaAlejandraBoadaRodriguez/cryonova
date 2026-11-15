@@ -54,7 +54,11 @@ export type UnitGroup =
   | "optical_depth"
   | "height"
   | "ozone"
-  | "snow_mass";
+  | "snow_mass"
+  | "temperature_variance"
+  | "vertical_velocity"
+  | "column_mass"
+  | "trace_humidity";
 
 export interface DisplayUnits {
   units: string;
@@ -110,6 +114,12 @@ export interface Topic {
   fieldCount: number;
   extraAnalyses: AnalysisKind[];
   suggestedPeriod: { start: string; end: string };
+  /** Length of the suggested period in complete years (the original catalog uses 20 or 30). */
+  suggestedYears: number;
+  /** Derived series the topic's question asks for (see derived.ts). */
+  derived: string[];
+  /** "original" = the 22-topic catalog of the approved prototype (+ its rain case); "extension" = added from live-verified collections. */
+  origin: "original" | "extension";
   words: LocalizedList;
   phrases: LocalizedList;
 }

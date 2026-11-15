@@ -1,5 +1,6 @@
 import { IMERG_COLLECTIONS, IMERG_VARIABLES } from "./imerg";
 import { MERRA2_COLLECTIONS, MERRA2_VARIABLES } from "./merra2";
+import { DERIVED } from "./derived";
 import { TOPICS } from "./topics";
 import type { CatalogVariable, CollectionSpec, Topic } from "./types";
 
@@ -61,6 +62,7 @@ export function publicCatalog() {
       };
     }),
     topics: TOPICS,
+    derived: DERIVED.map((d) => ({ key: d.key, formula: d.formula, inputs: d.inputs, name: d.name, description: d.description, units: d.display.units, trendUnits: d.display.trendUnits })),
   };
 }
 
