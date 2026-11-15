@@ -1,0 +1,283 @@
+/*
+ * Catalog page (/catalog). Text colours on white: #3b5368 8.0:1, #0f5b3a
+ * 8.4:1, --sa-deep 17.8:1 (WCAG AA). Scoped so the page never restyles the
+ * workspace or the dashboard.
+ */
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+.kicker {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sa-electric);
+  margin: 0;
+}
+
+.title {
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  margin: 4px 0 8px;
+  color: var(--sa-deep);
+}
+
+.lead {
+  max-width: 78ch;
+  margin: 0 0 6px;
+  color: #3b5368;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 12px 16px;
+  align-items: start;
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid var(--sa-card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-size: 0.92rem;
+}
+
+.summary p {
+  margin: 0;
+}
+
+.soft {
+  color: #3b5368;
+}
+
+.jump {
+  margin-top: 12px;
+}
+
+.jump ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+}
+
+.jump a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--sa-card-border);
+  border-radius: 999px;
+  background: var(--white);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.jump a:hover {
+  background: #eef4ff;
+}
+
+.empty {
+  margin-top: 20px;
+  padding: 24px 16px;
+  text-align: center;
+  background: var(--white);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.empty p {
+  margin: 0 0 12px;
+}
+
+.group {
+  margin-top: 28px;
+}
+
+.groupHead {
+  border-left: 4px solid var(--sa-electric);
+  padding: 2px 0 2px 14px;
+  margin-bottom: 12px;
+}
+
+.groupHead h2 {
+  font-size: 1.3rem;
+  color: var(--sa-deep);
+  margin: 0 0 4px;
+  scroll-margin-top: 12px;
+}
+
+.groupTitle {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  color: #3b5368;
+}
+
+.groupMeta {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #3b5368;
+  overflow-wrap: anywhere;
+}
+
+.groupStatus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: #3b5368;
+}
+
+.entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 12px;
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px 16px;
+  background: var(--white);
+  border: 1px solid var(--sa-card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.derived {
+  border-style: dashed;
+  border-color: var(--border-strong);
+}
+
+.entryHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 10px;
+}
+
+.entryHead h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--sa-deep);
+}
+
+.code {
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  color: var(--ink);
+  background: var(--ice);
+  border: 1px solid var(--sa-card-border);
+  border-radius: 6px;
+  padding: 1px 6px;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  margin: 0;
+}
+
+.aggregation {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #3b5368;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.facts div {
+  min-width: 0;
+}
+
+.facts dt {
+  color: #3b5368;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.facts .wide {
+  grid-column: 1 / -1;
+}
+
+.needs {
+  font-size: 0.875rem;
+}
+
+.needsTitle {
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+
+.inputs {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.inputs li + li {
+  margin-top: 2px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.added {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0f5b3a;
+}
+
+@media (max-width: 767px) {
+  .controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
