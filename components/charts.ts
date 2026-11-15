@@ -6,17 +6,23 @@
 import type { VariableResult } from "@/src/jobs/types";
 import { decimalsFor, fmtP, fmtSigned } from "@/src/lib/format";
 
+/**
+ * Chart palette from the approved prototype (NASA Space Apps colors): monthly
+ * values in Electric Blue, the fitted trend dashed in Rocket Red, departures
+ * diverging Neon Blue (below) and Rocket Red (above). Lines and bars meet the
+ * 3:1 non-text contrast on white; text stays Deep Blue.
+ */
 export const COLORS = {
-  series: "#11697A",
-  seriesFaint: "rgba(17, 105, 122, 0.38)",
-  trend: "#132B40",
-  trendBand: "rgba(19, 43, 64, 0.12)",
-  negative: "#2B6CB0",
-  positive: "#C05621",
-  grid: "#E3EAF1",
+  series: "#0042A6",
+  seriesFaint: "rgba(0, 66, 166, 0.35)",
+  trend: "#E43700",
+  trendBand: "rgba(228, 55, 0, 0.12)",
+  negative: "#0960E1",
+  positive: "#E43700",
+  grid: "#D5DEEA",
   axis: "#8FA5BA",
-  ink: "#132B40",
-  muted: "#4A5E70",
+  ink: "#07173F",
+  muted: "#3B5368",
 };
 
 function pLabel(p: number): string {

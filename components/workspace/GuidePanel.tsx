@@ -6,41 +6,9 @@
  * live). Ready state: the investigation plan with Start analysis.
  */
 import Link from "next/link";
-import { useId } from "react";
+import { useId, useState } from "react";
 import { EXAMPLE, type ExampleInvestigation, FOLLOW_UPS } from "@/src/plan/examples";
 import type { Plan } from "@/src/plan/plan";
-
-function DetectiveAvatar() {
-  // Original pixel-art magnifier badge (no third-party artwork).
-  const px = (x: number, y: number, c: string) => <rect key={`${x}-${y}-${c}`} x={x * 4} y={y * 4} width="4" height="4" fill={c} />;
-  const ring = [[4, 1], [5, 1], [6, 1], [3, 2], [7, 2], [2, 3], [8, 3], [2, 4], [8, 4], [2, 5], [8, 5], [3, 6], [7, 6], [4, 7], [5, 7], [6, 7]];
-  const glass = [[4, 2], [5, 2], [6, 2], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [4, 6], [5, 6], [6, 6]];
-  const handle = [[8, 8], [9, 9], [10, 10], [11, 11], [9, 8], [10, 9], [11, 10], [12, 11], [12, 12]];
-  return (
-    <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true">
-      <rect width="56" height="56" rx="12" fill="#07173F" />
-      <g transform="translate(2,2)">
-        {glass.map(([x, y]) => px(x!, y!, "#2E96F5"))}
-        {[[4, 3], [5, 3], [4, 4]].map(([x, y]) => px(x!, y!, "#9fd3ff"))}
-        {ring.map(([x, y]) => px(x!, y!, "#EAFE07"))}
-        {handle.map(([x, y]) => px(x!, y!, "#c9a26b"))}
-      </g>
-    </svg>
-  );
-}
-
-function FollowUpCard({ example, onUse }: { example: ExampleInvestigation; onUse: (e: ExampleInvestigation) => void }) {
-  return (
-    <li className="guide-card" data-testid={`follow-up-${example.id}`}>
-      <button type="button" className="card-link" onClick={() => onUse(example)}>
-        <span className="guide-kicker">{example.title}</span>
-        <h3>{example.question}</h3>
-        <span className="guide-why">{example.why}</span>
-      </button>
-      <span className="pill pill-live">Runs live</span>
-    </li>
-  );
-}
 
 export interface ProgressItem {
   label: string;
@@ -62,29 +30,68 @@ interface GuidePanelProps {
   onStart: () => void;
 }
 
+function GuideHead({ titleId }: { titleId: string }) {
+  return (
+    <div className="guide-head">
+      {/* eslint-disable-next-line @next/next/no-img-element -- pixel-art guide from the approved prototype, rendered pixelated */}
+      <img src="/brand/detective.png" width={150} height={177} alt="" />
+      <div>
+        <p className="ws-step" style={{ margin: 0 }}>
+          Your climate investigation guide
+        </p>
+        <h2 className="guide-title" id={titleId}>
+          Earth Trend Detective
+        </h2>
+      </div>
+    </div>
+  );
+}
+
+function SavedExample({ onUse }: { onUse: () => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <article className="guide-card guide-card-featured" data-testid="example-card">
+      <span className="guide-kicker">Example investigation · Saved run, fetched {EXAMPLE.savedPreview.fetched}</span>
+      <h3>{EXAMPLE.question}</h3>
+      <p>Colombia · January 2005 – December 2024 · Near-surface air temperature (MERRA-2 T2M). Using it fills the setup; a new run queries NASA again.</p>
+      <div className="guide-actions">
+        <button type="button" className="ws-btn ws-btn-primary" onClick={onUse} data-testid="use-example">
+          Use this investigation
+        </button>
+        <button type="button" className="ws-btn ws-btn-link" aria-expanded={open} aria-controls="saved-example-result" onClick={() => setOpen((v) => !v)}>
+          {open ? "Hide saved result" : "Show saved result"}
+        </button>
+      </div>
+      <div id="saved-example-result" hidden={!open}>
+        <div className="cr-stat">
+          <strong>{EXAMPLE.savedPreview.headline.split(" (")[0]}</strong>
+          <span>{EXAMPLE.savedPreview.headline.includes("(") ? `(${EXAMPLE.savedPreview.headline.split(" (")[1]}` : ""}</span>
+        </div>
+        <p>
+          Saved result, not live: {EXAMPLE.savedPreview.detail}. Data fetched {EXAMPLE.savedPreview.fetched}.
+        </p>
+        <Link className="ws-btn ws-btn-link" href={`/investigations/${EXAMPLE.savedPreview.runId}`}>
+          Open the saved run’s dashboard
+        </Link>
+      </div>
+    </article>
+  );
+}
+
 export function GuidePanel(props: GuidePanelProps) {
   const { plan, view, canShowPlan, progress, starting, startError, suggestedQuestion } = props;
   const id = useId();
-  const started = progress.some((p) => p.done);
+  // The default period is always valid, so it does not count as the user having started.
+  const started = progress.some((p) => p.done && p.label !== "Period");
   return (
     <aside className="ws-area-guide" aria-labelledby={`${id}-title`} data-testid="guide">
-      <div className="guide-head">
-        <DetectiveAvatar />
-        <div>
-          <p className="ws-step" style={{ margin: 0 }}>
-            Your climate investigation guide
-          </p>
-          <h2 className="guide-title" id={`${id}-title`}>
-            Earth Trend Detective
-          </h2>
-        </div>
-      </div>
+      <GuideHead titleId={`${id}-title`} />
 
       {view === "guide" ? (
         <>
           {!started ? (
             <p className="guide-intro">
-              Ask a question in English or Spanish, or start from the example below. The assistant fills the setup on the left as a proposal you can edit; nothing runs until you press Start analysis.
+              Ask a plain-language question in English or Spanish, or start from the example below. I use the place and dates in your question first, then your globe pick and the dates on the left. Nothing runs until you press Start analysis.
             </p>
           ) : (
             <section className="guide-progress" aria-labelledby={`${id}-progress`} data-testid="guide-progress">
@@ -113,49 +120,32 @@ export function GuidePanel(props: GuidePanelProps) {
             </section>
           )}
 
-          <article className="guide-card guide-card-featured" data-testid="example-card">
-            <button type="button" className="card-link" onClick={() => props.onUseExample(EXAMPLE)}>
-              <span className="guide-kicker">Example investigation</span>
-              <h3>{EXAMPLE.question}</h3>
-              <span className="guide-why">Colombia · January 2005 – December 2024 · Near-surface air temperature (MERRA-2 T2M)</span>
-            </button>
-            <div className="guide-saved">
-              <span className="pill pill-saved">Saved example · fetched {EXAMPLE.savedPreview.fetched}</span>
-              <p>
-                <strong>{EXAMPLE.savedPreview.headline}</strong> — {EXAMPLE.savedPreview.detail}. A new run queries NASA again.
-              </p>
-            </div>
-            <div className="row">
-              <button type="button" className="ws-btn ws-btn-primary" onClick={() => props.onUseExample(EXAMPLE)} data-testid="use-example">
-                Use this investigation
-              </button>
-              <Link className="ws-btn ws-btn-link" href={`/investigations/${EXAMPLE.savedPreview.runId}`}>
-                Open the saved run
-              </Link>
-            </div>
-          </article>
+          <SavedExample onUse={() => props.onUseExample(EXAMPLE)} />
 
           <h3 className="guide-subtitle">Follow-up questions</h3>
-          <p className="guide-why">Same place and dates, related variables or methods. Each one fills the setup.</p>
+          <p className="guide-why">Same place and dates; related variables or methods. Each one fills the setup and runs live when you start it.</p>
           <ul className="guide-list">
             {FOLLOW_UPS.map((f) => (
-              <FollowUpCard key={f.id} example={f} onUse={props.onUseExample} />
+              <li key={f.id}>
+                <button type="button" className="guide-live" onClick={() => props.onUseExample(f)} data-testid={`follow-up-${f.id}`}>
+                  <span className="guide-kicker">{f.title}</span>
+                  <span className="q">{f.question}</span>
+                  <span className="guide-why">{f.why}</span>
+                </button>
+              </li>
             ))}
           </ul>
         </>
       ) : (
-        <section className="plan" aria-labelledby={`${id}-plan`} data-testid="plan">
+        <section className={plan.blockers.length > 0 ? "plan plan-card has-blockers" : "plan plan-card"} aria-labelledby={`${id}-plan`} data-testid="plan">
           <div className="plan-head">
-            <p className="ws-step" style={{ margin: 0 }}>
+            <p className="ws-step" style={{ margin: 0 }} id={`${id}-plan`}>
               <span className="ws-step-num">03 / </span>Investigation plan
             </p>
             <button type="button" className="ws-btn ws-btn-link" onClick={() => props.onView("guide")}>
               See examples
             </button>
           </div>
-          <h3 id={`${id}-plan`} className="visually-hidden">
-            Investigation plan
-          </h3>
           <label className="plan-label" htmlFor={`${id}-question`}>
             Question to answer
           </label>
@@ -197,6 +187,11 @@ export function GuidePanel(props: GuidePanelProps) {
                     </span>
                   </li>
                 ))}
+                {plan.derived.map((d) => (
+                  <li key={d.key}>
+                    {d.name} <span className="muted">(derived: {d.formula}; {d.units})</span>
+                  </li>
+                ))}
               </ul>
             </dd>
             <dt>Primary analysis</dt>
@@ -223,15 +218,13 @@ export function GuidePanel(props: GuidePanelProps) {
             ))}
           </ul>
           {plan.blockers.length > 0 && (
-            <div className="alert alert-warn" id={`${id}-blockers`} data-testid="plan-blockers">
-              <div>
-                <strong>Start analysis is disabled until:</strong>
-                <ul className="plan-list">
-                  {plan.blockers.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              </div>
+            <div className="plan-blockers" id={`${id}-blockers`} data-testid="plan-blockers">
+              <strong>Start analysis is disabled until:</strong>
+              <ul className="plan-list">
+                {plan.blockers.map((b) => (
+                  <li key={b}>{b}</li>
+                ))}
+              </ul>
             </div>
           )}
           {startError && (

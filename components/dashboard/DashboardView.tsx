@@ -118,7 +118,7 @@ export function DashboardView({ result, question, mode }: { result: RunResult; q
   return (
     <div className="stack" data-testid="dashboard">
       <header className="dash-head">
-        <p className="step-label">Investigation results</p>
+        <p className="dash-kicker">Cryonova / Evidence lab</p>
         <h1>{question ?? `${primary?.name.en ?? "Trend"} in ${region}`}</h1>
         <p className="dash-meta">
           <span>{region}</span>
@@ -141,8 +141,8 @@ export function DashboardView({ result, question, mode }: { result: RunResult; q
 
       {primary && (
         <section className="card dash-headline" aria-labelledby="headline-title" data-testid="headline-finding">
-          <p className="step-label">Headline finding</p>
-          <h2 id="headline-title">
+          <p className="dash-kicker">01 / Headline finding</p>
+          <h2 id="headline-title" className="dash-section-title" style={{ fontSize: "1.25rem" }}>
             {primary.name.en} · {region}
           </h2>
           <MainFinding v={primary} result={result} />

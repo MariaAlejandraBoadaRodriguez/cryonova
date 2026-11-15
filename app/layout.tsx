@@ -1,16 +1,14 @@
 import "@fontsource/overpass/400.css";
+import "@fontsource/overpass/400-italic.css";
 import "@fontsource/overpass/600.css";
 import "@fontsource/overpass/700.css";
-import "@fontsource/overpass/800.css";
-import "@fontsource/fira-sans/400.css";
-import "@fontsource/fira-sans/500.css";
-import "@fontsource/fira-sans/600.css";
 import "@fontsource/fira-sans/700.css";
+import "@fontsource/fira-sans/900.css";
 import "@fontsource/fira-code/400.css";
-import "@fontsource/fira-code/500.css";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { SiteNav } from "@/components/SiteNav";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
@@ -30,17 +28,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <header className="site-header on-dark">
           <div className="inner">
             <Link href="/" className="brand" aria-label="Cryonova, Earth Trend Detective: new investigation">
-              <span className="brand-mark" aria-hidden="true" />
-              <span className="brand-title">Cryonova</span>
-              <span className="brand-sub" aria-hidden="true">
-                / Earth Trend Detective
+              {/* eslint-disable-next-line @next/next/no-img-element -- static SVG brand asset from the approved prototype */}
+              <img className="brand-logo" src="/brand/space-apps-logo.svg" width={561} height={221} alt="NASA Space Apps Challenge" />
+              {/* eslint-disable-next-line @next/next/no-img-element -- static SVG brand asset from the approved prototype */}
+              <img className="brand-mark-small" src="/brand/space-apps-mark.svg" width={222} height={222} alt="" />
+              <span className="brand-text" aria-hidden="true">
+                <span className="brand-title">Cryonova</span>
+                <span className="brand-sub">/ Earth Trend Detective</span>
               </span>
             </Link>
-            <nav aria-label="Main">
-              <Link href="/">New investigation</Link>
-              <Link href="/open">Open with code</Link>
-              <Link href="/sources">Data sources</Link>
-            </nav>
+            <SiteNav />
             <span className="brand-tagline">NASA Earth data · Trend investigations</span>
           </div>
         </header>

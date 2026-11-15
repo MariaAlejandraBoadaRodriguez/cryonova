@@ -104,7 +104,7 @@ export function RunDashboard({ runId }: { runId: string }) {
     return (
       <div className="stack">
         <header className="dash-head">
-          <p className="step-label">Investigation results</p>
+          <p className="dash-kicker">Cryonova / Evidence lab</p>
           <h1>{run.question ?? "Live analysis"}</h1>
         </header>
         <section className="card stack" role="status" aria-live="polite" data-testid="run-progress">
@@ -134,7 +134,7 @@ export function RunDashboard({ runId }: { runId: string }) {
     return (
       <div className="stack">
         <header className="dash-head">
-          <p className="step-label">Investigation results</p>
+          <p className="dash-kicker">Cryonova / Evidence lab</p>
           <h1>{run.question ?? "Live analysis"}</h1>
         </header>
         {run.status === "cancelled" ? (
