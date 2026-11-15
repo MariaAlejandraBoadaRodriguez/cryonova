@@ -1970,8 +1970,8 @@ code,
 }
 
 /* Comparison table: fits a 1366 px laptop without horizontal scrolling. */
-.discovery-table th,
-.discovery-table td {
+table.data.discovery-table th,
+table.data.discovery-table td {
   white-space: normal;
   vertical-align: top;
 }
@@ -1989,8 +1989,8 @@ code,
   min-width: 10rem;
 }
 
-.discovery-table .col-years,
-.discovery-table .col-details {
+table.data.discovery-table .col-years,
+table.data.discovery-table .col-details {
   white-space: nowrap;
 }
 
