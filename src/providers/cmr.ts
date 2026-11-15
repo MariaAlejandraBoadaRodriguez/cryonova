@@ -50,12 +50,18 @@ export interface GranuleSearchResult {
   queryUrl: string;
 }
 
+export interface GranuleSearchOptions {
+  /** Keep only granules whose name contains this text (sent to CMR as a readable_granule_name pattern). */
+  titleFilter?: string;
+}
+
 export async function findGranules(
   conceptId: string,
   start: string,
   end: string,
   policy: RequestPolicy,
   fetchImpl?: (input: string, init?: RequestInit) => Promise<Response>,
+  options: GranuleSearchOptions = {},
 ): Promise<GranuleSearchResult> {
   const params = new URLSearchParams({
     collection_concept_id: conceptId,
@@ -63,6 +69,10 @@ export async function findGranules(
     page_size: "2000",
     sort_key: "start_date",
   });
+  if (options.titleFilter) {
+    params.set("readable_granule_name[]", `*${options.titleFilter}*`);
+    params.set("options[readable_granule_name][pattern]", "true");
+  }
   const queryUrl = `${CMR_SEARCH}/granules.json?${params.toString()}`;
   const started = Date.now();
   const entries: CmrEntry[] = [];
@@ -98,6 +108,7 @@ export async function findGranules(
   for (const entry of entries) {
     const month = entry.time_start.slice(0, 7);
     if (month < start || month > end) continue;
+    if (options.titleFilter && !entry.title.includes(options.titleFilter)) continue;
     const ref: GranuleRef = { id: entry.id, title: entry.title, month, timeStart: entry.time_start, opendapUrl: pickOpendapUrl(entry.links) };
     const existing = byMonth.get(month);
     if (existing) {

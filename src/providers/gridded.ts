@@ -13,8 +13,11 @@ export interface VariableMonthValue {
   key: string;
   /** Weighted mean in provider units, or null when no valid cell was returned. */
   mean: number | null;
+  /** Valid grid cells (or reporting stations) behind the mean. */
   validCells: number;
   totalCells: number;
+  /** Station data only: each reporting station's value in provider units. */
+  points?: Array<{ id: string; value: number }>;
 }
 
 export interface GranuleRead {
@@ -35,7 +38,8 @@ export function buildConstraint(collection: CollectionSpec, variables: CatalogVa
   const latSlab = hyperslab(window.lat);
   const lonSlab = hyperslab(lonPiece);
   const spatial = grid.order === "lat-lon" ? `${latSlab}${lonSlab}` : `${lonSlab}${latSlab}`;
-  const projections = variables.map((v) => `${v.dapName}[0:0]${spatial}`);
+  const time = grid.hasTime === false ? "" : "[0:0]";
+  const projections = variables.map((v) => `${v.dapName}${time}${spatial}`);
   projections.push(`${grid.latName}${latSlab}`, `${grid.lonName}${lonSlab}`);
   return projections.map(encodeProjection).join(",");
 }

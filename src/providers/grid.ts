@@ -29,10 +29,18 @@ export interface GridWindow {
 
 const EPS = 1e-9;
 
+/** Index range of the cell centers inside [lo, hi]; works for ascending and descending (negative step) axes. */
 export function axisRange(axis: AxisSpec, lo: number, hi: number): { start: number; stop: number } | null {
-  const start = Math.max(0, Math.ceil((lo - axis.start) / axis.step - EPS));
-  const stop = Math.min(axis.count - 1, Math.floor((hi - axis.start) / axis.step + EPS));
+  const a = (lo - axis.start) / axis.step;
+  const b = (hi - axis.start) / axis.step;
+  const start = Math.max(0, Math.ceil(Math.min(a, b) - EPS));
+  const stop = Math.min(axis.count - 1, Math.floor(Math.max(a, b) + EPS));
   return start > stop ? null : { start, stop };
+}
+
+/** Coordinate of the cell center at an index. */
+export function coordinateAt(axis: AxisSpec, index: number): number {
+  return axis.start + axis.step * index;
 }
 
 export function nearestIndex(axis: AxisSpec, value: number): number {

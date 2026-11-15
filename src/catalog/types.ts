@@ -6,7 +6,7 @@ export type Localized = z.infer<typeof Localized>;
 export const LocalizedList = z.object({ en: z.array(z.string()), es: z.array(z.string()) });
 export type LocalizedList = z.infer<typeof LocalizedList>;
 
-/** A regular lat/lon grid as published by the provider (cell centers). */
+/** A regular lat/lon grid as published by the provider (cell centers). A negative step is a descending axis (north to south). */
 export interface AxisSpec {
   start: number;
   step: number;
@@ -21,7 +21,19 @@ export interface GridSpec {
   latName: string;
   lonName: string;
   resolutionLabel: string;
+  /** False when the data array has no leading time dimension (OB.DAAC L3m files hold one period each). */
+  hasTime?: boolean;
 }
+
+/**
+ * How a collection is read.
+ * - opendap: CMR granule search + NASA Cloud OPeNDAP subset (MERRA-2, IMERG, GLDAS).
+ * - obdaac: CMR granule search + OB.DAAC OPeNDAP subset, falling back to the cloud file (SeaWiFS).
+ * - cds: one asynchronous Copernicus CDS retrieve job per run, polled until it is ready (ERA5).
+ * - harmony: one asynchronous NASA Harmony job per run, served by Giovanni's area-averaging service.
+ * - noaa-cdo: NOAA CDO station search plus monthly station observations (GSOM).
+ */
+export type AccessKind = "opendap" | "obdaac" | "cds" | "harmony" | "noaa-cdo";
 
 export interface CollectionSpec {
   source: SourceId;
@@ -37,9 +49,17 @@ export interface CollectionSpec {
   citation: string;
   doi?: string;
   landingPage: string;
+  /** Defaults to "opendap". */
+  access?: AccessKind;
+  /** Short name of the organisation serving the data, used in provenance text. */
+  servedBy?: string;
+  /** Only granules whose title contains this text are used (OB.DAAC lists daily, 8-day and monthly files together). */
+  granuleTitleFilter?: string;
+  /** Provider request identifiers for non-OPeNDAP access (CDS dataset and product type, NOAA dataset). */
+  remote?: { dataset: string; productType?: string };
 }
 
-export type SourceId = "merra2" | "imerg";
+export type SourceId = "merra2" | "imerg" | "gldas" | "seawifs" | "era5" | "noaa" | "giovanni";
 
 export type UnitGroup =
   | "temperature"
@@ -58,7 +78,11 @@ export type UnitGroup =
   | "temperature_variance"
   | "vertical_velocity"
   | "column_mass"
-  | "trace_humidity";
+  | "trace_humidity"
+  | "soil_moisture"
+  | "volumetric_water"
+  | "chlorophyll"
+  | "precip_total";
 
 export interface DisplayUnits {
   units: string;
@@ -77,8 +101,10 @@ export interface CatalogVariable {
   key: string;
   source: SourceId;
   collection: string;
-  /** Variable path as named in the OPeNDAP DDS. */
+  /** Variable path as named in the OPeNDAP DDS or in the decoded file (NetCDF variable, CSV column, NOAA datatype). */
   dapName: string;
+  /** Name used in the provider request when it differs from dapName (CDS variable, Giovanni data field ID). */
+  requestName?: string;
   name: Localized;
   description: Localized;
   providerLongName: string;
@@ -86,6 +112,8 @@ export interface CatalogVariable {
   fillValue: number;
   display: DisplayUnits;
   domain: Domain;
+  /** Gridded field (default) or station observations. */
+  geometry?: "grid" | "stations";
   frequency: "monthly";
   /** How the monthly value is defined by the product. */
   aggregation: string;
