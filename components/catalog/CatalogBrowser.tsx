@@ -121,8 +121,8 @@ function VariableItem({ entry, group, status, times, onAdd }: { entry: VariableE
         </div>
       </Facts>
       <div className={styles.actions}>
-        <button type="button" className="btn btn-primary btn-small" onClick={onAdd} data-testid={`catalog-add-${entry.key}`}>
-          Add to investigation<span className="visually-hidden">: {entry.name}</span>
+        <button type="button" className="btn btn-primary btn-small" onClick={onAdd} aria-label={`Add to investigation: ${entry.name}`} data-testid={`catalog-add-${entry.key}`}>
+          Add to investigation
         </button>
         <p className={styles.added} role="status" data-testid={`catalog-added-${entry.key}`}>
           {addedText(times, "Added")}
@@ -169,8 +169,8 @@ function DerivedItem({ entry, group, status, times, onAdd }: { entry: DerivedEnt
         </ul>
       </div>
       <div className={styles.actions}>
-        <button type="button" className="btn btn-secondary btn-small" onClick={onAdd} data-testid={`catalog-add-inputs-${entry.key}`}>
-          Add inputs<span className="visually-hidden">: {list}, for {entry.name}</span>
+        <button type="button" className="btn btn-secondary btn-small" onClick={onAdd} aria-label={`Add inputs: ${list}, for ${entry.name}`} data-testid={`catalog-add-inputs-${entry.key}`}>
+          Add inputs
         </button>
         <p className={styles.added} role="status" data-testid={`catalog-added-${entry.key}`}>
           {addedText(times, `Added ${list}`)}
