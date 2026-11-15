@@ -70,6 +70,17 @@ timestamp → point a preview's `DATABASE_URL` at it → `GET /api/health` and o
 
 ## Rollback
 
+### Rollback point before removing the Orbits pattern (recorded 2026-11-15 16:30 UTC)
+
+| Item | Value |
+|---|---|
+| Production deployment | `dpl_GbGGRrXtcaeqFT6rqQRSqMoPoZqw` (AI-disclosure fix, verified by the production smoke at 16:18 UTC) |
+| `master` SHA | `b9855e592a9835a784792888df72f216e044ad98` |
+
+To return production to this point: Vercel → project `cryonova` → Deployments → `dpl_GbGGRrXtcaeqFT6rqQRSqMoPoZqw` →
+⋯ → **Instant Rollback**, or `vercel rollback dpl_GbGGRrXtcaeqFT6rqQRSqMoPoZqw --scope maria-alejandra-boada-rodriguezs-projects`.
+CSS and asset change only; no database step is needed.
+
 ### Rollback point before the AI-disclosure fix (recorded 2026-11-15 16:12 UTC)
 
 | Item | Value |
