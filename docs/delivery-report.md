@@ -49,4 +49,20 @@ Date: 2026-11-14 (UTC). Everything below was observed during this session; nothi
 2. **Tag `checkpoint-t3`.** Tag pushes are refused by the session's git policy (HTTP 403); command in `docs/checkpoints/T3.md`.
 3. **ERA5, NOAA, Giovanni, GLDAS, SeaWiFS data paths.** Status reporting is live; readers are not integrated (decision D-20).
 4. **Neon preview branches and restore drill.** No `NEON_API_KEY`; preview and production share `neondb` (additive migrations only). Restore drill steps are in the operations runbook.
-5. **Original Databricks notebooks and 22-topic catalog.** Not present in the environment; the catalog was rebuilt from live metadata (D-04) and parity was proven against a statsmodels reference rather than the notebooks' own runs.
+5. **Original Databricks notebooks.** Not present in the environment; parity was proven against a statsmodels reference rather than the notebooks' own runs. (The 22-topic catalog arrived with the prototype and was reconciled in the redesign, D-21/D-22.)
+
+## Redesign (three-column workspace, results dashboard, prototype catalog and look)
+
+Brief: `cryonova-redesign-brief-en.md`; visual reference and original catalog: `docs/design/prototype/cryonova-earth-trend-detective.html`.
+Pull request: MariaAlejandraBoadaRodriguez/cryonova#5 (branch `feat/three-column-workspace`).
+
+- **Workspace at `/`.** Setup rail with the original 22 topics plus extensions, a grouped, searchable catalog with tags and derived series, period with archive coverage and suggested period, and country/territory or custom area. Assistant (EN/ES) that fills the setup and sees edits. Blue Marble globe with keyboard and list alternatives. A guide that becomes the investigation plan with Start analysis disabled-with-reason. Screenshots: `docs/benchmarks/screenshots/workspace-{initial,ready}-{desktop,mobile}.png`.
+- **Dashboard `/investigations/[runId]`** and read-only reopening by code on `/open`. Screenshots: `docs/benchmarks/screenshots/dashboard-{desktop,mobile}.png` (live run, 2015–2024, Colombia).
+- **Catalog.** 65 variables verified against the live DDS/DAS (`docs/benchmarks/catalog-verification.md`). The original 22 topics plus the rain case are adopted, with 12 derived series (D-21 to D-23).
+- **No CDN at runtime.** Texture, map data and libraries come from the app; an E2E test asserts same-origin requests only (D-25).
+- **Tests.** 146 unit tests; 18 Playwright tests (desktop + mobile, axe WCAG 2.2 AA) including the live journey with `LIVE_E2E=1`: Start analysis → dashboard → CSV/PDF → save → reopen by code in a fresh browser → back to setup.
+- **Preview verification** (deployment `dpl_Hv8GZFJQjqX9HukcEKwdWJ4BTqa9`, commit `c31103e`):
+  - `/api/health?deep=ai`: database at migration 2, AI served by `claude-sonnet-5-5`.
+  - `/api/catalog`: 65 variables, 33 topics, 12 derived series.
+  - Texture served as `image/jpeg` by the app.
+  - Live run `c8963321-efb5-4af0-81fa-2db6ae2d0fc4` (Colombia 2015–2024, TS, T2M and derived TS−T2M): 120 of 120 months read in 38 s. The derived series equals TS − T2M month by month (2015-01: 24.8197 − 24.6454 = 0.1744 °C); trend +0.067 °C/decade (95% CI +0.002 to +0.132).
