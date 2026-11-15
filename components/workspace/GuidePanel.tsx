@@ -38,8 +38,12 @@ interface GuidePanelProps {
 function GuideHead({ titleId }: { titleId: string }) {
   return (
     <div className="guide-head">
-      {/* eslint-disable-next-line @next/next/no-img-element -- pixel-art guide from the approved prototype, rendered pixelated */}
-      <img src="/brand/detective.png" width={150} height={177} alt="" />
+      {/* Space Apps rules: AI-generated images carry a visible label directly under them. */}
+      <figure className="guide-avatar" data-testid="detective-figure">
+        {/* eslint-disable-next-line @next/next/no-img-element -- pixel-art guide from the approved prototype, rendered pixelated */}
+        <img src="/brand/detective.png" width={150} height={177} alt="Pixel-art detective, your investigation guide" />
+        <figcaption className="ai-caption">AI-generated image</figcaption>
+      </figure>
       <div>
         <p className="ws-step" style={{ margin: 0 }}>
           Your climate investigation guide

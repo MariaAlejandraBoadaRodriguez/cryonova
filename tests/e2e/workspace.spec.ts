@@ -26,6 +26,22 @@ test("initial workspace: guide with an example and follow-ups, accessible", asyn
   await page.screenshot({ path: shot("workspace-initial"), fullPage: false });
 });
 
+test("header is plain text without logos; the AI-generated detective image is labelled", async ({ page }) => {
+  await page.goto("/");
+  const header = page.locator("header.site-header");
+  await expect(header.locator("img")).toHaveCount(0);
+  await expect(header).toContainText("Cryonova");
+  await expect(page.locator('img[src*="space-apps"]')).toHaveCount(0);
+  const figure = page.getByTestId("detective-figure");
+  await expect(figure.locator('img[src="/brand/detective.png"]')).toBeVisible();
+  const caption = figure.locator("figcaption");
+  await expect(caption).toHaveText("AI-generated image");
+  await expect(caption).toBeVisible();
+  const [img, cap] = await Promise.all([figure.locator("img").boundingBox(), caption.boundingBox()]);
+  expect(cap!.y).toBeGreaterThanOrEqual(img!.y + img!.height - 1);
+  await expect(page.locator('img[src="/brand/detective.png"]')).toHaveCount(await page.locator('[data-testid="detective-figure"] img').count());
+});
+
 test("the workspace makes no requests outside its own origin (no CDN)", async ({ page, baseURL }) => {
   const origin = new URL(baseURL!).host;
   const foreign: string[] = [];

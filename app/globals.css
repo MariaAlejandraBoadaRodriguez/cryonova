@@ -777,20 +777,6 @@ code,
   color: #fff;
 }
 
-.brand-logo {
-  display: block;
-  height: 42px;
-  width: auto;
-  padding-right: 14px;
-  border-right: 1px solid var(--sa-line);
-}
-
-.brand-mark-small {
-  display: none;
-  height: 30px;
-  width: 30px;
-}
-
 .brand-text {
   display: inline-flex;
   align-items: baseline;
@@ -1497,6 +1483,22 @@ code,
   image-rendering: pixelated;
 }
 
+.guide-avatar {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+}
+
+.ai-caption {
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 .guide-title {
   font-family: var(--font-heading);
   font-weight: 900;
@@ -2188,13 +2190,8 @@ table.data.discovery-table .col-details {
     display: none;
   }
 
-  .brand-logo,
   .brand-sub {
     display: none;
-  }
-
-  .brand-mark-small {
-    display: block;
   }
 
   .plan dl {
