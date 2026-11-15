@@ -1,9 +1,10 @@
 import { z } from "zod";
 
-export const Localized = z.object({ en: z.string(), es: z.string() });
+/** English-only platform (D-35): catalog text keeps the `{ en }` shape so `.en` accessors stay stable. */
+export const Localized = z.object({ en: z.string() });
 export type Localized = z.infer<typeof Localized>;
 
-export const LocalizedList = z.object({ en: z.array(z.string()), es: z.array(z.string()) });
+export const LocalizedList = z.object({ en: z.array(z.string()) });
 export type LocalizedList = z.infer<typeof LocalizedList>;
 
 /** A regular lat/lon grid as published by the provider (cell centers). A negative step is a descending axis (north to south). */

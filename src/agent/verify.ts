@@ -1,8 +1,10 @@
 /**
  * Checks that every number cited in an AI explanation matches a value in the
  * structured result it was given (within the rounding the text shows).
- * Handles decimal commas (Spanish), thousands separators, percentages,
- * signed values and ranges.
+ * Numbers are read as English prose writes them (D-35): "." is the decimal
+ * mark and "," only groups thousands ("1,013.25"). Percentages, signed values
+ * and ranges are handled; a number in any other format (e.g. "0,33") has no
+ * reading and is reported as unverified.
  */
 
 export interface CitedNumber {
@@ -33,7 +35,7 @@ export function collectNumbers(value: unknown, out: number[] = []): number[] {
   return out;
 }
 
-/** Numbers as written in prose. Each match may have several readings (comma as decimal or thousands). */
+/** Numbers as written in English prose. A match has one reading, or none when its format is not English. */
 export function extractNumbers(text: string): Array<{ raw: string; readings: number[]; decimals: number[] }> {
   const out: Array<{ raw: string; readings: number[]; decimals: number[] }> = [];
   const pattern = /(?<![\w.,])[+\-−]?\d{1,3}(?:[.,]\d{3})+(?:[.,]\d+)?(?![\d])|(?<![\w.,])[+\-−]?\d+(?:[.,]\d+)?(?![\d])/g;
@@ -49,12 +51,8 @@ export function extractNumbers(text: string): Array<{ raw: string; readings: num
         decimals.push(s.includes(".") ? s.split(".")[1]!.length : 0);
       }
     };
-    if (/^\d+$/.test(unsigned)) add(unsigned);
-    else {
-      add(unsigned.replace(/,/g, "")); // English thousands / decimal point
-      add(unsigned.replace(/\./g, "").replace(",", ".")); // Spanish decimal comma
-      if (/^\d+,\d+$/.test(unsigned)) add(unsigned.replace(",", "."));
-    }
+    const english = /^\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(unsigned) ? unsigned.replace(/,/g, "") : unsigned;
+    if (/^\d+(?:\.\d+)?$/.test(english)) add(english);
     out.push({ raw, readings, decimals });
   }
   return out;

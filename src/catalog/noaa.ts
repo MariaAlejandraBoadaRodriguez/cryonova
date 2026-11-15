@@ -43,7 +43,7 @@ export const NOAA_COLLECTIONS: Record<string, CollectionSpec> = {
 const VERIFIED = { method: "CDO /datatypes?datasetid=GSOM and a units=metric data sample", date: "2026-11-15" };
 const celsius: DisplayUnits = { units: "°C", scale: 1, offset: 0, trendUnits: "°C/decade", group: "temperature", decimals: 2 };
 
-function station(dapName: string, longName: string, providerUnits: string, display: DisplayUnits, name: { en: string; es: string }, description: { en: string; es: string }, words: { en: string[]; es: string[] }, phrases: { en: string[]; es: string[] }): CatalogVariable {
+function station(dapName: string, longName: string, providerUnits: string, display: DisplayUnits, name: { en: string }, description: { en: string }, words: { en: string[] }, phrases: { en: string[] }): CatalogVariable {
   return {
     key: `noaa.${dapName}`,
     source: "noaa",
@@ -59,8 +59,8 @@ function station(dapName: string, longName: string, providerUnits: string, displ
     geometry: "stations",
     frequency: "monthly",
     aggregation: "GSOM monthly summary per station (NOAA NCEI); the regional series is the mean of the stations reporting that month.",
-    words: { en: [...words.en, "station", "stations", "observed", "observations", "noaa", "ghcn"], es: [...words.es, "estacion", "estaciones", "observado", "observaciones", "noaa"] },
-    phrases: { en: [...phrases.en, "weather station", "weather stations", "station observations", "station data"], es: [...phrases.es, "estacion meteorologica", "estaciones meteorologicas", "observaciones de estaciones"] },
+    words: { en: [...words.en, "station", "stations", "observed", "observations", "noaa", "ghcn"] },
+    phrases: { en: [...phrases.en, "weather station", "weather stations", "station observations", "station data"] },
     role: "primary",
     verified: VERIFIED,
   };
@@ -68,19 +68,19 @@ function station(dapName: string, longName: string, providerUnits: string, displ
 
 export const NOAA_VARIABLES: CatalogVariable[] = [
   station("TAVG", "Average Temperature.", "°C", celsius,
-    { en: "Average temperature at weather stations (NOAA GSOM)", es: "Temperatura media en estaciones meteorológicas (NOAA GSOM)" },
-    { en: "Monthly mean air temperature measured at stations inside the area (point data).", es: "Temperatura media mensual del aire medida en estaciones dentro del área (datos puntuales)." },
-    { en: ["temperature", "average"], es: ["temperatura", "media"] }, { en: ["station temperature", "observed temperature"], es: ["temperatura observada"] }),
+    { en: "Average temperature at weather stations (NOAA GSOM)" },
+    { en: "Monthly mean air temperature measured at stations inside the area (point data)." },
+    { en: ["temperature", "average"] }, { en: ["station temperature", "observed temperature"] }),
   station("TMAX", "Maximum temperature", "°C", celsius,
-    { en: "Mean daily maximum temperature at stations (NOAA GSOM)", es: "Temperatura máxima diaria media en estaciones (NOAA GSOM)" },
-    { en: "Monthly mean of the daily maximum temperature at stations inside the area (point data).", es: "Media mensual de la temperatura máxima diaria en estaciones dentro del área (datos puntuales)." },
-    { en: ["maximum", "temperature", "heat"], es: ["maxima", "temperatura", "calor"] }, { en: ["maximum temperature"], es: ["temperatura maxima"] }),
+    { en: "Mean daily maximum temperature at stations (NOAA GSOM)" },
+    { en: "Monthly mean of the daily maximum temperature at stations inside the area (point data)." },
+    { en: ["maximum", "temperature", "heat"] }, { en: ["maximum temperature"] }),
   station("TMIN", "Minimum temperature", "°C", celsius,
-    { en: "Mean daily minimum temperature at stations (NOAA GSOM)", es: "Temperatura mínima diaria media en estaciones (NOAA GSOM)" },
-    { en: "Monthly mean of the daily minimum temperature at stations inside the area (point data).", es: "Media mensual de la temperatura mínima diaria en estaciones dentro del área (datos puntuales)." },
-    { en: ["minimum", "temperature", "nights"], es: ["minima", "temperatura", "noches"] }, { en: ["minimum temperature"], es: ["temperatura minima"] }),
+    { en: "Mean daily minimum temperature at stations (NOAA GSOM)" },
+    { en: "Monthly mean of the daily minimum temperature at stations inside the area (point data)." },
+    { en: ["minimum", "temperature", "nights"] }, { en: ["minimum temperature"] }),
   station("PRCP", "Precipitation", "mm", { units: "mm/month", scale: 1, offset: 0, trendUnits: "mm/month per decade", group: "precip_total", decimals: 1 },
-    { en: "Monthly precipitation at weather stations (NOAA GSOM)", es: "Precipitación mensual en estaciones meteorológicas (NOAA GSOM)" },
-    { en: "Total precipitation measured each month at stations inside the area (point data).", es: "Precipitación total medida cada mes en estaciones dentro del área (datos puntuales)." },
-    { en: ["precipitation", "rain", "rainfall", "gauge"], es: ["precipitacion", "lluvia", "pluviometro"] }, { en: ["station rainfall", "rain gauge"], es: ["lluvia observada", "pluviometros"] }),
+    { en: "Monthly precipitation at weather stations (NOAA GSOM)" },
+    { en: "Total precipitation measured each month at stations inside the area (point data)." },
+    { en: ["precipitation", "rain", "rainfall", "gauge"] }, { en: ["station rainfall", "rain gauge"] }),
 ];

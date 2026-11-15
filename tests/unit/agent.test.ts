@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { buildFacts, explainWithRules } from "@/src/agent/explain";
-import { detectLanguage, planWithRules, yearsInText } from "@/src/agent/fallback";
+import { buildFacts, EXPLAIN_SYSTEM, type Explanation, explainWithRules } from "@/src/agent/explain";
+import { planWithRules, yearsInText } from "@/src/agent/fallback";
 import { addUsage, emptyUsage, estimateCostUsd } from "@/src/agent/pricing";
 import { finalizeProposal, lastCompleteYear } from "@/src/agent/proposal";
+import { englishSummary, isEnglish } from "@/src/agent/stored-explanations";
 import { collectNumbers, extractNumbers, verifyNumbers } from "@/src/agent/verify";
 import { MemoryRunStore } from "@/src/db/store";
 import { executeRun } from "@/src/jobs/runner";
@@ -12,9 +13,8 @@ import { SelectionSchema } from "@/src/jobs/selection";
 describe("number verification", () => {
   const facts = { trend: { slopePerDecade: 0.33, ci95: [0.04, 0.62], pValue: 0.024, completeYears: 20 }, coverage: { validCellPercent: 99.5 }, period: { start: "2005-01", end: "2024-12" } };
 
-  it("accepts exact, signed, Spanish decimal-comma and percent citations", () => {
+  it("accepts exact, signed and percent citations", () => {
     expect(verifyNumbers("Rose by +0.33 °C/decade (95% CI 0.04 to 0.62; p = 0.024; 20 complete years, 2005–2024).", facts)).toMatchObject({ unverified: [] });
-    expect(verifyNumbers("Aumentó 0,33 °C por década (IC 95%: 0,04 a 0,62).", facts).unverified).toEqual([]);
     expect(verifyNumbers("Valid cells: 99.5%.", facts).unverified).toEqual([]);
     expect(verifyNumbers("A range of 0.04-0.62.", facts).unverified).toEqual([]);
   });
@@ -23,6 +23,12 @@ describe("number verification", () => {
     const v = verifyNumbers("It warmed by 0.45 °C per decade since 1990.", facts);
     expect(v.unverified).toEqual(["0.45", "1990"]);
     expect(v.checked).toBe(2);
+  });
+
+  it("reads numbers in English format only: a comma groups thousands, it is never a decimal mark", () => {
+    expect(extractNumbers("1,013.25 hPa and 2,000 m").map((n) => n.readings)).toEqual([[1013.25], [2000]]);
+    expect(extractNumbers("0,45 or 1.013,25").map((n) => n.readings)).toEqual([[], []]);
+    expect(verifyNumbers("It rose 0,04 °C per decade.", facts).unverified).toEqual(["0,04"]);
   });
 
   it("parses thousands separators and collects numbers from strings", () => {
@@ -34,23 +40,35 @@ describe("number verification", () => {
 describe("rule-based planner", () => {
   it("reads region, variable and years from an English question", () => {
     const raw = planWithRules("Did near-surface air temperature in Colombia change between 2005 and 2024?");
-    expect(raw.language).toBe("en");
     expect(raw.regionId).toBe("country:CO");
     expect(raw.variables[0]?.key).toBe("merra2.T2M");
     expect([raw.start, raw.end]).toEqual(["2005-01", "2024-12"]);
     const proposal = finalizeProposal(raw, "rules", "q");
     expect(proposal.ready).toBe(true);
+    expect(proposal.language).toBe("en");
     expect(SelectionSchema.safeParse(proposal.selection).success).toBe(true);
   });
 
-  it("understands Spanish and 'desde'", () => {
-    const raw = planWithRules("¿Ha cambiado la lluvia en la cuenca amazónica desde 2001?");
-    expect(raw.language).toBe("es");
+  it("understands 'since' and English place and variable names", () => {
+    const raw = planWithRules("Has rainfall changed in the Amazon basin since 2001?");
     expect(raw.regionId).toBe("region:amazon");
     expect(raw.variables.map((v) => v.key)).toContain("merra2.PRECTOTCORR");
     expect(raw.start).toBe("2001-01");
-    expect(detectLanguage("Is soil moisture declining?")).toBe("en");
     expect(yearsInText("from 1979 to 2003 and 2150")).toEqual([2003]);
+  });
+
+  it("answers a question written in another language in English", () => {
+    // Spanish input on purpose: the platform is English-only (D-35), so the reply must still be English.
+    const question = "¿Ha cambiado la lluvia en Perú desde 2001?";
+    const raw = planWithRules(question);
+    expect(raw.regionId).toBe("country:PE");
+    expect(raw.regionName).toBe("Peru");
+    expect(raw.start).toBe("2001-01");
+    const proposal = finalizeProposal(raw, "rules", question);
+    expect(proposal.language).toBe("en");
+    expect(proposal.clarification).toBe("Which variable are you interested in?");
+    expect(proposal.assumptions).toEqual(["Period taken from the years mentioned in the question."]);
+    expect(proposal.analysis).toMatch(/^Live monthly series/);
   });
 
   it("asks for clarification when region or variable is missing", () => {
@@ -91,7 +109,7 @@ describe("pricing", () => {
 });
 
 describe("rule-based explanation", () => {
-  it("builds verified bilingual explanations from a run result", async () => {
+  it("builds verified English explanations from a run result", async () => {
     const fixture = readFileSync(new URL("../fixtures/opendap/merra2_slv_200501_colombia_t2m.dods", import.meta.url));
     const months = Array.from({ length: 12 * 12 }, (_, i) => `${2013 + Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, "0")}`);
     const fetchImpl = async (url: string) =>
@@ -103,12 +121,11 @@ describe("rule-based explanation", () => {
     const { run } = await store.createRun({ id: crypto.randomUUID(), selection, idempotencyKey: "k", clientKey: null });
     const done = await executeRun(run.id, { store, earthdataToken: "t", fetchImpl });
     const result = done!.result!;
-    const en = explainWithRules(result, "en");
-    const es = explainWithRules(result, "es");
+    const en = explainWithRules(result);
+    expect(en.language).toBe("en");
     expect(en.sections?.chart).toMatch(/monthly regional mean/);
-    expect(es.sections?.chart).toMatch(/media regional mensual/);
     expect(en.verification.unverified).toEqual([]);
-    expect(es.verification.unverified).toEqual([]);
+    expect(explainWithRules(result, "anomalies").chart).toBe("anomalies");
     const facts = buildFacts(result, "anomalies");
     expect(facts.chart).toMatch(/anomalies/);
     expect(facts.variables[0]?.trend).toMatchObject({ completeYears: 12 });
@@ -157,5 +174,28 @@ describe("planner context (workspace setup and earlier turns)", () => {
     expect(message).toContain("User: Rain in Peru?");
     expect(message).not.toContain("ignore previous instructions");
     expect(planMessage("Plain question?")).toBe("Plain question?");
+  });
+});
+
+describe("English-only assistant (D-35)", () => {
+  it("tells the planner and the explainer to answer in English, whatever the question's language", async () => {
+    const { PLAN_SYSTEM, PLAN_TOOLS } = await import("@/src/agent/planner");
+    expect(PLAN_SYSTEM).toMatch(/If the user writes in another language, still answer in English/);
+    expect(EXPLAIN_SYSTEM).toMatch(/Write in English only/);
+    expect(EXPLAIN_SYSTEM).toMatch(/written in another language, still answer in English/);
+    const propose = PLAN_TOOLS.find((t) => t.name === "propose_selection")!;
+    expect(Object.keys((propose.input_schema as { properties: Record<string, unknown> }).properties)).not.toContain("language");
+  });
+
+  it("reads only English summaries from older stored explanations", () => {
+    const en = { language: "en", chart: "series" } as Explanation;
+    const legacy = { language: "es", chart: "series" } as unknown as Explanation;
+    expect(englishSummary({ summary: legacy, summaries: { en, es: legacy } })).toBe(en);
+    expect(englishSummary({ summary: en, summaries: { es: legacy } })).toBe(en);
+    expect(englishSummary({ summary: legacy, summaries: { es: legacy } })).toBeNull();
+    expect(englishSummary({ followUps: [legacy] })).toBeNull();
+    expect(englishSummary(null)).toBeNull();
+    expect(isEnglish({})).toBe(true);
+    expect(isEnglish(legacy)).toBe(false);
   });
 });

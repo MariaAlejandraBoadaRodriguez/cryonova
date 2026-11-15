@@ -2,7 +2,8 @@
  * Chart and result interpretation. Claude receives only computed facts from
  * the run (values already rounded for display) and must cite numbers exactly;
  * every cited number is verified afterwards. Without AI, a deterministic
- * explanation is built from the same facts.
+ * explanation is built from the same facts. Explanations are always in English
+ * (D-35), whatever the language of a follow-up question.
  */
 import { z } from "zod";
 import { EVIDENCE_LABEL, evidenceOf, qValuesFor, regionLabel } from "@/src/reports/narrative";
@@ -26,6 +27,7 @@ export interface ExplanationSections {
 
 export interface Explanation {
   source: "ai" | "rules";
+  /** Always "en" for new explanations; entries stored before D-35 may say otherwise (see stored-explanations.ts). */
   language: Language;
   question: string | null;
   followUp: string | null;
@@ -47,7 +49,6 @@ function variableFacts(v: VariableResult, qValue: number | null) {
   return {
     key: v.key,
     name: v.name.en,
-    name_es: v.name.es,
     product: `${v.product} v${v.version}`,
     units: a.units,
     trendUnits: a.trendUnits,
@@ -115,11 +116,11 @@ export function buildFacts(result: RunResult, chart: ChartKind = "series") {
   };
 }
 
-const EXPLAIN_SYSTEM = `You are the research assistant of Cryonova. You explain the results of one live investigation of NASA data to students and teachers.
+export const EXPLAIN_SYSTEM = `You are the research assistant of Cryonova. You explain the results of one live investigation of NASA data to students and teachers.
 
 Rules:
 - Use only the FACTS in the user message. Every number you write must appear in FACTS exactly as written there (same decimals, same sign), or be a year or month taken from FACTS. Do not compute, convert or re-round numbers.
-- Write in the requested language (en = English, es = Spanish) with plain, precise sentences; 1 to 3 sentences per field.
+- Write in English only, with plain, precise sentences; 1 to 3 sentences per field. If the follow-up question is written in another language, still answer in English.
 - chart: what the chart shows (series, axes, units, band). pattern: the pattern observed. change: how much it changed (trend per decade and fitted change over the period). uncertainty: the 95% interval, p-value, number of complete years, coverage and what they mean. source: products, versions and when the data were fetched. limitations: scope limits (regional mean, reanalysis or satellite estimates, gaps, a trend describes this period and does not prove a cause).
 - If the trend is insufficient or the interval includes zero, say so clearly instead of claiming a change.
 - When several trends were tested (multipleComparison in FACTS), call a trend statistically significant only when its "evidence" says so after the Benjamini-Hochberg correction; a p-value below 0.05 with a q-value at or above 0.05 is only nominal and must be described that way.
@@ -142,14 +143,14 @@ const EXPLAIN_JSON_SCHEMA = {
   additionalProperties: false,
 };
 
-export async function explainWithClaude(result: RunResult, options: { language: Language; question?: string | null; followUp?: string | null; chart?: ChartKind; signal?: AbortSignal }): Promise<Explanation> {
+export async function explainWithClaude(result: RunResult, options: { question?: string | null; followUp?: string | null; chart?: ChartKind; signal?: AbortSignal }): Promise<Explanation> {
   const client = anthropicClient();
   const model = agentModel();
   const chart = options.chart ?? "series";
   const facts = buildFacts(result, chart);
   const started = Date.now();
   const usage = emptyUsage();
-  const payload = { language: options.language, question: options.question ?? null, followUp: options.followUp ?? null, selectedChart: chart, FACTS: facts };
+  const payload = { question: options.question ?? null, followUp: options.followUp ?? null, selectedChart: chart, FACTS: facts };
   const response = await client.beta.messages.create(
     {
       model,
@@ -175,7 +176,7 @@ export async function explainWithClaude(result: RunResult, options: { language: 
   const fullText = options.followUp ? answer : Object.values(sections).join(" ");
   return {
     source: "ai",
-    language: options.language,
+    language: "en",
     question: options.question ?? null,
     followUp: options.followUp ?? null,
     chart,
@@ -187,9 +188,8 @@ export async function explainWithClaude(result: RunResult, options: { language: 
   };
 }
 
-/** Deterministic explanation from the same facts, in English or Spanish. */
-export function explainWithRules(result: RunResult, language: Language, chart: ChartKind = "series"): Explanation {
-  const es = language === "es";
+/** Deterministic explanation from the same facts, in English. */
+export function explainWithRules(result: RunResult, chart: ChartKind = "series"): Explanation {
   const region = regionLabel(result);
   const parts: ExplanationSections = { chart: "", pattern: "", change: "", uncertainty: "", source: "", limitations: "" };
   const v = result.variables[0];
@@ -197,43 +197,29 @@ export function explainWithRules(result: RunResult, language: Language, chart: C
   if (v) {
     const a = v.analysis;
     const d = decimalsFor(v.unitGroup);
-    const name = es ? v.name.es : v.name.en;
-    parts.chart = es
-      ? `El gráfico muestra la media regional mensual (línea fina), las medias anuales de años completos (puntos) y la tendencia lineal con su banda de incertidumbre del 95% para ${name} en ${region}, de ${fmtMonth(result.selection.start)} a ${fmtMonth(result.selection.end)}, en ${a.units}.`
-      : `The chart shows the monthly regional mean (thin line), complete-year annual means (dots) and the linear trend with its 95% uncertainty band for ${name} in ${region}, ${fmtMonth(result.selection.start)} to ${fmtMonth(result.selection.end)}, in ${a.units}.`;
+    const name = v.name.en;
+    parts.chart = `The chart shows the monthly regional mean (thin line), complete-year annual means (dots) and the linear trend with its 95% uncertainty band for ${name} in ${region}, ${fmtMonth(result.selection.start)} to ${fmtMonth(result.selection.end)}, in ${a.units}.`;
     if (a.trend.status === "ok") {
       const t = a.trend;
       const clear = t.ci95PerDecade[0] > 0 || t.ci95PerDecade[1] < 0;
       const up = t.slopePerDecade > 0;
-      parts.pattern = es
-        ? clear
-          ? `Entre ${t.firstYear} y ${t.lastYear} la variable ${up ? "aumentó" : "disminuyó"} de forma sostenida.`
-          : `Entre ${t.firstYear} y ${t.lastYear} no hay una tendencia clara: el intervalo del 95% incluye el cero.`
-        : clear
-          ? `From ${t.firstYear} to ${t.lastYear} the variable ${up ? "increased" : "decreased"} steadily.`
-          : `From ${t.firstYear} to ${t.lastYear} there is no clear trend: the 95% interval includes zero.`;
-      parts.change = es
-        ? `La tendencia es de ${fmtSigned(t.slopePerDecade, d)} ${a.trendUnits}, un cambio ajustado de ${fmtSigned(t.totalChange, d)} ${a.units} en el periodo.`
-        : `The trend is ${fmtSigned(t.slopePerDecade, d)} ${a.trendUnits}, a fitted change of ${fmtSigned(t.totalChange, d)} ${a.units} over the period.`;
-      parts.uncertainty = es
-        ? `Intervalo del 95% (HAC): ${fmtSigned(t.ci95PerDecade[0], d)} a ${fmtSigned(t.ci95PerDecade[1], d)}; p ${fmtP(t.pValue)}; ${t.n} años completos; ${a.coverage.monthsValid} de ${a.coverage.requestedMonths} meses con datos válidos.`
-        : `95% interval (HAC): ${fmtSigned(t.ci95PerDecade[0], d)} to ${fmtSigned(t.ci95PerDecade[1], d)}; p ${fmtP(t.pValue)}; ${t.n} complete years; ${a.coverage.monthsValid} of ${a.coverage.requestedMonths} months with valid data.`;
+      parts.pattern = clear
+        ? `From ${t.firstYear} to ${t.lastYear} the variable ${up ? "increased" : "decreased"} steadily.`
+        : `From ${t.firstYear} to ${t.lastYear} there is no clear trend: the 95% interval includes zero.`;
+      parts.change = `The trend is ${fmtSigned(t.slopePerDecade, d)} ${a.trendUnits}, a fitted change of ${fmtSigned(t.totalChange, d)} ${a.units} over the period.`;
+      parts.uncertainty = `95% interval (HAC): ${fmtSigned(t.ci95PerDecade[0], d)} to ${fmtSigned(t.ci95PerDecade[1], d)}; p ${fmtP(t.pValue)}; ${t.n} complete years; ${a.coverage.monthsValid} of ${a.coverage.requestedMonths} months with valid data.`;
     } else {
-      parts.pattern = es ? "No hay suficientes años completos para estimar una tendencia." : a.trend.reason;
-      parts.change = es ? `Media del periodo: ${fmt(a.stats.mean, d)} ${a.units}.` : `Period mean: ${fmt(a.stats.mean, d)} ${a.units}.`;
-      parts.uncertainty = es ? `${a.coverage.monthsValid} de ${a.coverage.requestedMonths} meses con datos válidos.` : `${a.coverage.monthsValid} of ${a.coverage.requestedMonths} months have valid data.`;
+      parts.pattern = a.trend.reason;
+      parts.change = `Period mean: ${fmt(a.stats.mean, d)} ${a.units}.`;
+      parts.uncertainty = `${a.coverage.monthsValid} of ${a.coverage.requestedMonths} months have valid data.`;
     }
     const s = result.sources[0];
-    parts.source = es
-      ? `Datos leídos en vivo de NASA (${result.sources.map((x) => `${x.collection} v${x.version}`).join(", ")}) entre ${s?.fetchedFrom?.slice(0, 16).replace("T", " ") ?? "—"} y ${s?.fetchedTo?.slice(0, 16).replace("T", " ") ?? "—"} UTC.`
-      : `Data read live from NASA (${result.sources.map((x) => `${x.collection} v${x.version}`).join(", ")}) between ${s?.fetchedFrom?.slice(0, 16).replace("T", " ") ?? "—"} and ${s?.fetchedTo?.slice(0, 16).replace("T", " ") ?? "—"} UTC.`;
-    parts.limitations = es
-      ? "Es un promedio regional que oculta diferencias locales; MERRA-2 es un reanálisis (modelo más observaciones); una tendencia describe este periodo y no demuestra una causa."
-      : "This is a regional average that hides local differences; MERRA-2 is a reanalysis (model plus observations); a trend describes this period and does not establish a cause.";
+    parts.source = `Data read live from NASA (${result.sources.map((x) => `${x.collection} v${x.version}`).join(", ")}) between ${s?.fetchedFrom?.slice(0, 16).replace("T", " ") ?? "—"} and ${s?.fetchedTo?.slice(0, 16).replace("T", " ") ?? "—"} UTC.`;
+    parts.limitations = "This is a regional average that hides local differences; MERRA-2 is a reanalysis (model plus observations); a trend describes this period and does not establish a cause.";
   }
   return {
     source: "rules",
-    language,
+    language: "en",
     question: result.selection.question ?? null,
     followUp: null,
     chart,

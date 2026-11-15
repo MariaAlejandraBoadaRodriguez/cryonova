@@ -3,7 +3,8 @@
  * Raw proposals are always normalized here: variables must exist in the
  * catalog, regions resolve through the gazetteer, periods are clamped to
  * declared coverage and the provider-read limit, and the result is validated
- * with the same schema the run executor uses.
+ * with the same schema the run executor uses. Proposals are always written in
+ * English (D-35), whatever the language of the question.
  */
 import { collectionOf, getVariable } from "@/src/catalog";
 import { type BBox, getRegion } from "@/src/catalog/regions";
@@ -11,10 +12,10 @@ import { monthsBetween } from "@/src/analytics/series";
 import { groupByCollection, MAX_PROVIDER_READS, type Selection, SelectionSchema } from "@/src/jobs/selection";
 import { validateBBox } from "@/src/providers/grid";
 
-export type Language = "en" | "es";
+/** Cryonova is English-only (D-35); the field stays in payloads so their shape does not change. */
+export type Language = "en";
 
 export interface RawProposal {
-  language: Language;
   variables: Array<{ key: string; rationale: string }>;
   regionId: string;
   regionName: string;
@@ -124,12 +125,12 @@ export function finalizeProposal(raw: RawProposal, source: Proposal["source"], q
   };
   const ready = Boolean(bbox) && unique.length > 0 && SelectionSchema.safeParse(selection).success;
   let clarification = raw.clarification.trim() || null;
-  if (!bbox && !clarification) clarification = raw.language === "es" ? "¿Qué región quieres analizar?" : "Which region should be analyzed?";
-  if (unique.length === 0 && !clarification) clarification = raw.language === "es" ? "¿Qué variable te interesa?" : "Which variable are you interested in?";
+  if (!bbox && !clarification) clarification = "Which region should be analyzed?";
+  if (unique.length === 0 && !clarification) clarification = "Which variable are you interested in?";
 
   return {
     source,
-    language: raw.language,
+    language: "en",
     ready,
     selection,
     rationale: unique.map((v) => ({ key: v.key, text: v.rationale })),

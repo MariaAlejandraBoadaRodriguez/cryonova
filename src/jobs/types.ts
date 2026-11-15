@@ -147,7 +147,7 @@ export interface StationResult {
 
 export interface VariableResult {
   key: string;
-  name: { en: string; es: string };
+  name: { en: string };
   source: string;
   collection: string;
   product: string;

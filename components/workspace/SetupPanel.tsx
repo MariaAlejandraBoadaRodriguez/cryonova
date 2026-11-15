@@ -186,7 +186,7 @@ export function SetupPanel(props: SetupPanelProps) {
     const q = query.trim();
     if (!q) return GROUPS;
     const hits = searchCatalog(q, 24).map((h) => h.variable.key);
-    const derived = DERIVED.filter((d) => `${d.name.en} ${d.formula} ${d.name.es}`.toLowerCase().includes(q.toLowerCase())).map((d) => d.key);
+    const derived = DERIVED.filter((d) => `${d.name.en} ${d.formula}`.toLowerCase().includes(q.toLowerCase())).map((d) => d.key);
     return [{ id: "search", title: `Matches for “${q}”`, source: "", variables: hits, derived }];
   }, [query]);
 
@@ -278,7 +278,7 @@ export function SetupPanel(props: SetupPanelProps) {
         <label className="rail-label" htmlFor={`${id}-search`}>
           Browse or search the catalog
         </label>
-        <input id={`${id}-search`} type="search" placeholder="e.g. temperature, lluvia, wind" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <input id={`${id}-search`} type="search" placeholder="e.g. temperature, rain, wind" value={query} onChange={(e) => setQuery(e.target.value)} />
         <div className="ws-catalog" role="group" aria-label="Catalog variables by topic">
           {groups.map((g) => (
             <details key={g.id} open={Boolean(query.trim()) || g.variables.some((k) => draft.variables.includes(k)) || g.derived.some((k) => draft.derived.includes(k))}>
