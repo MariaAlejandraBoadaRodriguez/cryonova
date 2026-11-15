@@ -1,15 +1,20 @@
 import "@fontsource/overpass/400.css";
 import "@fontsource/overpass/600.css";
 import "@fontsource/overpass/700.css";
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/500.css";
+import "@fontsource/overpass/800.css";
+import "@fontsource/fira-sans/400.css";
+import "@fontsource/fira-sans/500.css";
+import "@fontsource/fira-sans/600.css";
+import "@fontsource/fira-sans/700.css";
+import "@fontsource/fira-code/400.css";
+import "@fontsource/fira-code/500.css";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "Cryonova · Earth system trend research",
+  title: "Cryonova · Earth Trend Detective",
   description: "Turn questions into reproducible analyses of live NASA data, with trends, uncertainty and provenance.",
 };
 
@@ -24,15 +29,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </a>
         <header className="site-header on-dark">
           <div className="inner">
-            <Link href="/" className="brand" aria-label="Cryonova home">
+            <Link href="/" className="brand" aria-label="Cryonova, Earth Trend Detective: new investigation">
               <span className="brand-mark" aria-hidden="true" />
-              Cryonova
+              <span className="brand-title">Cryonova</span>
+              <span className="brand-sub" aria-hidden="true">
+                / Earth Trend Detective
+              </span>
             </Link>
             <nav aria-label="Main">
-              <Link href="/investigate">New investigation</Link>
-              <Link href="/#open-with-code">Open with code</Link>
+              <Link href="/">New investigation</Link>
+              <Link href="/open">Open with code</Link>
               <Link href="/sources">Data sources</Link>
             </nav>
+            <span className="brand-tagline">NASA Earth data · Trend investigations</span>
           </div>
         </header>
         <main id="main">{children}</main>
