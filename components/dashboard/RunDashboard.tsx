@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import type { StoredExplanations } from "@/src/agent/explain-service";
 import type { PublicRun } from "@/src/jobs/service";
 import { TERMINAL_STATUSES, type RunResult } from "@/src/jobs/types";
-import { fmtDuration } from "@/src/lib/format";
+import { fmtDuration, fmtUtc } from "@/src/lib/format";
 import { setupHref } from "@/src/plan/url";
 import { SelectionSchema } from "@/src/jobs/selection";
 import { ErrorIcon } from "../icons";
@@ -29,6 +29,8 @@ function phaseText(run: PublicRun): string {
   }
 }
 
+const PROVIDER_LABEL: Record<string, string> = { cds: "Copernicus CDS", harmony: "NASA Harmony (Giovanni)" };
+
 export function RunDashboard({ runId }: { runId: string }) {
   const [run, setRun] = useState<PublicRun | null>(null);
   const [missing, setMissing] = useState(false);
@@ -50,14 +52,18 @@ export function RunDashboard({ runId }: { runId: string }) {
           const data = (await response.json()) as PublicRun;
           setRun(data);
           if (TERMINAL_STATUSES.includes(data.status)) return;
+          // While a provider job is queued, poll around its next status check (at most every 30 s).
+          const waitUntil = data.progress.waitUntil ? Date.parse(data.progress.waitUntil) : Number.NaN;
+          if (Number.isFinite(waitUntil)) delay = Math.min(30_000, Math.max(4_000, waitUntil - Date.now() + 500));
+          else delay = Math.min(delay * 1.2, 4000);
+        } else {
+          delay = Math.min(delay * 1.2, 4000);
         }
       } catch {
         // Network hiccup: keep polling with backoff.
+        delay = Math.min(delay * 1.5, 15_000);
       }
-      if (!stopped) {
-        delay = Math.min(delay * 1.2, 4000);
-        timer = setTimeout(tick, delay);
-      }
+      if (!stopped) timer = setTimeout(tick, delay);
     };
     timer = setTimeout(tick, 100);
     return () => {
@@ -116,6 +122,18 @@ export function RunDashboard({ runId }: { runId: string }) {
           <div className="progress-bar" aria-hidden="true">
             <span style={{ width: `${progressPct}%` }} />
           </div>
+          {(run.progress.jobs ?? []).filter((j) => j.provider !== "noaa-cdo").length > 0 && (
+            <ul className="plan-list" data-testid="provider-jobs">
+              {(run.progress.jobs ?? [])
+                .filter((j) => j.provider !== "noaa-cdo")
+                .map((j) => (
+                  <li key={`${j.collection}-${j.jobRef ?? "none"}`}>
+                    <strong>{PROVIDER_LABEL[j.provider] ?? j.provider}</strong> job <span className="mono">{j.jobRef ?? "—"}</span> · {j.status} · submitted {fmtUtc(j.submittedAt)} · {j.checks} status check{j.checks === 1 ? "" : "s"}
+                    {j.message ? <span className="muted"> · {j.message}</span> : null}
+                  </li>
+                ))}
+            </ul>
+          )}
           <div className="row">
             <button type="button" className="btn btn-ghost btn-small" onClick={cancel} disabled={run.cancelRequested}>
               {run.cancelRequested ? "Cancelling…" : "Cancel run"}

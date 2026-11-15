@@ -114,7 +114,7 @@ export function DashboardBar({ result, question, mode }: { result: RunResult; qu
 export function DashboardView({ result, question, mode }: { result: RunResult; question: string | null; mode: DashboardMode }) {
   const primary = primaryVariable(result);
   const region = regionLabel(result);
-  const sources = [...new Set(result.sources.map((s) => `${s.collection} v${s.version}`))].join(", ");
+  const sources = [...new Set(result.sources.map((s) => s.label ?? `${s.collection} v${s.version}`))].join(", ");
   return (
     <div className="stack" data-testid="dashboard">
       <header className="dash-head">
@@ -139,7 +139,7 @@ export function DashboardView({ result, question, mode }: { result: RunResult; q
 
       <CoverageWarnings result={result} />
 
-      {primary && (
+      {primary && primary.analysis.coverage.monthsValid > 0 && (
         <section className="card dash-headline" aria-labelledby="headline-title" data-testid="headline-finding">
           <p className="dash-kicker">01 / Headline finding</p>
           <h2 id="headline-title" className="dash-section-title" style={{ fontSize: "1.25rem" }}>
