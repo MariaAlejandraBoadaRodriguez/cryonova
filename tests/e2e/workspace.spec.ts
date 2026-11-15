@@ -42,6 +42,22 @@ test("header is plain text without logos; the AI-generated detective image is la
   await expect(page.locator('img[src="/brand/detective.png"]')).toHaveCount(await page.locator('[data-testid="detective-figure"] img').count());
 });
 
+test("the workspace background is plain dark blue, without the Space Apps Orbits pattern", async ({ page }) => {
+  await page.goto("/");
+  const ws = page.locator(".ws").first();
+  await expect(ws).toBeVisible();
+  const style = await ws.evaluate((el) => {
+    const own = getComputedStyle(el);
+    const before = getComputedStyle(el, "::before");
+    return { image: own.backgroundImage, color: own.backgroundColor, beforeContent: before.content, beforeImage: before.backgroundImage };
+  });
+  expect(style.image).toBe("none");
+  expect(style.color).toBe("rgb(7, 23, 63)");
+  expect(style.beforeImage).not.toContain("orbits");
+  expect(["none", "normal"]).toContain(style.beforeContent);
+  expect((await page.request.get("/brand/orbits.png")).status()).toBe(404);
+});
+
 test("the workspace makes no requests outside its own origin (no CDN)", async ({ page, baseURL }) => {
   const origin = new URL(baseURL!).host;
   const foreign: string[] = [];

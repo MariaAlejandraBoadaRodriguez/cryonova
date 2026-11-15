@@ -145,5 +145,5 @@ averaged data on single levels (Copernicus C3S/ECMWF, doi:10.24381/cds.f17050d7,
 Copernicus Climate Change Service information); NOAA NCEI Global Summary of the Month (doi:10.7289/V5QV3JJ5)
 through the CDO web services. HDF5/NetCDF-4 files are read with h5wasm (NIST, public domain; HDF5 licence). Country
 boxes and borders from Natural Earth (public domain) via `world-atlas`. Globe texture: NASA Visible Earth Blue
-Marble (public domain), from the `three-globe` package (MIT). The detective artwork (AI-generated) and the orbit
-pattern come from the approved prototype; the app shows no NASA or Space Apps logo.
+Marble (public domain), from the `three-globe` package (MIT). The detective artwork (AI-generated) comes from the
+approved prototype; the app shows no NASA or Space Apps logo or graphic pattern.

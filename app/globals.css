@@ -843,20 +843,10 @@ code,
     "setup globe guide";
   height: calc(100dvh - var(--header-h));
   min-height: 620px;
-  background: linear-gradient(135deg, var(--sa-electric) 0%, var(--sa-deep) 100%);
+  /* Plain dark blue: no Space Apps pattern or brand gradient (AI-assisted content may not use them). */
+  background: var(--sa-deep);
   color: #fff;
   font-size: 14px;
-}
-
-/* The Space Apps "Orbits" pattern at 25%, behind the center column (side columns are opaque). */
-.ws::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: url("/brand/orbits.png") var(--rail-w) 0 / min(900px, 90vw) no-repeat;
-  opacity: 0.25;
-  pointer-events: none;
 }
 
 .ws-step {
@@ -2161,10 +2151,6 @@ table.data.discovery-table .col-details {
       "setup"
       "globe"
       "guide";
-  }
-
-  .ws::before {
-    background-position: 0 0;
   }
 
   .ws-area-assistant {
