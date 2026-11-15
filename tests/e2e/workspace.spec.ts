@@ -113,7 +113,7 @@ test("the assistant answers in Spanish and fills the setup as an editable propos
   await page.goto("/");
   await page.getByTestId("assistant-input").fill("¿Ha cambiado la precipitación en Perú desde 2001?");
   await page.getByTestId("investigate-button").click();
-  await expect(page.getByRole("log")).toContainText(/Propuesta:/, { timeout: 60_000 });
+  await expect(page.getByTestId("assistant-proposal")).toContainText(/Propuesta:/, { timeout: 60_000 });
   await expect(page.getByText("Selected: Peru", { exact: false })).toBeVisible();
   await expect(page.getByTestId("plan")).toBeVisible();
   await expect(page.getByTestId("plan-period")).toContainText("Jan 2001");
@@ -123,8 +123,94 @@ test("the assistant answers in Spanish and fills the setup as an editable propos
 test("old links redirect: /investigate?q= asks the assistant on the workspace", async ({ page }) => {
   await page.goto(`/investigate?q=${encodeURIComponent("Is it getting warmer in Chile since 2001?")}`);
   await expect(page).toHaveURL(/\/\?q=/);
-  await expect(page.getByRole("log")).toContainText(/Proposal:/, { timeout: 60_000 });
+  await expect(page.getByTestId("assistant-proposal")).toContainText(/Proposal:/, { timeout: 60_000 });
   await expect(page.getByText("Selected: Chile", { exact: false })).toBeVisible();
+});
+
+test("the proposal is a readable card in the right panel; the center keeps the question and the globe", async ({ page }) => {
+  await page.goto("/");
+  const center = page.getByTestId("assistant");
+  await expect(center.getByText(/English or Spanish|The assistant sees your setup/)).toHaveCount(0);
+  await page.getByTestId("assistant-input").fill("How has temperature changed in Colombia since 2005?");
+  await page.getByTestId("assistant-input").press("Enter");
+
+  const card = page.getByTestId("guide").getByTestId("assistant-proposal");
+  await expect(card).toContainText("Proposal:", { timeout: 60_000 });
+  await expect(card).toContainText("Everything on the left is editable");
+  await expect(card).toBeVisible();
+  // Screen readers still hear it: the card sits in a polite live region.
+  await expect(page.getByRole("status").filter({ has: page.getByTestId("assistant-proposal") })).toHaveAttribute("aria-live", "polite");
+  expect(await card.locator(".proposal-text").evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(14);
+
+  // The center only acknowledges it, with a link to the card.
+  await expect(center).not.toContainText("Proposal:");
+  await expect(center.getByRole("link", { name: "Review the proposal" })).toHaveAttribute("href", "#assistant-proposal");
+  await expect(page.getByTestId("assistant-input")).toHaveValue("");
+  await expect(page.getByTestId("plan")).toBeVisible();
+  await expectAccessible(page);
+  await card.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: shot("workspace-proposal"), fullPage: false });
+});
+
+test("the globe keeps its instructions in its accessible description instead of a hint line", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText("Drag to rotate · scroll or pinch to zoom", { exact: false })).toHaveCount(0);
+  const toolbar = page.getByRole("group", { name: "Map mode" });
+  await expect(toolbar.locator(":scope > :not(button)")).toHaveCount(0);
+  const globe = page.getByRole("application");
+  await expect(globe).toHaveAccessibleName("Choose a location");
+  await expect(globe).toHaveAccessibleDescription(/Drag to rotate, scroll or pinch to zoom, and click a country to select it\./);
+  await expect(globe).toHaveAccessibleDescription(/Arrow keys rotate and the plus and minus keys zoom\./);
+  // Drawing mode still says how to draw and cancel.
+  await page.getByTestId("draw-toggle").click();
+  await expect(toolbar).toContainText("Drag a rectangle on the globe. Esc cancels.");
+  await page.keyboard.press("Escape");
+  await expect(toolbar.locator(":scope > :not(button)")).toHaveCount(0);
+});
+
+const LONG_QUESTION =
+  "How has near-surface air temperature changed in Colombia between 2005 and 2024, and is the warming stronger in the Andes during the dry season than during the wet season once the strongest ENSO years are set aside, the growth of the largest cities is considered and the gaps in satellite coverage over the mountains are taken into account?";
+
+/** Visible text lines of a textarea (its inner height over its line height). */
+function visibleLines(el: HTMLTextAreaElement): number {
+  const s = getComputedStyle(el);
+  return (el.clientHeight - parseFloat(s.paddingTop) - parseFloat(s.paddingBottom)) / parseFloat(s.lineHeight);
+}
+
+test("long questions: the question grows to four lines, Shift+Enter adds a line, Enter asks, the plan shows it all", async ({ page }) => {
+  expect(LONG_QUESTION.length).toBeGreaterThanOrEqual(300);
+  await page.goto("/");
+  const input = page.getByTestId("assistant-input");
+  await expect(input).toHaveJSProperty("tagName", "TEXTAREA");
+  // Empty, it shows the placeholder: one line, or two on a narrow phone.
+  const initial = await input.evaluate(visibleLines);
+  expect(initial).toBeLessThan(2.5);
+
+  // Shift+Enter inserts a line break instead of asking.
+  await input.click();
+  await page.keyboard.type("First line");
+  await page.keyboard.press("Shift+Enter");
+  await page.keyboard.type("second line");
+  await expect(input).toHaveValue("First line\nsecond line");
+  expect(Math.round(await input.evaluate(visibleLines))).toBe(2);
+
+  // A ~300-character question grows the field to four lines; the rest scrolls inside it.
+  await input.fill(LONG_QUESTION);
+  expect(Math.round(await input.evaluate(visibleLines))).toBe(4);
+  expect(await input.evaluate((el) => el.scrollHeight > el.clientHeight + 1)).toBe(true);
+
+  // Enter asks; the field empties and shrinks back.
+  await input.press("Enter");
+  await expect(page.getByTestId("assistant-proposal")).toContainText("Proposal:", { timeout: 60_000 });
+  await expect(input).toHaveValue("");
+  expect(await input.evaluate(visibleLines)).toBeCloseTo(initial, 1);
+
+  // The plan's question shows the whole text, without an inner scrollbar.
+  const planQuestion = page.getByTestId("plan-question");
+  await expect(planQuestion).toHaveValue(LONG_QUESTION);
+  expect(await planQuestion.evaluate((el) => el.scrollHeight <= el.clientHeight + 1)).toBe(true);
+  expect(await planQuestion.evaluate(visibleLines)).toBeGreaterThan(4);
+  await expectAccessible(page);
 });
 
 test("unknown runs and wrong codes are handled without revealing anything", async ({ page }) => {
