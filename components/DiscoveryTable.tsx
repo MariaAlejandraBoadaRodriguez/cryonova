@@ -63,7 +63,7 @@ export function DiscoveryTable({ result }: { result: RunResult }) {
               <th scope="col" className="num">
                 p
               </th>
-              {header("q", "q (BH)", true)}
+              {header("q", "Adjusted p (BH q)", true)}
               {header("snr", "Change / variability", true)}
               <th scope="col" className="num">
                 Years
