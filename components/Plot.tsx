@@ -15,6 +15,8 @@ interface PlotProps extends PlotSpec {
   ariaLabel: string;
   className?: string;
   testId?: string;
+  /** Short explanation printed under the chart (what it shows, the pattern, how to read it). */
+  caption?: string;
 }
 
 const CONFIG = {
@@ -24,7 +26,7 @@ const CONFIG = {
   toImageButtonOptions: { format: "png", scale: 3 },
 };
 
-export function Plot({ data, layout, ariaLabel, className = "chart-frame", testId }: PlotProps) {
+export function Plot({ data, layout, ariaLabel, className = "chart-frame", testId, caption }: PlotProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,6 +50,11 @@ export function Plot({ data, layout, ariaLabel, className = "chart-frame", testI
   return (
     <figure className="chart-figure" aria-label={ariaLabel} data-testid={testId}>
       <div ref={ref} className={className} />
+      {caption && (
+        <figcaption className="chart-caption" data-testid="chart-caption">
+          {caption}
+        </figcaption>
+      )}
     </figure>
   );
 }

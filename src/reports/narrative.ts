@@ -10,12 +10,49 @@ import { decimalsFor, fmt, fmtP, fmtSigned } from "@/src/lib/format";
 
 const decimalsOf = (v: VariableResult) => decimalsFor(v.unitGroup);
 
-export const EVIDENCE_LABEL: Record<EvidenceLevel, string> = {
-  significant: "Statistically significant trend (95% interval excludes zero)",
-  nominal: "Nominally significant, not after multiple-comparison correction",
-  inconclusive: "Inconclusive: the 95% interval includes zero",
-  insufficient: "Not enough complete years for a trend",
+/**
+ * Short evidence names shown on badges, in the comparison table, the CSV and
+ * the PDF. A "no clear trend yet" result is valid evidence and is always
+ * shown and explained, never hidden.
+ */
+export const EVIDENCE_NAME: Record<EvidenceLevel, string> = {
+  significant: "Clear trend",
+  nominal: "Possible trend, not confirmed",
+  inconclusive: "No clear trend yet",
+  insufficient: "Not enough data",
 };
+
+/**
+ * Plain-language meaning of each level ("How to read this"). `corrected` is
+ * true when several trends were tested together and the Benjamini–Hochberg
+ * correction applies.
+ */
+export function evidenceMeaning(level: EvidenceLevel, corrected: boolean): string {
+  switch (level) {
+    case "significant":
+      return corrected
+        ? "The 95% interval of the trend excludes zero and the trend stays significant after the Benjamini–Hochberg correction for testing several variables at once."
+        : "The 95% interval of the trend excludes zero, so the change stands out from natural year-to-year variation in this period.";
+    case "nominal":
+      return "On its own the 95% interval excludes zero, but the trend is not significant after the Benjamini–Hochberg correction for testing several variables at once, so it may be a chance result. Treat it as a lead to check, not a finding.";
+    case "inconclusive":
+      return "The 95% interval of the trend includes zero: the data cannot separate the change from natural year-to-year variation in this period. A longer period or a different region may help.";
+    default:
+      return "Too few complete years (each with 12 valid months) to estimate a trend; at least 10 are needed.";
+  }
+}
+
+/** Name and meaning in one sentence, for text-only outputs (AI facts, PDF findings). */
+export const EVIDENCE_LABEL: Record<EvidenceLevel, string> = {
+  significant: "Clear trend: the 95% interval excludes zero (and, when several trends are compared, the trend stays significant after the Benjamini–Hochberg correction)",
+  nominal: "Possible trend, not confirmed: the 95% interval excludes zero, but the trend is not significant after the Benjamini–Hochberg correction for comparing several trends",
+  inconclusive: "No clear trend yet: the 95% interval includes zero, so the data cannot separate the change from natural year-to-year variation in this period",
+  insufficient: "Not enough data: too few complete years to estimate a trend",
+};
+
+/** One-line note shown under the comparison table and in the reports. */
+export const NO_CLEAR_TREND_NOTE =
+  "No clear trend yet means the data cannot separate the change from natural year-to-year variation in this period; a longer period or a different region may help.";
 
 export function regionLabel(result: Pick<RunResult, "region">): string {
   return result.region.name ?? "the selected region";

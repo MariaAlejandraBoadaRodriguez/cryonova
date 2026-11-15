@@ -9,9 +9,11 @@ import { useMemo } from "react";
 import { getRegion } from "@/src/catalog/regions";
 import type { RunResult, VariableResult } from "@/src/jobs/types";
 import { fmt, fmtBBox, fmtBytes, fmtDuration, fmtMonth, fmtP, fmtSigned, fmtUtc } from "@/src/lib/format";
-import { coverageSentence, EVIDENCE_LABEL, evidenceOf, magnitudeSentence, qValuesFor, regionLabel, trendSentence } from "@/src/reports/narrative";
+import { anomalyCaption, seasonalCaption, seriesCaption } from "@/src/reports/captions";
+import { coverageSentence, evidenceOf, magnitudeSentence, qValuesFor, regionLabel, trendSentence } from "@/src/reports/narrative";
 import { anomalyChart, decimalsOf, seasonalCycleChart, seriesChart } from "./charts";
 import { DiscoveryTable } from "./DiscoveryTable";
+import { EvidenceHint } from "./EvidenceHint";
 import { Plot } from "./Plot";
 import { StationPanel } from "./StationPanel";
 import { TableWrap } from "./TableWrap";
@@ -19,16 +21,7 @@ import { TableWrap } from "./TableWrap";
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export function EvidenceBadge({ v, qValue }: { v: VariableResult; qValue: number | null }) {
-  const level = evidenceOf(v, qValue);
-  const strong = level === "significant";
-  return (
-    <span className={strong ? "badge badge-strong" : "badge badge-neutral"}>
-      <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-        {strong ? <circle cx="5" cy="5" r="5" fill="#EAFE07" /> : <circle cx="5" cy="5" r="4" fill="none" stroke="currentColor" strokeWidth="2" />}
-      </svg>
-      {EVIDENCE_LABEL[level]}
-    </span>
-  );
+  return <EvidenceHint level={evidenceOf(v, qValue)} corrected={qValue !== null} testId="evidence-badge" />;
 }
 
 /** Headline numbers, plain-language finding and the annotated main chart for one variable. */
@@ -65,6 +58,7 @@ export function MainFinding({ v, result }: { v: VariableResult; result: RunResul
         <Plot
           {...series}
           testId="series-chart"
+          caption={seriesCaption(v)}
           ariaLabel={`Monthly and annual ${v.name.en} in ${region} with linear trend. ${trendSentence(v, region)} Values are listed in the tables below.`}
         />
       </div>
@@ -115,7 +109,7 @@ export function VariableAnalyses({ v, result }: { v: VariableResult; result: Run
       <div className="dash-grid">
         <section className="dash-panel" aria-label={`Seasonal cycle of ${v.name.en}`}>
           <h4>Seasonal cycle</h4>
-          <Plot {...cycle} ariaLabel={`Average ${v.name.en} for each calendar month in ${region}.`} />
+          <Plot {...cycle} caption={seasonalCaption(v)} ariaLabel={`Average ${v.name.en} for each calendar month in ${region}.`} />
           <details>
             <summary>Monthly means table</summary>
         <TableWrap label="Mean of each calendar month">
@@ -147,7 +141,7 @@ export function VariableAnalyses({ v, result }: { v: VariableResult; result: Run
         </section>
         <section className="dash-panel" aria-label={`Monthly anomalies of ${v.name.en}`}>
           <h4>Monthly anomalies</h4>
-        <Plot {...anomalies} ariaLabel={`Monthly anomalies of ${v.name.en} relative to each calendar month's mean. Warm bars are above, blue bars below.`} />
+        <Plot {...anomalies} caption={anomalyCaption(v)} ariaLabel={`Monthly anomalies of ${v.name.en} relative to each calendar month's mean. Warm bars are above, blue bars below.`} />
         <p className="field-help">
           Longest run of positive anomalies:{" "}
           {a.streaks.longestPositiveAnomalyMonths
