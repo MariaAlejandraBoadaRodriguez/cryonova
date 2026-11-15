@@ -97,7 +97,7 @@ export function GuidePanel(props: GuidePanelProps) {
         <>
           {!started ? (
             <p className="guide-intro">
-              Ask a plain-language question in English or Spanish, or start from the example below. I use the place and dates in your question first, then your globe pick and the dates on the left. Nothing runs until you press Start analysis.
+              Ask a plain-language question, or start from the example below. I use the place and dates in your question first, then your globe pick and the dates on the left. Nothing runs until you press Start analysis.
             </p>
           ) : (
             <section className="guide-progress" aria-labelledby={`${id}-progress`} data-testid="guide-progress">

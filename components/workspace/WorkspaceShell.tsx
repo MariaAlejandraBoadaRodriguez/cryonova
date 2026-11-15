@@ -44,35 +44,26 @@ function reconcileDerived(variables: string[], previous: string[]): string[] {
   return [...new Set([...kept, ...(topic?.derived ?? [])])];
 }
 
-const MONTHS_ES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-function monthLabel(ym: string, language: "en" | "es"): string {
-  if (language === "en") return fmtMonth(ym);
-  return `${MONTHS_ES[Number(ym.slice(5, 7)) - 1]} ${ym.slice(0, 4)}`;
-}
-
-/** The assistant's reply for a proposal, in the language of the question. */
+/** The assistant's reply for a proposal, always in English (D-35). */
 function proposalReply(proposal: Proposal): ThreadMessage[] {
-  const es = proposal.language === "es";
   const sel = proposal.selection;
-  const names = sel.variables.map((k) => getVariable(k)).filter((v) => v !== undefined).map((v) => (es ? v.name.es : v.name.en));
+  const names = sel.variables.map((k) => getVariable(k)).filter((v) => v !== undefined).map((v) => v.name.en);
   const region = sel.region?.regionId ? getRegion(sel.region.regionId) : undefined;
-  const place = region ? (es ? region.names.es : region.names.en) : sel.region ? (es ? "el área indicada" : "the area you gave") : null;
-  const period = `${monthLabel(sel.start, proposal.language)} – ${monthLabel(sel.end, proposal.language)}`;
-  const parts = [names.length > 0 ? names.join(", ") : es ? "sin variable aún" : "no variable yet", place ?? (es ? "sin lugar aún" : "no place yet"), period];
-  const text = es
-    ? `Propuesta: ${parts.join(" · ")}. Puedes editar todo a la izquierda; el plan se actualiza con tus cambios.`
-    : `Proposal: ${parts.join(" · ")}. Everything on the left is editable; the plan updates as you change it.`;
+  const place = region ? region.names.en : sel.region ? "the area you gave" : null;
+  const period = `${fmtMonth(sel.start)} – ${fmtMonth(sel.end)}`;
+  const parts = [names.length > 0 ? names.join(", ") : "no variable yet", place ?? "no place yet", period];
+  const text = `Proposal: ${parts.join(" · ")}. Everything on the left is editable; the plan updates as you change it.`;
   const details = [
     ...proposal.rationale.map((r) => {
       const v = getVariable(r.key);
-      return `${v ? (es ? v.name.es : v.name.en) : r.key}: ${r.text}`;
+      return `${v ? v.name.en : r.key}: ${r.text}`;
     }),
     ...proposal.assumptions,
     ...proposal.notes,
     ...(proposal.source === "rules" && proposal.aiStatus ? [proposal.aiStatus] : []),
   ];
-  const messages: ThreadMessage[] = [{ id: crypto.randomUUID(), role: "assistant", text, details, badge: proposal.source === "ai" ? (es ? "IA" : "AI") : es ? "Reglas" : "Rules" }];
-  if (proposal.clarification) messages.push({ id: crypto.randomUUID(), role: "assistant", text: proposal.clarification, badge: es ? "Pregunta" : "Question" });
+  const messages: ThreadMessage[] = [{ id: crypto.randomUUID(), role: "assistant", text, details, badge: proposal.source === "ai" ? "AI" : "Rules" }];
+  if (proposal.clarification) messages.push({ id: crypto.randomUUID(), role: "assistant", text: proposal.clarification, badge: "Question" });
   return messages;
 }
 

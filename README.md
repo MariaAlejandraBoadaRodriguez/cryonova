@@ -4,7 +4,7 @@ AI-assisted Earth system trend research (NASA Space Apps 2026 · Earth System Tr
 
 Cryonova turns questions into reproducible analyses of **live Earth-observation data** (NASA MERRA-2, GPM IMERG,
 GLDAS, SeaWiFS and Giovanni; Copernicus ERA5; NOAA weather stations). In a three-column workspace,
-teachers and students ask a question in English or Spanish (the assistant fills the setup as an editable
+teachers and students ask a question in plain English (the assistant fills the setup as an editable
 proposal), or pick variables, a period and a country or custom area on an interactive globe. The plan on the
 right lists the analyses and checks data sufficiency; "Start analysis" queries the provider at that moment and
 opens a results dashboard with trends and uncertainty, climate diagnostics, an interpretation whose cited figures
@@ -28,7 +28,7 @@ without an account, and CSV and PDF exports come from the same stored result.
 | Research agent: question (+ current setup and earlier turns) → editable proposal (variables, region, period) using catalog, gazetteer and live coverage tools; rule-based fallback | `src/agent/planner.ts`, `src/agent/fallback.ts`, `app/api/agent/plan` |
 | Live queries: CMR discovery + Cloud OPeNDAP DAP2 subsets (MERRA-2, IMERG, GLDAS), OB.DAAC subsets with a bounded cloud-file fallback (SeaWiFS), asynchronous Copernicus CDS jobs (ERA5) and NASA Harmony/Giovanni jobs stored in Neon and advanced by polling, NOAA CDO station search and monthly observations (point data); cosine-latitude weighted regional means; durable resumable jobs with cancellation | `src/providers/`, `src/jobs/runner.ts`, `app/api/runs` |
 | Statistics: OLS trend on complete-year means with Newey–West HAC (1 lag), seasonal cycle, anomalies, ranking, period comparison (Welch), seasonal trends, streaks, Benjamini–Hochberg discovery; derived series (differences, wind-vector magnitudes) | `src/analytics/`, `src/catalog/derived.ts` (parity with statsmodels in `analytics/`) |
-| Interpretation in the user's language with numeric citation check | `src/agent/explain.ts`, `src/agent/verify.ts` |
+| Interpretation in English with numeric citation check | `src/agent/explain.ts`, `src/agent/verify.ts` |
 | Results dashboard (live progress, headline finding, analyses, comparison table, interpretation, provenance, save, CSV/PDF, refresh, back to setup); reopen by code on the same dashboard, read-only | `components/dashboard/`, `src/db/investigations.ts` |
 | CSV (results, monthly series) and vector PDF report | `src/reports/` , `app/api/exports` |
 | Connector status: live probes that read one real value where possible, plus the last real value each connector returned (`connector_checks`) | `src/providers/status.ts`, `/sources`, `/api/connectors/status` |

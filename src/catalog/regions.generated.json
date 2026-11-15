@@ -7,8 +7,7 @@
    "iso2": "AF",
    "numeric": "004",
    "names": {
-    "en": "Afghanistan",
-    "es": "Afganistán"
+    "en": "Afghanistan"
    },
    "aliases": [
     "AF",
@@ -27,8 +26,7 @@
    "iso2": "AL",
    "numeric": "008",
    "names": {
-    "en": "Albania",
-    "es": "Albania"
+    "en": "Albania"
    },
    "aliases": [
     "AL",
@@ -47,8 +45,7 @@
    "iso2": "DZ",
    "numeric": "012",
    "names": {
-    "en": "Algeria",
-    "es": "Argelia"
+    "en": "Algeria"
    },
    "aliases": [
     "DZ",
@@ -67,8 +64,7 @@
    "iso2": "AO",
    "numeric": "024",
    "names": {
-    "en": "Angola",
-    "es": "Angola"
+    "en": "Angola"
    },
    "aliases": [
     "AO",
@@ -87,8 +83,7 @@
    "iso2": "AQ",
    "numeric": "010",
    "names": {
-    "en": "Antarctica",
-    "es": "Antártida"
+    "en": "Antarctica"
    },
    "aliases": [
     "AQ",
@@ -107,8 +102,7 @@
    "iso2": "AR",
    "numeric": "032",
    "names": {
-    "en": "Argentina",
-    "es": "Argentina"
+    "en": "Argentina"
    },
    "aliases": [
     "AR",
@@ -127,8 +121,7 @@
    "iso2": "AM",
    "numeric": "051",
    "names": {
-    "en": "Armenia",
-    "es": "Armenia"
+    "en": "Armenia"
    },
    "aliases": [
     "AM",
@@ -147,8 +140,7 @@
    "iso2": "AU",
    "numeric": "036",
    "names": {
-    "en": "Australia",
-    "es": "Australia"
+    "en": "Australia"
    },
    "aliases": [
     "AU",
@@ -167,8 +159,7 @@
    "iso2": "AT",
    "numeric": "040",
    "names": {
-    "en": "Austria",
-    "es": "Austria"
+    "en": "Austria"
    },
    "aliases": [
     "AT",
@@ -187,8 +178,7 @@
    "iso2": "AZ",
    "numeric": "031",
    "names": {
-    "en": "Azerbaijan",
-    "es": "Azerbaiyán"
+    "en": "Azerbaijan"
    },
    "aliases": [
     "AZ",
@@ -207,8 +197,7 @@
    "iso2": "BS",
    "numeric": "044",
    "names": {
-    "en": "Bahamas",
-    "es": "Bahamas"
+    "en": "Bahamas"
    },
    "aliases": [
     "BS",
@@ -227,8 +216,7 @@
    "iso2": "BD",
    "numeric": "050",
    "names": {
-    "en": "Bangladesh",
-    "es": "Bangladesh"
+    "en": "Bangladesh"
    },
    "aliases": [
     "BD",
@@ -247,8 +235,7 @@
    "iso2": "BY",
    "numeric": "112",
    "names": {
-    "en": "Belarus",
-    "es": "Bielorrusia"
+    "en": "Belarus"
    },
    "aliases": [
     "BY",
@@ -267,8 +254,7 @@
    "iso2": "BE",
    "numeric": "056",
    "names": {
-    "en": "Belgium",
-    "es": "Bélgica"
+    "en": "Belgium"
    },
    "aliases": [
     "BE",
@@ -287,8 +273,7 @@
    "iso2": "BZ",
    "numeric": "084",
    "names": {
-    "en": "Belize",
-    "es": "Belice"
+    "en": "Belize"
    },
    "aliases": [
     "BZ",
@@ -307,8 +292,7 @@
    "iso2": "BJ",
    "numeric": "204",
    "names": {
-    "en": "Benin",
-    "es": "Benin"
+    "en": "Benin"
    },
    "aliases": [
     "BJ",
@@ -327,8 +311,7 @@
    "iso2": "BT",
    "numeric": "064",
    "names": {
-    "en": "Bhutan",
-    "es": "Bután"
+    "en": "Bhutan"
    },
    "aliases": [
     "BT",
@@ -347,8 +330,7 @@
    "iso2": "BO",
    "numeric": "068",
    "names": {
-    "en": "Bolivia",
-    "es": "Bolivia"
+    "en": "Bolivia"
    },
    "aliases": [
     "BO",
@@ -367,8 +349,7 @@
    "iso2": "BA",
    "numeric": "070",
    "names": {
-    "en": "Bosnia and Herzegovina",
-    "es": "Bosnia y Herzegovina"
+    "en": "Bosnia and Herzegovina"
    },
    "aliases": [
     "Bosnia and Herz.",
@@ -388,8 +369,7 @@
    "iso2": "BW",
    "numeric": "072",
    "names": {
-    "en": "Botswana",
-    "es": "Botswana"
+    "en": "Botswana"
    },
    "aliases": [
     "BW",
@@ -408,8 +388,7 @@
    "iso2": "BR",
    "numeric": "076",
    "names": {
-    "en": "Brazil",
-    "es": "Brasil"
+    "en": "Brazil"
    },
    "aliases": [
     "BR",
@@ -428,8 +407,7 @@
    "iso2": "BN",
    "numeric": "096",
    "names": {
-    "en": "Brunei Darussalam",
-    "es": "Brunei Darussalam"
+    "en": "Brunei Darussalam"
    },
    "aliases": [
     "Brunei",
@@ -449,8 +427,7 @@
    "iso2": "BG",
    "numeric": "100",
    "names": {
-    "en": "Bulgaria",
-    "es": "Bulgaria"
+    "en": "Bulgaria"
    },
    "aliases": [
     "BG",
@@ -469,8 +446,7 @@
    "iso2": "BF",
    "numeric": "854",
    "names": {
-    "en": "Burkina Faso",
-    "es": "Burkina Faso"
+    "en": "Burkina Faso"
    },
    "aliases": [
     "BF",
@@ -489,8 +465,7 @@
    "iso2": "BI",
    "numeric": "108",
    "names": {
-    "en": "Burundi",
-    "es": "Burundi"
+    "en": "Burundi"
    },
    "aliases": [
     "BI",
@@ -509,8 +484,7 @@
    "iso2": "KH",
    "numeric": "116",
    "names": {
-    "en": "Cambodia",
-    "es": "Camboya"
+    "en": "Cambodia"
    },
    "aliases": [
     "KH",
@@ -529,8 +503,7 @@
    "iso2": "CM",
    "numeric": "120",
    "names": {
-    "en": "Cameroon",
-    "es": "Camerún"
+    "en": "Cameroon"
    },
    "aliases": [
     "CM",
@@ -549,8 +522,7 @@
    "iso2": "CA",
    "numeric": "124",
    "names": {
-    "en": "Canada",
-    "es": "Canadá"
+    "en": "Canada"
    },
    "aliases": [
     "CA",
@@ -569,8 +541,7 @@
    "iso2": "CF",
    "numeric": "140",
    "names": {
-    "en": "Central African Republic",
-    "es": "República Centroafricana"
+    "en": "Central African Republic"
    },
    "aliases": [
     "Central African Rep.",
@@ -590,8 +561,7 @@
    "iso2": "TD",
    "numeric": "148",
    "names": {
-    "en": "Chad",
-    "es": "Chad"
+    "en": "Chad"
    },
    "aliases": [
     "TD",
@@ -610,8 +580,7 @@
    "iso2": "CL",
    "numeric": "152",
    "names": {
-    "en": "Chile",
-    "es": "Chile"
+    "en": "Chile"
    },
    "aliases": [
     "CL",
@@ -630,8 +599,7 @@
    "iso2": "CO",
    "numeric": "170",
    "names": {
-    "en": "Colombia",
-    "es": "Colombia"
+    "en": "Colombia"
    },
    "aliases": [
     "CO",
@@ -650,8 +618,7 @@
    "iso2": "CR",
    "numeric": "188",
    "names": {
-    "en": "Costa Rica",
-    "es": "Costa Rica"
+    "en": "Costa Rica"
    },
    "aliases": [
     "CR",
@@ -670,8 +637,7 @@
    "iso2": "CI",
    "numeric": "384",
    "names": {
-    "en": "Cote d'Ivoire",
-    "es": "Costa de Marfil"
+    "en": "Cote d'Ivoire"
    },
    "aliases": [
     "Côte d'Ivoire",
@@ -692,8 +658,7 @@
    "iso2": "HR",
    "numeric": "191",
    "names": {
-    "en": "Croatia",
-    "es": "Croacia"
+    "en": "Croatia"
    },
    "aliases": [
     "HR",
@@ -712,8 +677,7 @@
    "iso2": "CU",
    "numeric": "192",
    "names": {
-    "en": "Cuba",
-    "es": "Cuba"
+    "en": "Cuba"
    },
    "aliases": [
     "CU",
@@ -732,8 +696,7 @@
    "iso2": "CY",
    "numeric": "196",
    "names": {
-    "en": "Cyprus",
-    "es": "Chipre"
+    "en": "Cyprus"
    },
    "aliases": [
     "CY",
@@ -752,8 +715,7 @@
    "iso2": "CZ",
    "numeric": "203",
    "names": {
-    "en": "Czech Republic",
-    "es": "República Checa"
+    "en": "Czech Republic"
    },
    "aliases": [
     "Czechia",
@@ -773,8 +735,7 @@
    "iso2": "CD",
    "numeric": "180",
    "names": {
-    "en": "Democratic Republic of the Congo",
-    "es": "Congo (República Democrática del)"
+    "en": "Democratic Republic of the Congo"
    },
    "aliases": [
     "Dem. Rep. Congo",
@@ -795,8 +756,7 @@
    "iso2": "DK",
    "numeric": "208",
    "names": {
-    "en": "Denmark",
-    "es": "Dinamarca"
+    "en": "Denmark"
    },
    "aliases": [
     "DK",
@@ -815,8 +775,7 @@
    "iso2": "DJ",
    "numeric": "262",
    "names": {
-    "en": "Djibouti",
-    "es": "Yibuti"
+    "en": "Djibouti"
    },
    "aliases": [
     "DJ",
@@ -835,8 +794,7 @@
    "iso2": "DO",
    "numeric": "214",
    "names": {
-    "en": "Dominican Republic",
-    "es": "República Dominicana"
+    "en": "Dominican Republic"
    },
    "aliases": [
     "Dominican Rep.",
@@ -856,8 +814,7 @@
    "iso2": "EC",
    "numeric": "218",
    "names": {
-    "en": "Ecuador",
-    "es": "Ecuador"
+    "en": "Ecuador"
    },
    "aliases": [
     "EC",
@@ -876,8 +833,7 @@
    "iso2": "EG",
    "numeric": "818",
    "names": {
-    "en": "Egypt",
-    "es": "Egipto"
+    "en": "Egypt"
    },
    "aliases": [
     "EG",
@@ -896,8 +852,7 @@
    "iso2": "SV",
    "numeric": "222",
    "names": {
-    "en": "El Salvador",
-    "es": "El Salvador"
+    "en": "El Salvador"
    },
    "aliases": [
     "SV",
@@ -916,8 +871,7 @@
    "iso2": "GQ",
    "numeric": "226",
    "names": {
-    "en": "Equatorial Guinea",
-    "es": "Guinea Ecuatorial"
+    "en": "Equatorial Guinea"
    },
    "aliases": [
     "Eq. Guinea",
@@ -937,8 +891,7 @@
    "iso2": "ER",
    "numeric": "232",
    "names": {
-    "en": "Eritrea",
-    "es": "Eritrea"
+    "en": "Eritrea"
    },
    "aliases": [
     "ER",
@@ -957,8 +910,7 @@
    "iso2": "EE",
    "numeric": "233",
    "names": {
-    "en": "Estonia",
-    "es": "Estonia"
+    "en": "Estonia"
    },
    "aliases": [
     "EE",
@@ -977,8 +929,7 @@
    "iso2": "SZ",
    "numeric": "748",
    "names": {
-    "en": "Eswatini",
-    "es": "Esuatini"
+    "en": "Eswatini"
    },
    "aliases": [
     "eSwatini",
@@ -998,8 +949,7 @@
    "iso2": "ET",
    "numeric": "231",
    "names": {
-    "en": "Ethiopia",
-    "es": "Etiopía"
+    "en": "Ethiopia"
    },
    "aliases": [
     "ET",
@@ -1018,8 +968,7 @@
    "iso2": "FK",
    "numeric": "238",
    "names": {
-    "en": "Falkland Islands (Malvinas)",
-    "es": "Islas Malvinas"
+    "en": "Falkland Islands (Malvinas)"
    },
    "aliases": [
     "Falkland Is.",
@@ -1039,8 +988,7 @@
    "iso2": "FJ",
    "numeric": "242",
    "names": {
-    "en": "Fiji",
-    "es": "Fiji"
+    "en": "Fiji"
    },
    "aliases": [
     "FJ",
@@ -1059,8 +1007,7 @@
    "iso2": "FI",
    "numeric": "246",
    "names": {
-    "en": "Finland",
-    "es": "Finlandia"
+    "en": "Finland"
    },
    "aliases": [
     "FI",
@@ -1079,8 +1026,7 @@
    "iso2": "FR",
    "numeric": "250",
    "names": {
-    "en": "France",
-    "es": "Francia"
+    "en": "France"
    },
    "aliases": [
     "FR",
@@ -1099,8 +1045,7 @@
    "iso2": "TF",
    "numeric": "260",
    "names": {
-    "en": "French Southern Territories",
-    "es": "Tierras Australes Francesas"
+    "en": "French Southern Territories"
    },
    "aliases": [
     "Fr. S. Antarctic Lands",
@@ -1120,8 +1065,7 @@
    "iso2": "GA",
    "numeric": "266",
    "names": {
-    "en": "Gabon",
-    "es": "Gabón"
+    "en": "Gabon"
    },
    "aliases": [
     "GA",
@@ -1140,8 +1084,7 @@
    "iso2": "GE",
    "numeric": "268",
    "names": {
-    "en": "Georgia",
-    "es": "Georgia"
+    "en": "Georgia"
    },
    "aliases": [
     "GE",
@@ -1160,8 +1103,7 @@
    "iso2": "DE",
    "numeric": "276",
    "names": {
-    "en": "Germany",
-    "es": "Alemania"
+    "en": "Germany"
    },
    "aliases": [
     "DE",
@@ -1180,8 +1122,7 @@
    "iso2": "GH",
    "numeric": "288",
    "names": {
-    "en": "Ghana",
-    "es": "Ghana"
+    "en": "Ghana"
    },
    "aliases": [
     "GH",
@@ -1200,8 +1141,7 @@
    "iso2": "GR",
    "numeric": "300",
    "names": {
-    "en": "Greece",
-    "es": "Grecia"
+    "en": "Greece"
    },
    "aliases": [
     "GR",
@@ -1220,8 +1160,7 @@
    "iso2": "GL",
    "numeric": "304",
    "names": {
-    "en": "Greenland",
-    "es": "Groenlandia"
+    "en": "Greenland"
    },
    "aliases": [
     "GL",
@@ -1240,8 +1179,7 @@
    "iso2": "GT",
    "numeric": "320",
    "names": {
-    "en": "Guatemala",
-    "es": "Guatemala"
+    "en": "Guatemala"
    },
    "aliases": [
     "GT",
@@ -1260,8 +1198,7 @@
    "iso2": "GN",
    "numeric": "324",
    "names": {
-    "en": "Guinea",
-    "es": "Guinea"
+    "en": "Guinea"
    },
    "aliases": [
     "GN",
@@ -1280,8 +1217,7 @@
    "iso2": "GW",
    "numeric": "624",
    "names": {
-    "en": "Guinea-Bissau",
-    "es": "Guinea Bissau"
+    "en": "Guinea-Bissau"
    },
    "aliases": [
     "GW",
@@ -1300,8 +1236,7 @@
    "iso2": "GY",
    "numeric": "328",
    "names": {
-    "en": "Guyana",
-    "es": "Guyana"
+    "en": "Guyana"
    },
    "aliases": [
     "GY",
@@ -1320,8 +1255,7 @@
    "iso2": "HT",
    "numeric": "332",
    "names": {
-    "en": "Haiti",
-    "es": "Haití"
+    "en": "Haiti"
    },
    "aliases": [
     "HT",
@@ -1340,8 +1274,7 @@
    "iso2": "HN",
    "numeric": "340",
    "names": {
-    "en": "Honduras",
-    "es": "Honduras"
+    "en": "Honduras"
    },
    "aliases": [
     "HN",
@@ -1360,8 +1293,7 @@
    "iso2": "HU",
    "numeric": "348",
    "names": {
-    "en": "Hungary",
-    "es": "Hungría"
+    "en": "Hungary"
    },
    "aliases": [
     "HU",
@@ -1380,8 +1312,7 @@
    "iso2": "IS",
    "numeric": "352",
    "names": {
-    "en": "Iceland",
-    "es": "Islandia"
+    "en": "Iceland"
    },
    "aliases": [
     "IS",
@@ -1400,8 +1331,7 @@
    "iso2": "IN",
    "numeric": "356",
    "names": {
-    "en": "India",
-    "es": "India"
+    "en": "India"
    },
    "aliases": [
     "IN",
@@ -1420,8 +1350,7 @@
    "iso2": "ID",
    "numeric": "360",
    "names": {
-    "en": "Indonesia",
-    "es": "Indonesia"
+    "en": "Indonesia"
    },
    "aliases": [
     "ID",
@@ -1440,8 +1369,7 @@
    "iso2": "IQ",
    "numeric": "368",
    "names": {
-    "en": "Iraq",
-    "es": "Iraq"
+    "en": "Iraq"
    },
    "aliases": [
     "IQ",
@@ -1460,8 +1388,7 @@
    "iso2": "IE",
    "numeric": "372",
    "names": {
-    "en": "Ireland",
-    "es": "Irlanda"
+    "en": "Ireland"
    },
    "aliases": [
     "IE",
@@ -1480,12 +1407,10 @@
    "iso2": "IR",
    "numeric": "364",
    "names": {
-    "en": "Islamic Republic of Iran",
-    "es": "Irán"
+    "en": "Islamic Republic of Iran"
    },
    "aliases": [
     "Iran",
-    "República Islámica de Irán",
     "IR",
     "IRN"
    ],
@@ -1502,8 +1427,7 @@
    "iso2": "IL",
    "numeric": "376",
    "names": {
-    "en": "Israel",
-    "es": "Israel"
+    "en": "Israel"
    },
    "aliases": [
     "IL",
@@ -1522,8 +1446,7 @@
    "iso2": "IT",
    "numeric": "380",
    "names": {
-    "en": "Italy",
-    "es": "Italia"
+    "en": "Italy"
    },
    "aliases": [
     "IT",
@@ -1542,8 +1465,7 @@
    "iso2": "JM",
    "numeric": "388",
    "names": {
-    "en": "Jamaica",
-    "es": "Jamaica"
+    "en": "Jamaica"
    },
    "aliases": [
     "JM",
@@ -1562,8 +1484,7 @@
    "iso2": "JP",
    "numeric": "392",
    "names": {
-    "en": "Japan",
-    "es": "Japón"
+    "en": "Japan"
    },
    "aliases": [
     "JP",
@@ -1582,8 +1503,7 @@
    "iso2": "JO",
    "numeric": "400",
    "names": {
-    "en": "Jordan",
-    "es": "Jordania"
+    "en": "Jordan"
    },
    "aliases": [
     "JO",
@@ -1602,8 +1522,7 @@
    "iso2": "KZ",
    "numeric": "398",
    "names": {
-    "en": "Kazakhstan",
-    "es": "Kazajistán"
+    "en": "Kazakhstan"
    },
    "aliases": [
     "KZ",
@@ -1622,8 +1541,7 @@
    "iso2": "KE",
    "numeric": "404",
    "names": {
-    "en": "Kenya",
-    "es": "Kenia"
+    "en": "Kenya"
    },
    "aliases": [
     "KE",
@@ -1642,8 +1560,7 @@
    "iso2": null,
    "numeric": null,
    "names": {
-    "en": "Kosovo",
-    "es": "Kosovo"
+    "en": "Kosovo"
    },
    "aliases": [],
    "bbox": {
@@ -1659,8 +1576,7 @@
    "iso2": "KW",
    "numeric": "414",
    "names": {
-    "en": "Kuwait",
-    "es": "Kuwait"
+    "en": "Kuwait"
    },
    "aliases": [
     "KW",
@@ -1679,8 +1595,7 @@
    "iso2": "KG",
    "numeric": "417",
    "names": {
-    "en": "Kyrgyzstan",
-    "es": "Kirguistán"
+    "en": "Kyrgyzstan"
    },
    "aliases": [
     "KG",
@@ -1699,8 +1614,7 @@
    "iso2": "LA",
    "numeric": "418",
    "names": {
-    "en": "Lao People's Democratic Republic",
-    "es": "República Democrática Popular de Lao"
+    "en": "Lao People's Democratic Republic"
    },
    "aliases": [
     "Laos",
@@ -1720,8 +1634,7 @@
    "iso2": "LV",
    "numeric": "428",
    "names": {
-    "en": "Latvia",
-    "es": "Letonia"
+    "en": "Latvia"
    },
    "aliases": [
     "LV",
@@ -1740,8 +1653,7 @@
    "iso2": "LB",
    "numeric": "422",
    "names": {
-    "en": "Lebanon",
-    "es": "Líbano"
+    "en": "Lebanon"
    },
    "aliases": [
     "LB",
@@ -1760,8 +1672,7 @@
    "iso2": "LS",
    "numeric": "426",
    "names": {
-    "en": "Lesotho",
-    "es": "Lesoto"
+    "en": "Lesotho"
    },
    "aliases": [
     "LS",
@@ -1780,8 +1691,7 @@
    "iso2": "LR",
    "numeric": "430",
    "names": {
-    "en": "Liberia",
-    "es": "Liberia"
+    "en": "Liberia"
    },
    "aliases": [
     "LR",
@@ -1800,8 +1710,7 @@
    "iso2": "LY",
    "numeric": "434",
    "names": {
-    "en": "Libya",
-    "es": "Libia"
+    "en": "Libya"
    },
    "aliases": [
     "LY",
@@ -1820,8 +1729,7 @@
    "iso2": "LT",
    "numeric": "440",
    "names": {
-    "en": "Lithuania",
-    "es": "Lituania"
+    "en": "Lithuania"
    },
    "aliases": [
     "LT",
@@ -1840,8 +1748,7 @@
    "iso2": "LU",
    "numeric": "442",
    "names": {
-    "en": "Luxembourg",
-    "es": "Luxemburgo"
+    "en": "Luxembourg"
    },
    "aliases": [
     "LU",
@@ -1860,8 +1767,7 @@
    "iso2": "MG",
    "numeric": "450",
    "names": {
-    "en": "Madagascar",
-    "es": "Madagascar"
+    "en": "Madagascar"
    },
    "aliases": [
     "MG",
@@ -1880,8 +1786,7 @@
    "iso2": "MW",
    "numeric": "454",
    "names": {
-    "en": "Malawi",
-    "es": "Malaui"
+    "en": "Malawi"
    },
    "aliases": [
     "MW",
@@ -1900,8 +1805,7 @@
    "iso2": "MY",
    "numeric": "458",
    "names": {
-    "en": "Malaysia",
-    "es": "Malasia"
+    "en": "Malaysia"
    },
    "aliases": [
     "MY",
@@ -1920,8 +1824,7 @@
    "iso2": "ML",
    "numeric": "466",
    "names": {
-    "en": "Mali",
-    "es": "Malí"
+    "en": "Mali"
    },
    "aliases": [
     "ML",
@@ -1940,8 +1843,7 @@
    "iso2": "MR",
    "numeric": "478",
    "names": {
-    "en": "Mauritania",
-    "es": "Mauritania"
+    "en": "Mauritania"
    },
    "aliases": [
     "MR",
@@ -1960,8 +1862,7 @@
    "iso2": "MX",
    "numeric": "484",
    "names": {
-    "en": "Mexico",
-    "es": "México"
+    "en": "Mexico"
    },
    "aliases": [
     "MX",
@@ -1980,8 +1881,7 @@
    "iso2": "MD",
    "numeric": "498",
    "names": {
-    "en": "Moldova, Republic of",
-    "es": "Moldavia"
+    "en": "Moldova, Republic of"
    },
    "aliases": [
     "Moldova",
@@ -2001,8 +1901,7 @@
    "iso2": "MN",
    "numeric": "496",
    "names": {
-    "en": "Mongolia",
-    "es": "Mongolia"
+    "en": "Mongolia"
    },
    "aliases": [
     "MN",
@@ -2021,8 +1920,7 @@
    "iso2": "ME",
    "numeric": "499",
    "names": {
-    "en": "Montenegro",
-    "es": "Montenegro"
+    "en": "Montenegro"
    },
    "aliases": [
     "ME",
@@ -2041,8 +1939,7 @@
    "iso2": "MA",
    "numeric": "504",
    "names": {
-    "en": "Morocco",
-    "es": "Marruecos"
+    "en": "Morocco"
    },
    "aliases": [
     "MA",
@@ -2061,8 +1958,7 @@
    "iso2": "MZ",
    "numeric": "508",
    "names": {
-    "en": "Mozambique",
-    "es": "Mozambique"
+    "en": "Mozambique"
    },
    "aliases": [
     "MZ",
@@ -2081,8 +1977,7 @@
    "iso2": "MM",
    "numeric": "104",
    "names": {
-    "en": "Myanmar",
-    "es": "Myanmar"
+    "en": "Myanmar"
    },
    "aliases": [
     "MM",
@@ -2101,8 +1996,7 @@
    "iso2": null,
    "numeric": null,
    "names": {
-    "en": "N. Cyprus",
-    "es": "N. Cyprus"
+    "en": "N. Cyprus"
    },
    "aliases": [],
    "bbox": {
@@ -2118,8 +2012,7 @@
    "iso2": "NA",
    "numeric": "516",
    "names": {
-    "en": "Namibia",
-    "es": "Namibia"
+    "en": "Namibia"
    },
    "aliases": [
     "NA",
@@ -2138,8 +2031,7 @@
    "iso2": "NP",
    "numeric": "524",
    "names": {
-    "en": "Nepal",
-    "es": "Nepal"
+    "en": "Nepal"
    },
    "aliases": [
     "NP",
@@ -2158,8 +2050,7 @@
    "iso2": "NL",
    "numeric": "528",
    "names": {
-    "en": "Netherlands",
-    "es": "Países Bajos"
+    "en": "Netherlands"
    },
    "aliases": [
     "The Netherlands",
@@ -2180,8 +2071,7 @@
    "iso2": "NC",
    "numeric": "540",
    "names": {
-    "en": "New Caledonia",
-    "es": "Nueva Caledonia"
+    "en": "New Caledonia"
    },
    "aliases": [
     "NC",
@@ -2200,8 +2090,7 @@
    "iso2": "NZ",
    "numeric": "554",
    "names": {
-    "en": "New Zealand",
-    "es": "Nueva Zelanda"
+    "en": "New Zealand"
    },
    "aliases": [
     "NZ",
@@ -2220,8 +2109,7 @@
    "iso2": "NI",
    "numeric": "558",
    "names": {
-    "en": "Nicaragua",
-    "es": "Nicaragua"
+    "en": "Nicaragua"
    },
    "aliases": [
     "NI",
@@ -2240,8 +2128,7 @@
    "iso2": "NE",
    "numeric": "562",
    "names": {
-    "en": "Niger",
-    "es": "Níger"
+    "en": "Niger"
    },
    "aliases": [
     "NE",
@@ -2260,8 +2147,7 @@
    "iso2": "NG",
    "numeric": "566",
    "names": {
-    "en": "Nigeria",
-    "es": "Nigeria"
+    "en": "Nigeria"
    },
    "aliases": [
     "NG",
@@ -2280,8 +2166,7 @@
    "iso2": "KP",
    "numeric": "408",
    "names": {
-    "en": "North Korea",
-    "es": "República Popular Democrática de Corea"
+    "en": "North Korea"
    },
    "aliases": [
     "KP",
@@ -2300,8 +2185,7 @@
    "iso2": "NO",
    "numeric": "578",
    "names": {
-    "en": "Norway",
-    "es": "Noruega"
+    "en": "Norway"
    },
    "aliases": [
     "NO",
@@ -2320,8 +2204,7 @@
    "iso2": "OM",
    "numeric": "512",
    "names": {
-    "en": "Oman",
-    "es": "Omán"
+    "en": "Oman"
    },
    "aliases": [
     "OM",
@@ -2340,8 +2223,7 @@
    "iso2": "PK",
    "numeric": "586",
    "names": {
-    "en": "Pakistan",
-    "es": "Pakistán"
+    "en": "Pakistan"
    },
    "aliases": [
     "PK",
@@ -2360,8 +2242,7 @@
    "iso2": "PA",
    "numeric": "591",
    "names": {
-    "en": "Panama",
-    "es": "Panamá"
+    "en": "Panama"
    },
    "aliases": [
     "PA",
@@ -2380,8 +2261,7 @@
    "iso2": "PG",
    "numeric": "598",
    "names": {
-    "en": "Papua New Guinea",
-    "es": "Papua Nueva Guinea"
+    "en": "Papua New Guinea"
    },
    "aliases": [
     "PG",
@@ -2400,8 +2280,7 @@
    "iso2": "PY",
    "numeric": "600",
    "names": {
-    "en": "Paraguay",
-    "es": "Paraguay"
+    "en": "Paraguay"
    },
    "aliases": [
     "PY",
@@ -2420,10 +2299,10 @@
    "iso2": "CN",
    "numeric": "156",
    "names": {
-    "en": "People's Republic of China",
-    "es": "China"
+    "en": "People's Republic of China"
    },
    "aliases": [
+    "China",
     "CN",
     "CHN"
    ],
@@ -2440,8 +2319,7 @@
    "iso2": "PE",
    "numeric": "604",
    "names": {
-    "en": "Peru",
-    "es": "Perú"
+    "en": "Peru"
    },
    "aliases": [
     "PE",
@@ -2460,8 +2338,7 @@
    "iso2": "PH",
    "numeric": "608",
    "names": {
-    "en": "Philippines",
-    "es": "Filipinas"
+    "en": "Philippines"
    },
    "aliases": [
     "PH",
@@ -2480,8 +2357,7 @@
    "iso2": "PL",
    "numeric": "616",
    "names": {
-    "en": "Poland",
-    "es": "Polonia"
+    "en": "Poland"
    },
    "aliases": [
     "PL",
@@ -2500,8 +2376,7 @@
    "iso2": "PT",
    "numeric": "620",
    "names": {
-    "en": "Portugal",
-    "es": "Portugal"
+    "en": "Portugal"
    },
    "aliases": [
     "PT",
@@ -2520,8 +2395,7 @@
    "iso2": "PR",
    "numeric": "630",
    "names": {
-    "en": "Puerto Rico",
-    "es": "Puerto Rico"
+    "en": "Puerto Rico"
    },
    "aliases": [
     "PR",
@@ -2540,8 +2414,7 @@
    "iso2": "QA",
    "numeric": "634",
    "names": {
-    "en": "Qatar",
-    "es": "Catar"
+    "en": "Qatar"
    },
    "aliases": [
     "QA",
@@ -2560,10 +2433,10 @@
    "iso2": "CG",
    "numeric": "178",
    "names": {
-    "en": "Republic of the Congo",
-    "es": "Congo"
+    "en": "Republic of the Congo"
    },
    "aliases": [
+    "Congo",
     "CG",
     "COG"
    ],
@@ -2580,10 +2453,10 @@
    "iso2": "GM",
    "numeric": "270",
    "names": {
-    "en": "Republic of The Gambia",
-    "es": "Gambia"
+    "en": "Republic of The Gambia"
    },
    "aliases": [
+    "Gambia",
     "The Gambia",
     "GM",
     "GMB"
@@ -2601,8 +2474,7 @@
    "iso2": "RO",
    "numeric": "642",
    "names": {
-    "en": "Romania",
-    "es": "Rumanía"
+    "en": "Romania"
    },
    "aliases": [
     "RO",
@@ -2621,8 +2493,7 @@
    "iso2": "RU",
    "numeric": "643",
    "names": {
-    "en": "Russian Federation",
-    "es": "Rusia"
+    "en": "Russian Federation"
    },
    "aliases": [
     "Russia",
@@ -2642,8 +2513,7 @@
    "iso2": "RW",
    "numeric": "646",
    "names": {
-    "en": "Rwanda",
-    "es": "Ruanda"
+    "en": "Rwanda"
    },
    "aliases": [
     "RW",
@@ -2662,8 +2532,7 @@
    "iso2": "SA",
    "numeric": "682",
    "names": {
-    "en": "Saudi Arabia",
-    "es": "Arabia Saudita"
+    "en": "Saudi Arabia"
    },
    "aliases": [
     "SA",
@@ -2682,8 +2551,7 @@
    "iso2": "SN",
    "numeric": "686",
    "names": {
-    "en": "Senegal",
-    "es": "Senegal"
+    "en": "Senegal"
    },
    "aliases": [
     "SN",
@@ -2702,8 +2570,7 @@
    "iso2": "RS",
    "numeric": "688",
    "names": {
-    "en": "Serbia",
-    "es": "Serbia"
+    "en": "Serbia"
    },
    "aliases": [
     "RS",
@@ -2722,8 +2589,7 @@
    "iso2": "SL",
    "numeric": "694",
    "names": {
-    "en": "Sierra Leone",
-    "es": "Sierra Leona"
+    "en": "Sierra Leone"
    },
    "aliases": [
     "SL",
@@ -2742,8 +2608,7 @@
    "iso2": "SK",
    "numeric": "703",
    "names": {
-    "en": "Slovakia",
-    "es": "Eslovaquia"
+    "en": "Slovakia"
    },
    "aliases": [
     "SK",
@@ -2762,8 +2627,7 @@
    "iso2": "SI",
    "numeric": "705",
    "names": {
-    "en": "Slovenia",
-    "es": "Eslovenia"
+    "en": "Slovenia"
    },
    "aliases": [
     "SI",
@@ -2782,8 +2646,7 @@
    "iso2": "SB",
    "numeric": "090",
    "names": {
-    "en": "Solomon Islands",
-    "es": "Islas Salomón"
+    "en": "Solomon Islands"
    },
    "aliases": [
     "Solomon Is.",
@@ -2803,8 +2666,7 @@
    "iso2": "SO",
    "numeric": "706",
    "names": {
-    "en": "Somalia",
-    "es": "Somalia"
+    "en": "Somalia"
    },
    "aliases": [
     "SO",
@@ -2823,8 +2685,7 @@
    "iso2": null,
    "numeric": null,
    "names": {
-    "en": "Somaliland",
-    "es": "Somaliland"
+    "en": "Somaliland"
    },
    "aliases": [],
    "bbox": {
@@ -2840,8 +2701,7 @@
    "iso2": "ZA",
    "numeric": "710",
    "names": {
-    "en": "South Africa",
-    "es": "Sudáfrica"
+    "en": "South Africa"
    },
    "aliases": [
     "ZA",
@@ -2860,8 +2720,7 @@
    "iso2": "KR",
    "numeric": "410",
    "names": {
-    "en": "South Korea",
-    "es": "República de Corea"
+    "en": "South Korea"
    },
    "aliases": [
     "Korea, Republic of",
@@ -2882,8 +2741,7 @@
    "iso2": "SS",
    "numeric": "728",
    "names": {
-    "en": "South Sudan",
-    "es": "Sudán del Sur"
+    "en": "South Sudan"
    },
    "aliases": [
     "S. Sudan",
@@ -2903,8 +2761,7 @@
    "iso2": "ES",
    "numeric": "724",
    "names": {
-    "en": "Spain",
-    "es": "España"
+    "en": "Spain"
    },
    "aliases": [
     "ES",
@@ -2923,8 +2780,7 @@
    "iso2": "LK",
    "numeric": "144",
    "names": {
-    "en": "Sri Lanka",
-    "es": "Sri Lanka"
+    "en": "Sri Lanka"
    },
    "aliases": [
     "LK",
@@ -2943,8 +2799,7 @@
    "iso2": "PS",
    "numeric": "275",
    "names": {
-    "en": "State of Palestine",
-    "es": "Palestina"
+    "en": "State of Palestine"
    },
    "aliases": [
     "Palestine",
@@ -2964,8 +2819,7 @@
    "iso2": "SD",
    "numeric": "729",
    "names": {
-    "en": "Sudan",
-    "es": "Sudán"
+    "en": "Sudan"
    },
    "aliases": [
     "SD",
@@ -2984,8 +2838,7 @@
    "iso2": "SR",
    "numeric": "740",
    "names": {
-    "en": "Suriname",
-    "es": "Suriname"
+    "en": "Suriname"
    },
    "aliases": [
     "SR",
@@ -3004,8 +2857,7 @@
    "iso2": "SE",
    "numeric": "752",
    "names": {
-    "en": "Sweden",
-    "es": "Suecia"
+    "en": "Sweden"
    },
    "aliases": [
     "SE",
@@ -3024,8 +2876,7 @@
    "iso2": "CH",
    "numeric": "756",
    "names": {
-    "en": "Switzerland",
-    "es": "Suiza"
+    "en": "Switzerland"
    },
    "aliases": [
     "CH",
@@ -3044,8 +2895,7 @@
    "iso2": "SY",
    "numeric": "760",
    "names": {
-    "en": "Syrian Arab Republic",
-    "es": "República Árabe Siria"
+    "en": "Syrian Arab Republic"
    },
    "aliases": [
     "Syria",
@@ -3065,8 +2915,7 @@
    "iso2": "TW",
    "numeric": "158",
    "names": {
-    "en": "Taiwan, Province of China",
-    "es": "Taiwán"
+    "en": "Taiwan, Province of China"
    },
    "aliases": [
     "Taiwan",
@@ -3086,8 +2935,7 @@
    "iso2": "TJ",
    "numeric": "762",
    "names": {
-    "en": "Tajikistan",
-    "es": "Tayikistán"
+    "en": "Tajikistan"
    },
    "aliases": [
     "TJ",
@@ -3106,8 +2954,7 @@
    "iso2": "TH",
    "numeric": "764",
    "names": {
-    "en": "Thailand",
-    "es": "Tailandia"
+    "en": "Thailand"
    },
    "aliases": [
     "TH",
@@ -3126,8 +2973,7 @@
    "iso2": "MK",
    "numeric": "807",
    "names": {
-    "en": "The Republic of North Macedonia",
-    "es": "Macedonia del Norte"
+    "en": "The Republic of North Macedonia"
    },
    "aliases": [
     "Macedonia",
@@ -3148,8 +2994,7 @@
    "iso2": "TL",
    "numeric": "626",
    "names": {
-    "en": "Timor-Leste",
-    "es": "Timor-Leste"
+    "en": "Timor-Leste"
    },
    "aliases": [
     "TL",
@@ -3168,8 +3013,7 @@
    "iso2": "TG",
    "numeric": "768",
    "names": {
-    "en": "Togo",
-    "es": "Togo"
+    "en": "Togo"
    },
    "aliases": [
     "TG",
@@ -3188,8 +3032,7 @@
    "iso2": "TT",
    "numeric": "780",
    "names": {
-    "en": "Trinidad and Tobago",
-    "es": "Trinidad y Tobago"
+    "en": "Trinidad and Tobago"
    },
    "aliases": [
     "TT",
@@ -3208,8 +3051,7 @@
    "iso2": "TN",
    "numeric": "788",
    "names": {
-    "en": "Tunisia",
-    "es": "Túnez"
+    "en": "Tunisia"
    },
    "aliases": [
     "TN",
@@ -3228,8 +3070,7 @@
    "iso2": "TR",
    "numeric": "792",
    "names": {
-    "en": "Türkiye",
-    "es": "Turquía"
+    "en": "Türkiye"
    },
    "aliases": [
     "Turkey",
@@ -3249,8 +3090,7 @@
    "iso2": "TM",
    "numeric": "795",
    "names": {
-    "en": "Turkmenistan",
-    "es": "Turkmenistán"
+    "en": "Turkmenistan"
    },
    "aliases": [
     "TM",
@@ -3269,8 +3109,7 @@
    "iso2": "UG",
    "numeric": "800",
    "names": {
-    "en": "Uganda",
-    "es": "Uganda"
+    "en": "Uganda"
    },
    "aliases": [
     "UG",
@@ -3289,8 +3128,7 @@
    "iso2": "UA",
    "numeric": "804",
    "names": {
-    "en": "Ukraine",
-    "es": "Ucrania"
+    "en": "Ukraine"
    },
    "aliases": [
     "UA",
@@ -3309,8 +3147,7 @@
    "iso2": "AE",
    "numeric": "784",
    "names": {
-    "en": "United Arab Emirates",
-    "es": "Emiratos Árabes Unidos"
+    "en": "United Arab Emirates"
    },
    "aliases": [
     "UAE",
@@ -3330,8 +3167,7 @@
    "iso2": "GB",
    "numeric": "826",
    "names": {
-    "en": "United Kingdom",
-    "es": "Reino Unido"
+    "en": "United Kingdom"
    },
    "aliases": [
     "UK",
@@ -3352,10 +3188,10 @@
    "iso2": "TZ",
    "numeric": "834",
    "names": {
-    "en": "United Republic of Tanzania",
-    "es": "Tanzania"
+    "en": "United Republic of Tanzania"
    },
    "aliases": [
+    "Tanzania",
     "TZ",
     "TZA"
    ],
@@ -3372,8 +3208,7 @@
    "iso2": "US",
    "numeric": "840",
    "names": {
-    "en": "United States of America",
-    "es": "Estados Unidos"
+    "en": "United States of America"
    },
    "aliases": [
     "United States",
@@ -3395,8 +3230,7 @@
    "iso2": "UY",
    "numeric": "858",
    "names": {
-    "en": "Uruguay",
-    "es": "Uruguay"
+    "en": "Uruguay"
    },
    "aliases": [
     "UY",
@@ -3415,8 +3249,7 @@
    "iso2": "UZ",
    "numeric": "860",
    "names": {
-    "en": "Uzbekistan",
-    "es": "Uzbekistán"
+    "en": "Uzbekistan"
    },
    "aliases": [
     "UZ",
@@ -3435,8 +3268,7 @@
    "iso2": "VU",
    "numeric": "548",
    "names": {
-    "en": "Vanuatu",
-    "es": "Vanuatu"
+    "en": "Vanuatu"
    },
    "aliases": [
     "VU",
@@ -3455,8 +3287,7 @@
    "iso2": "VE",
    "numeric": "862",
    "names": {
-    "en": "Venezuela",
-    "es": "Venezuela"
+    "en": "Venezuela"
    },
    "aliases": [
     "VE",
@@ -3475,8 +3306,7 @@
    "iso2": "VN",
    "numeric": "704",
    "names": {
-    "en": "Vietnam",
-    "es": "Vietnam"
+    "en": "Vietnam"
    },
    "aliases": [
     "VN",
@@ -3495,8 +3325,7 @@
    "iso2": "EH",
    "numeric": "732",
    "names": {
-    "en": "Western Sahara",
-    "es": "Sahara Occidental"
+    "en": "Western Sahara"
    },
    "aliases": [
     "W. Sahara",
@@ -3516,8 +3345,7 @@
    "iso2": "YE",
    "numeric": "887",
    "names": {
-    "en": "Yemen",
-    "es": "Yemen"
+    "en": "Yemen"
    },
    "aliases": [
     "YE",
@@ -3536,8 +3364,7 @@
    "iso2": "ZM",
    "numeric": "894",
    "names": {
-    "en": "Zambia",
-    "es": "Zambia"
+    "en": "Zambia"
    },
    "aliases": [
     "ZM",
@@ -3556,8 +3383,7 @@
    "iso2": "ZW",
    "numeric": "716",
    "names": {
-    "en": "Zimbabwe",
-    "es": "Zimbabue"
+    "en": "Zimbabwe"
    },
    "aliases": [
     "ZW",

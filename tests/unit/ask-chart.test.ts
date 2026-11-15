@@ -76,11 +76,11 @@ afterEach(() => {
 });
 
 describe("chart options", () => {
-  it("every dropdown option has labels and a default question", () => {
+  it("every dropdown option has an English label and a default question", () => {
     expect([...CHART_KINDS]).toEqual(["series", "anomalies", "seasonal"]);
     for (const kind of CHART_KINDS) {
       expect(CHART_LABELS[kind].en.length).toBeGreaterThan(0);
-      expect(CHART_LABELS[kind].es.length).toBeGreaterThan(0);
+      expect(Object.keys(CHART_LABELS[kind])).toEqual(["en"]);
       expect(DEFAULT_QUESTIONS[kind]).toMatch(/chart show\?$/);
       expect(isChartKind(kind)).toBe(true);
     }
@@ -99,7 +99,7 @@ describe("chart options", () => {
 });
 
 describe("browser request for a chart question", () => {
-  const body = { runId: "00000000-0000-4000-8000-000000000000", language: "en" as const, chart: "anomalies" as const, followUp: "What does the monthly anomalies chart show?" };
+  const body = { runId: "00000000-0000-4000-8000-000000000000", chart: "anomalies" as const, followUp: "What does the monthly anomalies chart show?" };
 
   it("posts the selected chart and question and returns the answer", async () => {
     const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ chart: "anomalies", answer: "Bars show departures." }), { status: 200 }));
@@ -179,7 +179,7 @@ describe("rule-based answers for every chart", () => {
   const result = syntheticResult();
 
   it.each(CHART_KINDS)("answers about the %s chart with figures that match the computed results", (chart) => {
-    const e = explainWithRules(result, "en", chart, "What does this chart show?");
+    const e = explainWithRules(result, chart, "What does this chart show?");
     expect(e.source).toBe("rules");
     expect(e.chart).toBe(chart);
     expect(e.followUp).toBe("What does this chart show?");
@@ -204,7 +204,7 @@ describe("rule-based answers for every chart", () => {
   it("covers several variables and keeps every figure verified", () => {
     const multi = syntheticResult(["merra2.T2M", "merra2.T2MDEW", "merra2.QV2M", "merra2.PS"]);
     for (const chart of CHART_KINDS) {
-      const e = explainWithRules(multi, "en", chart, "Compare the variables.");
+      const e = explainWithRules(multi, chart, "Compare the variables.");
       expect(e.answer?.split("\n\n")).toHaveLength(4);
       expect(e.answer).toMatch(/same chart for the other variables is in their cards above/);
       expect(e.verification.unverified).toEqual([]);
@@ -212,7 +212,7 @@ describe("rule-based answers for every chart", () => {
   });
 
   it("keeps the summary sections unchanged without a follow-up", () => {
-    const e = explainWithRules(result, "en");
+    const e = explainWithRules(result);
     expect(e.answer).toBeNull();
     expect(e.sections?.chart).toMatch(/monthly regional mean/);
     expect(e.verification.unverified).toEqual([]);
@@ -223,7 +223,7 @@ describe("explanation service: every chart option gets an answer", () => {
   it.each(CHART_KINDS)("answers a %s question without an AI key, from the chart's data", async (chart) => {
     const result = syntheticResult();
     const runId = await storedRun(result);
-    const outcome = await explainRun({ runId, clientKey: "no-ai", language: "en", chart, followUp: DEFAULT_QUESTIONS[chart] });
+    const outcome = await explainRun({ runId, clientKey: "no-ai", chart, followUp: DEFAULT_QUESTIONS[chart] });
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
     const e = outcome.explanation;
@@ -241,7 +241,7 @@ describe("explanation service: every chart option gets an answer", () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "test-key");
     ai.create.mockResolvedValueOnce(aiReply("The chart answer from the AI."));
     const runId = await storedRun(syntheticResult());
-    const outcome = await explainRun({ runId, clientKey: `ai-${chart}`, language: "en", chart, followUp: "Which month stands out?" });
+    const outcome = await explainRun({ runId, clientKey: `ai-${chart}`, chart, followUp: "Which month stands out?" });
     expect(outcome.ok && outcome.explanation).toMatchObject({ source: "ai", chart, answer: "The chart answer from the AI.", sections: null });
     const request = ai.create.mock.calls[0]![0] as { messages: Array<{ content: string }>; system: Array<{ text: string }> };
     const payload = JSON.parse(request.messages[0]!.content) as { followUp: string; selectedChart: string; FACTS: ReturnType<typeof buildFacts> };
@@ -258,7 +258,7 @@ describe("explanation service: every chart option gets an answer", () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "test-key");
     ai.create.mockRejectedValueOnce(new Error("socket hang up"));
     const runId = await storedRun(syntheticResult());
-    const outcome = await explainRun({ runId, clientKey: "ai-fails", language: "en", chart: "seasonal", followUp: "Which month is highest?" });
+    const outcome = await explainRun({ runId, clientKey: "ai-fails", chart: "seasonal", followUp: "Which month is highest?" });
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
     expect(outcome.explanation).toMatchObject({ source: "rules", chart: "seasonal", aiError: "The AI step failed unexpectedly." });
@@ -270,15 +270,15 @@ describe("explanation service: every chart option gets an answer", () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "test-key");
     ai.create.mockResolvedValueOnce(aiReply(""));
     const runId = await storedRun(syntheticResult());
-    const outcome = await explainRun({ runId, clientKey: "ai-empty", language: "en", chart: "anomalies", followUp: "What does the monthly anomalies chart show?" });
+    const outcome = await explainRun({ runId, clientKey: "ai-empty", chart: "anomalies", followUp: "What does the monthly anomalies chart show?" });
     expect(outcome.ok && outcome.explanation).toMatchObject({ source: "rules", chart: "anomalies", aiError: "The AI assistant returned an empty answer." });
     expect(outcome.ok && outcome.explanation.answer).toMatch(/monthly anomalies chart/);
   });
 
   it("still serves the cached summary for the series chart", async () => {
     const runId = await storedRun(syntheticResult());
-    const first = await explainRun({ runId, clientKey: "summary", language: "en" });
-    const second = await explainRun({ runId, clientKey: "summary", language: "en" });
+    const first = await explainRun({ runId, clientKey: "summary" });
+    const second = await explainRun({ runId, clientKey: "summary" });
     expect(first.ok && second.ok && second.explanation.createdAt === first.explanation.createdAt).toBe(true);
     expect(first.ok && first.explanation.sections?.chart).toMatch(/monthly regional mean/);
   });

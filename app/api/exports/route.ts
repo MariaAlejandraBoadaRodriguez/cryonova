@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { Explanation } from "@/src/agent/explain";
-import type { StoredExplanations } from "@/src/agent/explain-service";
+import { englishSummary, type StoredExplanations } from "@/src/agent/stored-explanations";
 import { lookupInvestigation } from "@/src/db/investigations";
 import { getRunStore } from "@/src/db/store";
 import type { RunResult } from "@/src/jobs/types";
@@ -19,8 +19,9 @@ const Body = z.object({
   code: z.string().max(40).optional(),
 });
 
+/** Only an English interpretation goes into the PDF (D-35); runs without one export without it. */
 function pickExplanation(stored: StoredExplanations | null | undefined): Explanation | null {
-  return stored?.summaries?.en ?? stored?.summary ?? stored?.summaries?.es ?? null;
+  return englishSummary(stored);
 }
 
 /** CSV or PDF of a live run (by runId) or a saved investigation (by code in the body). */

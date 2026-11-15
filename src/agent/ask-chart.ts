@@ -3,19 +3,19 @@
  * their labels and default questions, and the browser request that sends a
  * question together with the selected chart. Shared by the panel (browser)
  * and the explanation service (server), so every dropdown option maps to the
- * chart facts the agent receives. No server-only imports here.
+ * chart facts the agent receives. No server-only imports here. English only
+ * (D-35): labels keep the `{ en }` shape and requests carry no language.
  */
 import type { Explanation } from "./explain";
-import type { Language } from "./proposal";
 
 export const CHART_KINDS = ["series", "anomalies", "seasonal"] as const;
 export type ChartKind = (typeof CHART_KINDS)[number];
 
 /** Dropdown labels, matching the chart titles on the dashboard. */
-export const CHART_LABELS: Record<ChartKind, Record<Language, string>> = {
-  series: { en: "Series and trend", es: "Serie y tendencia" },
-  anomalies: { en: "Monthly anomalies", es: "Anomalías mensuales" },
-  seasonal: { en: "Seasonal cycle", es: "Ciclo estacional" },
+export const CHART_LABELS: Record<ChartKind, { en: string }> = {
+  series: { en: "Series and trend" },
+  anomalies: { en: "Monthly anomalies" },
+  seasonal: { en: "Seasonal cycle" },
 };
 
 /** Sent when Ask is pressed without a typed question. */
@@ -40,7 +40,6 @@ export function chartQuestion(chart: ChartKind, typed: string): string {
 
 export interface AskRequest {
   runId: string;
-  language: Language;
   chart: ChartKind;
   followUp: string;
 }

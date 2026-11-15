@@ -1,6 +1,8 @@
 /**
  * Explanation service shared by GET /api/runs/{id}/explanation (cached
- * summary) and POST /api/agent/explain (follow-up questions).
+ * summary) and POST /api/agent/explain (follow-up questions). Explanations are
+ * always written in English (D-35); older non-English summaries stay stored but
+ * are never served (see stored-explanations.ts).
  */
 import { getRunStore } from "@/src/db/store";
 import type { RunResult } from "@/src/jobs/types";
@@ -8,35 +10,29 @@ import { config } from "@/src/lib/env";
 import { logger } from "@/src/lib/log";
 import { describeAgentError } from "./client";
 import { type ChartKind, type Explanation, explainWithClaude, explainWithRules } from "./explain";
-import { detectLanguage } from "./language";
 import { emptyUsage } from "./pricing";
-import type { Language } from "./proposal";
+import { englishSummary, type StoredExplanations } from "./stored-explanations";
 import { checkAiQuota, recordAiUsage } from "./usage";
 
-export interface StoredExplanations {
-  summary?: Explanation;
-  summaries?: Partial<Record<Language, Explanation>>;
-  followUps?: Explanation[];
-}
+export type { StoredExplanations } from "./stored-explanations";
 
 export type ExplainOutcome = { ok: true; explanation: Explanation } | { ok: false; status: number; title: string };
 
-export async function explainRun(input: { runId: string; clientKey: string; language?: Language; chart?: ChartKind; followUp?: string }): Promise<ExplainOutcome> {
+export async function explainRun(input: { runId: string; clientKey: string; chart?: ChartKind; followUp?: string }): Promise<ExplainOutcome> {
   const store = getRunStore();
   const run = await store.getRun(input.runId);
   if (!run) return { ok: false, status: 404, title: "Run not found" };
   const result = run.result as RunResult | null;
   if (!result || (run.status !== "succeeded" && run.status !== "partial")) return { ok: false, status: 409, title: "The run has no results to explain yet." };
   const chart = input.chart ?? "series";
-  const language = input.language ?? detectLanguage(`${input.followUp ?? ""} ${run.question ?? ""}`);
   const stored = (run.explanation ?? {}) as StoredExplanations;
-  const cached = stored.summaries?.[language] ?? (stored.summary?.language === language ? stored.summary : undefined);
+  const cached = englishSummary(stored);
   if (!input.followUp && cached && cached.chart === chart) return { ok: true, explanation: cached };
 
   // Follow-ups get a rule-based answer about the selected chart; summaries get the rule-based sections.
   const automatic = input.followUp ? "this automatic answer is built from the selected chart's data" : "showing an automatic explanation built from the results";
   const fallback = (status: string, aiError?: string): Explanation => ({
-    ...explainWithRules(result, language, chart, input.followUp),
+    ...explainWithRules(result, chart, input.followUp),
     followUp: input.followUp ?? null,
     aiStatus: status,
     ...(aiError ? { aiError } : {}),
@@ -52,7 +48,7 @@ export async function explainRun(input: { runId: string; clientKey: string; lang
       const started = Date.now();
       const kind = input.followUp ? "ask" : "explain";
       try {
-        explanation = await explainWithClaude(result, { language, question: run.question, followUp: input.followUp, chart });
+        explanation = await explainWithClaude(result, { question: run.question, followUp: input.followUp, chart });
         await recordAiUsage({
           kind,
           model: explanation.ai?.model ?? config.anthropicModel,
@@ -72,9 +68,8 @@ export async function explainRun(input: { runId: string; clientKey: string; lang
       }
     }
   }
-  const next: StoredExplanations = input.followUp
-    ? { ...stored, followUps: [...(stored.followUps ?? []), explanation].slice(-10) }
-    : { ...stored, summary: explanation, summaries: { ...(stored.summaries ?? {}), [language]: explanation } };
+  // Legacy keys (summaries by language) are left as stored; the new summary is English.
+  const next: StoredExplanations = input.followUp ? { ...stored, followUps: [...(stored.followUps ?? []), explanation].slice(-10) } : { ...stored, summary: explanation };
   await store.setExplanation(run.id, next).catch(() => undefined);
   return { ok: true, explanation };
 }

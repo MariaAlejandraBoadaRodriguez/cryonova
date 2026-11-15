@@ -1,6 +1,7 @@
 /**
  * Builds src/catalog/regions.generated.json from Natural Earth 110 m country
- * shapes (world-atlas) and ISO country names in English and Spanish.
+ * shapes (world-atlas) and ISO country names in English (the platform is
+ * English-only, D-35; aliases are only used for matching and are never shown).
  * Longitude extents use the largest-gap rule so countries that cross the
  * antimeridian get a box with west > east instead of a near-global box.
  */
@@ -11,7 +12,6 @@ import { feature } from "topojson-client";
 
 const require = createRequire(import.meta.url);
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
-countries.registerLocale(require("i18n-iso-countries/langs/es.json"));
 const topology = require("world-atlas/countries-110m.json");
 
 type Position = [number, number];
@@ -60,13 +60,10 @@ for (const f of features) {
   const { west, east } = longitudeExtent(points.map((p) => p[0]));
   const alpha2 = f.id ? countries.numericToAlpha2(f.id) : undefined;
   const en = (alpha2 && countries.getName(alpha2, "en")) || f.properties.name;
-  const es = (alpha2 && countries.getName(alpha2, "es")) || f.properties.name;
   const aliases = new Set<string>([f.properties.name]);
   if (alpha2) {
-    for (const lang of ["en", "es"]) {
-      const all = countries.getName(alpha2, lang, { select: "all" }) as unknown as string[] | undefined;
-      (all ?? []).forEach((name) => aliases.add(name));
-    }
+    const all = countries.getName(alpha2, "en", { select: "all" }) as unknown as string[] | undefined;
+    (all ?? []).forEach((name) => aliases.add(name));
     aliases.add(alpha2);
     const alpha3 = countries.alpha2ToAlpha3(alpha2);
     if (alpha3) aliases.add(alpha3);
@@ -76,8 +73,8 @@ for (const f of features) {
     kind: "country",
     iso2: alpha2 ?? null,
     numeric: f.id ?? null,
-    names: { en, es },
-    aliases: [...aliases].filter((a) => a !== en && a !== es),
+    names: { en },
+    aliases: [...aliases].filter((a) => a !== en),
     bbox: { west: round(west), south: round(Math.min(...lats)), east: round(east), north: round(Math.max(...lats)) },
   });
 }

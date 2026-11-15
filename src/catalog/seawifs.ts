@@ -46,10 +46,9 @@ export const SEAWIFS_VARIABLES: CatalogVariable[] = [
     source: "seawifs",
     collection: "SeaWiFS_L3m_CHL",
     dapName: "chlor_a",
-    name: { en: "Ocean chlorophyll-a concentration (SeaWiFS)", es: "Concentración de clorofila-a en el océano (SeaWiFS)" },
+    name: { en: "Ocean chlorophyll-a concentration (SeaWiFS)" },
     description: {
       en: "Near-surface phytoplankton chlorophyll-a retrieved from ocean colour (OCI algorithm). Ocean cells only; 1997-09 to 2010-12.",
-      es: "Clorofila-a del fitoplancton cerca de la superficie, obtenida del color del océano (algoritmo OCI). Solo celdas oceánicas; 1997-09 a 2010-12.",
     },
     providerLongName: "Chlorophyll Concentration, OCI Algorithm",
     providerUnits: "mg m^-3",
@@ -60,9 +59,8 @@ export const SEAWIFS_VARIABLES: CatalogVariable[] = [
     aggregation: "Monthly composite of daily SeaWiFS retrievals (OB.DAAC L3m MO); the regional value is the cos-latitude weighted mean of valid ocean cells.",
     words: {
       en: ["chlorophyll", "phytoplankton", "ocean", "colour", "color", "seawifs", "marine", "productivity", "algae", "sea"],
-      es: ["clorofila", "fitoplancton", "oceano", "color", "seawifs", "marino", "productividad", "algas", "mar"],
     },
-    phrases: { en: ["ocean chlorophyll", "ocean color", "phytoplankton bloom", "marine productivity"], es: ["clorofila oceanica", "color del oceano", "floracion de fitoplancton"] },
+    phrases: { en: ["ocean chlorophyll", "ocean color", "phytoplankton bloom", "marine productivity"] },
     role: "primary",
     verified: { method: "HDF5 attributes of the 2000-06 cloud file (OPeNDAP DAS was rate limited)", date: "2026-11-15" },
   },

@@ -39,17 +39,14 @@ const VERIFIED = { method: "OPeNDAP DDS/DAS of granule 2010-06", date: "2026-11-
 const soil: DisplayUnits = { units: "kg/m²", scale: 1, offset: 0, trendUnits: "kg/m² per decade", group: "soil_moisture", decimals: 2 };
 const flux: DisplayUnits = { units: "mm/day", scale: 86400, offset: 0, trendUnits: "mm/day per decade", group: "precip_rate", decimals: 3 };
 
-function layer(dapName: string, depth: string, depthEs: string, words: string[], wordsEs: string[]): CatalogVariable {
+function layer(dapName: string, depth: string, words: string[]): CatalogVariable {
   return {
     key: `gldas.${dapName}`,
     source: "gldas",
     collection: "GLDAS_NOAH025_M",
     dapName,
-    name: { en: `Soil moisture ${depth} (GLDAS Noah)`, es: `Humedad del suelo ${depthEs} (GLDAS Noah)` },
-    description: {
-      en: `Water held in the ${depth} soil layer, as mass per unit area (1 kg/m² = 1 mm of water). Land cells only.`,
-      es: `Agua contenida en la capa de suelo de ${depthEs}, como masa por unidad de área (1 kg/m² = 1 mm de agua). Solo celdas de tierra.`,
-    },
+    name: { en: `Soil moisture ${depth} (GLDAS Noah)` },
+    description: { en: `Water held in the ${depth} soil layer, as mass per unit area (1 kg/m² = 1 mm of water). Land cells only.` },
     providerLongName: "Soil moisture",
     providerUnits: "kg m-2",
     fillValue: FILL,
@@ -57,27 +54,26 @@ function layer(dapName: string, depth: string, depthEs: string, words: string[],
     domain: "land",
     frequency: "monthly",
     aggregation: "Monthly mean of the model's 3-hourly instantaneous soil water content.",
-    words: { en: ["soil", "moisture", "gldas", "drought", "land", ...words], es: ["suelo", "humedad", "gldas", "sequia", ...wordsEs] },
-    phrases: { en: ["soil moisture", "soil water", ...words.map((w) => `${w} soil moisture`)], es: ["humedad del suelo", "agua en el suelo"] },
+    words: { en: ["soil", "moisture", "gldas", "drought", "land", ...words] },
+    phrases: { en: ["soil moisture", "soil water", ...words.map((w) => `${w} soil moisture`)] },
     role: "primary",
     verified: VERIFIED,
   };
 }
 
 export const GLDAS_VARIABLES: CatalogVariable[] = [
-  layer("SoilMoi0_10cm_inst", "0–10 cm", "0–10 cm", ["surface", "topsoil"], ["superficial"]),
-  layer("SoilMoi10_40cm_inst", "10–40 cm", "10–40 cm", ["shallow"], ["somera"]),
-  layer("SoilMoi40_100cm_inst", "40–100 cm", "40–100 cm", ["deep"], ["profunda"]),
-  layer("SoilMoi100_200cm_inst", "100–200 cm", "100–200 cm", ["deepest"], ["muy profunda"]),
+  layer("SoilMoi0_10cm_inst", "0–10 cm", ["surface", "topsoil"]),
+  layer("SoilMoi10_40cm_inst", "10–40 cm", ["shallow"]),
+  layer("SoilMoi40_100cm_inst", "40–100 cm", ["deep"]),
+  layer("SoilMoi100_200cm_inst", "100–200 cm", ["deepest"]),
   {
     key: "gldas.RootMoist_inst",
     source: "gldas",
     collection: "GLDAS_NOAH025_M",
     dapName: "RootMoist_inst",
-    name: { en: "Root-zone soil moisture (GLDAS Noah)", es: "Humedad del suelo en la zona radicular (GLDAS Noah)" },
+    name: { en: "Root-zone soil moisture (GLDAS Noah)" },
     description: {
       en: "Water available to plant roots in the model's root zone (kg/m² = mm of water). Land cells only.",
-      es: "Agua disponible para las raíces en la zona radicular del modelo (kg/m² = mm de agua). Solo celdas de tierra.",
     },
     providerLongName: "Root zone soil moisture",
     providerUnits: "kg m-2",
@@ -86,8 +82,8 @@ export const GLDAS_VARIABLES: CatalogVariable[] = [
     domain: "land",
     frequency: "monthly",
     aggregation: "Monthly mean of the model's 3-hourly instantaneous root-zone soil water.",
-    words: { en: ["root", "zone", "soil", "moisture", "gldas", "drought", "vegetation", "crops"], es: ["raiz", "radicular", "suelo", "humedad", "gldas", "sequia", "cultivos"] },
-    phrases: { en: ["root zone soil moisture", "root-zone moisture", "agricultural drought"], es: ["humedad de la zona radicular", "sequia agricola"] },
+    words: { en: ["root", "zone", "soil", "moisture", "gldas", "drought", "vegetation", "crops"] },
+    phrases: { en: ["root zone soil moisture", "root-zone moisture", "agricultural drought"] },
     role: "primary",
     verified: VERIFIED,
   },
@@ -96,10 +92,9 @@ export const GLDAS_VARIABLES: CatalogVariable[] = [
     source: "gldas",
     collection: "GLDAS_NOAH025_M",
     dapName: "Evap_tavg",
-    name: { en: "Evapotranspiration (GLDAS Noah)", es: "Evapotranspiración (GLDAS Noah)" },
+    name: { en: "Evapotranspiration (GLDAS Noah)" },
     description: {
       en: "Water returned to the atmosphere by evaporation and plant transpiration. Provider flux in kg m-2 s-1, shown as mm/day (×86,400). Land cells only.",
-      es: "Agua devuelta a la atmósfera por evaporación y transpiración. Flujo del proveedor en kg m-2 s-1, mostrado en mm/día (×86.400). Solo celdas de tierra.",
     },
     providerLongName: "Evapotranspiration",
     providerUnits: "kg m-2 s-1",
@@ -108,8 +103,8 @@ export const GLDAS_VARIABLES: CatalogVariable[] = [
     domain: "land",
     frequency: "monthly",
     aggregation: "Monthly mean of the 3-hourly mean evapotranspiration rate.",
-    words: { en: ["evapotranspiration", "evaporation", "transpiration", "gldas", "land"], es: ["evapotranspiracion", "evaporacion", "transpiracion", "gldas"] },
-    phrases: { en: ["evapotranspiration", "water loss to the atmosphere"], es: ["evapotranspiracion"] },
+    words: { en: ["evapotranspiration", "evaporation", "transpiration", "gldas", "land"] },
+    phrases: { en: ["evapotranspiration", "water loss to the atmosphere"] },
     role: "primary",
     verified: VERIFIED,
   },

@@ -10,10 +10,11 @@ const Body = z.object({
   runId: z.string().uuid(),
   followUp: z.string().trim().min(2).max(400).optional(),
   chart: z.enum(CHART_KINDS).default("series"),
-  language: z.enum(["en", "es"]).optional(),
+  /** Accepted from older clients and ignored: explanations are always in English (D-35). */
+  language: z.string().max(16).optional(),
 });
 
-/** Interprets a finished run or answers a follow-up question, from computed facts only. */
+/** Interprets a finished run or answers a follow-up question (in English), from computed facts only. */
 export async function POST(request: Request) {
   let body: z.infer<typeof Body>;
   try {
@@ -21,6 +22,6 @@ export async function POST(request: Request) {
   } catch {
     return problem(422, "Invalid request", "runId, optional followUp (2-400 characters) and chart are expected.");
   }
-  const outcome = await explainRun({ ...body, clientKey: clientKeyFrom(request) });
+  const outcome = await explainRun({ runId: body.runId, followUp: body.followUp, chart: body.chart, clientKey: clientKeyFrom(request) });
   return outcome.ok ? json(outcome.explanation) : problem(outcome.status, outcome.title);
 }
