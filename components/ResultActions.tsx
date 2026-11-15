@@ -59,37 +59,12 @@ export function ResultActions({ runId, code: savedCode }: { runId?: string; code
       <h3 id="share-title" style={{ margin: 0 }}>
         Save and download
       </h3>
-      {!savedCode &&
-        (code ? (
-          <div className="alert alert-ok" role="status">
-            <div className="stack" style={{ width: "100%" }}>
-              <div>
-                Saved. Retrieval code: <strong className="mono" data-testid="retrieval-code" style={{ fontSize: "1.2rem" }}>{code}</strong>
-              </div>
-              <div className="row">
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-small"
-                  onClick={async () => {
-                    await navigator.clipboard?.writeText(code).catch(() => undefined);
-                    setCopied(true);
-                  }}
-                >
-                  {copied ? "Copied" : "Copy code"}
-                </button>
-                <span className="field-help">Anyone with this code can open a read-only copy from the home page. Keep it to share the investigation.</span>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="row">
-            <button type="button" className="btn btn-primary" onClick={save} disabled={saving || !runId} data-testid="save-button">
-              {saving ? "Saving…" : "Save investigation"}
-            </button>
-            <span className="field-help">Stores this exact result, method and interpretation, and gives you a code. No account needed.</span>
-          </div>
-        ))}
-      <div className="row">
+      <div className="actions-row" data-testid="actions-row">
+        {!savedCode && (
+          <button type="button" className="btn btn-primary btn-small" onClick={save} disabled={saving || !runId || code !== null} data-testid="save-button">
+            {saving ? "Saving…" : code ? "Saved" : "Save investigation"}
+          </button>
+        )}
         <button type="button" className="btn btn-secondary btn-small" onClick={() => exportAs("csv")} disabled={busy !== null}>
           {busy === "csv" ? "Preparing…" : "Download CSV (results)"}
         </button>
@@ -100,6 +75,28 @@ export function ResultActions({ runId, code: savedCode }: { runId?: string; code
           {busy === "pdf" ? "Preparing…" : "Download PDF report"}
         </button>
       </div>
+      {!savedCode && code && (
+        <div className="alert alert-ok" role="status">
+          <div className="stack" style={{ width: "100%" }}>
+            <div>
+              Saved. Retrieval code: <strong className="mono" data-testid="retrieval-code" style={{ fontSize: "1.2rem" }}>{code}</strong>
+            </div>
+            <div className="row">
+              <button
+                type="button"
+                className="btn btn-secondary btn-small"
+                onClick={async () => {
+                  await navigator.clipboard?.writeText(code).catch(() => undefined);
+                  setCopied(true);
+                }}
+              >
+                {copied ? "Copied" : "Copy code"}
+              </button>
+              <span className="field-help">Anyone with this code can open a read-only copy from the home page. Keep it to share the investigation.</span>
+            </div>
+          </div>
+        </div>
+      )}
       {error && (
         <p className="alert alert-error" role="alert">
           <ErrorIcon /> {error}
