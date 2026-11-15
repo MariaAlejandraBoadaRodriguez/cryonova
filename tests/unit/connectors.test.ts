@@ -195,7 +195,7 @@ describe("OB.DAAC reads", () => {
     const fetchImpl = fakeFetch([
       (url) => (url.startsWith(opendapUrl) ? new Response("Rate Limiting - Too Many Requests", { status: 429 }) : undefined),
       (url) => (url.startsWith("https://obdaac-tea.earthdatacloud.nasa.gov/") ? new Response(null, { status: 303, headers: { location: "https://dwgofd1fffpxv.cloudfront.net/file.nc?Signature=s" } }) : undefined),
-      (url) => (url.startsWith("https://dwgofd1fffpxv.cloudfront.net/") ? new Response(file) : undefined),
+      (url) => (url.startsWith("https://dwgofd1fffpxv.cloudfront.net/") ? new Response(file.slice().buffer) : undefined),
     ], calls);
     let reserved = 0;
     const read = await readObdaacGranule(opendapUrl, collection, [variable], window, { token: "secret-token", policy: { timeoutMs: 2000, retries: 0 }, fetchImpl, allowCloudFile: () => ++reserved <= 1 });
@@ -266,7 +266,7 @@ describe("Copernicus CDS (ERA5)", () => {
       (url, init) => (url.endsWith("/execution") && init?.method === "POST" ? Response.json({ jobID: "job-1", status: "accepted" }, { status: 201 }) : undefined),
       (url) => (url.endsWith("/retrieve/v1/jobs/job-1") ? Response.json({ status, started: null, finished: null }) : undefined),
       (url) => (url.endsWith("/retrieve/v1/jobs/job-1/results") ? Response.json({ asset: { value: { href: "https://object-store.os-api.cci2.ecmwf.int/cache/x.nc" } } }) : undefined),
-      (url) => (url.startsWith("https://object-store") ? new Response(nc) : undefined),
+      (url) => (url.startsWith("https://object-store") ? new Response(nc.slice().buffer) : undefined),
     ], calls);
     const ctx: RemoteContext = { runId: "r", collection: getCollection("ERA5_SL_MONTHLY")!, variables, bbox: BOX, start: "2010-01", end: "2010-02", months, credentials: { cdsKey: "cds-secret", cdsUrl: "https://cds.example/api" }, fetchImpl };
     const submitted = await cdsConnector.submit(ctx, "all");
