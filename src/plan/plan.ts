@@ -10,7 +10,7 @@ import { type BBox, getRegion } from "@/src/catalog/regions";
 import { groupByCollection, MAX_PROVIDER_READS, type Selection, SelectionSchema } from "@/src/jobs/selection";
 import { fmtBBox, fmtMonth } from "@/src/lib/format";
 import { windowForBBox } from "@/src/providers/grid";
-import { era5GridStep, minStationMonths, NOAA_MAX_CANDIDATES as MAX_CANDIDATES, OBDAAC_FILE_FALLBACK_MONTHS } from "@/src/providers/limits";
+import { era5GridStep, minStationMonths, NOAA_MAX_CANDIDATES as MAX_CANDIDATES, NOAA_MAX_STATIONS, OBDAAC_FILE_FALLBACK_MONTHS } from "@/src/providers/limits";
 
 export type LocationMode = "country" | "custom";
 
@@ -147,7 +147,7 @@ export function accessChecks(collectionNames: string[], months: number, bbox: BB
     } else if (access === "harmony") {
       checks.push({ level: "info", text: `${name}: NASA Giovanni computes the area average (one NASA Harmony job, usually ready within a minute).` });
     } else if (access === "noaa-cdo") {
-      checks.push({ level: "info", text: `${name}: point data from weather stations. Up to ${MAX_CANDIDATES} stations with the best record inside the area are read; those with at least ${minStationMonths(months)} months form the regional mean, and every station is shown on the map.` });
+      checks.push({ level: "info", text: `${name}: point data from weather stations. Up to ${MAX_CANDIDATES} stations with the best record inside the area are read; the ${NOAA_MAX_STATIONS} with the most months (at least ${minStationMonths(months)} months each) form the regional mean, and every station is shown on the map.` });
     }
   }
   return checks;

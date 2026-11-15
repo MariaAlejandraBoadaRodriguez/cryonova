@@ -61,7 +61,7 @@ export function StationPanel({ v, result }: { v: VariableResult; result: RunResu
           })}
         </svg>
         <figcaption className="field-help">
-          ● stations in the regional mean ({used}) · ○ other stations with data ({stations.length - used}). Dashed line: the selected area.
+          ● stations in the regional mean ({used}) · ○ other stations with data ({stations.length - used}). Dashed line: the selected area. A station trend needs 10 complete calendar years (12 reported months each).
         </figcaption>
       </figure>
       <TableWrap label={`Stations for ${v.name.en}`}>
@@ -95,7 +95,7 @@ export function StationPanel({ v, result }: { v: VariableResult; result: RunResu
                   </div>
                 </td>
                 <td className="mono">{s.mean === null ? "—" : fmt(s.mean, d)}</td>
-                <td className="mono">{s.trendPerDecade === null ? "too short" : `${fmtSigned(s.trendPerDecade, d)} (p ${fmtP(s.trendPValue ?? 1)})`}</td>
+                <td className="mono">{s.trendPerDecade === null ? "n/a (< 10 complete years)" : `${fmtSigned(s.trendPerDecade, d)} (p ${fmtP(s.trendPValue ?? 1)})`}</td>
                 <td>{s.usedInRegionalMean ? "Yes" : "No"}</td>
               </tr>
             ))}

@@ -86,7 +86,7 @@ the provider's own `created` / `started` / `finished` timestamps (UTC).
 | `CDSAPI_URL`, `CDSAPI_KEY` | present (since 2026-11-15) | present (sensitive) | Copernicus ERA5 connector |
 | `NOAA_CDO_TOKEN` | present (since 2026-11-15) | present (sensitive) | NOAA CDO connector |
 | `NEON_API_KEY`, `NEON_PROJECT_ID` | present (since 2026-11-15) | n/a (GitHub Actions secrets) | per-PR Neon branches in CI |
-| `VERCEL_TOKEN`, `VERCEL_ORG_ID` | present | n/a | deployment automation |
+| `VERCEL_TOKEN`, `VERCEL_ORG_ID` | present | n/a | deployment automation; **not yet GitHub Actions secrets** (the preview-wiring step of `neon-preview.yml` reports them missing; `NEON_API_KEY` and `NEON_PROJECT_ID` are set there) |
 | `EARTHDATA_USERNAME/PASSWORD` | absent | absent | not needed (bearer token) |
 
 Since 2026-11-15 ERA5 and NOAA are verified from the dev container as well;
@@ -119,6 +119,8 @@ CONNECT). The owner approved this exact-host allowlist on 2026-11-14:
 | `api.giovanni.earthdata.nasa.gov` | Giovanni API | reachable, but requires interactive Earthdata Login; not used |
 | `console.neon.tech` | Neon API (branches) | 200 |
 | `tile.openstreetmap.org` | map tiles | not needed: the globe and maps use bundled assets only |
+| `cryonova-git-f-111e1c-maria-alejandra-boada-rodriguezs-projects.vercel.app` | PR #6 preview branch alias (allowlisted 2026-11-15) | 307 to the share link, then 200 with the Vercel share cookie |
+| `cryonova-pi.vercel.app` | public production domain (allowlisted 2026-11-15) | 200 without authentication (Standard Protection) |
 
 ## Live reads verified from the dev container
 

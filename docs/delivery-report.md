@@ -91,3 +91,26 @@ Request: verify every credential, integrate the five pending sources with real v
 | Giovanni via Harmony (GLDAS) | Reachable (Giovanni services listed) | `066cc153-3d50-4d1c-b8da-dfb97cf01298` | Area average 0–10 cm, 2010-06: **36.2341 kg/m²** (equal to the OPeNDAP-based run) | 12/12 | 547 B | 37 s, 2 invocations |
 | Giovanni via Harmony (IMERG) | — | `df4dea1a-db6d-40c4-a15f-018c008a1003` | Area-average precipitation, 2010-06: **10.1168 mm/day** | 12/12 | 557 B | 37 s, 2 invocations |
 | MERRA-2, GPM IMERG | Verified live (21.082 °C; 5.410 mm/day) | — | (unchanged connectors) | — | — | — |
+
+### Production verification (commit `7fcfbd9`, deployment `dpl_5YwYp18JZcK8hT7MuXH5D3BnfcTw`, https://cryonova-pi.vercel.app)
+
+- **Before the merge.** Migration 0002 was applied to the production database: `npm run db:migrate` listed 3 migrations and the new tables `provider_jobs` and `connector_checks`. The previous production deployment kept answering `/api/health` OK.
+- **After the deploy.** `/api/health?deep=ai`: database at migration 3; AI served by `claude-sonnet-5-5` in 975 ms.
+- **`/api/connectors/status`.** All seven connectors report **Verified live** with a real value: MERRA-2, GPM IMERG, GLDAS and NOAA from the page's own probe; SeaWiFS, ERA5 and Giovanni from the production runs below.
+- **Closing PR #6.** The workflow deleted Neon branch `preview/pr-6`; only `production` remains. The branch-scoped Vercel variables were removed from the dev container, because the Actions secrets for Vercel are still missing.
+
+| Connector | Production run | Real value | Months | Bytes | Time |
+|---|---|---|---|---|---|
+| GLDAS | `b256473b-29a0-48a3-b105-a277e7087173` | Soil moisture 0–10 cm, Colombia box, 2010-06: **36.2341 kg/m²** | 12/12 | 332,940 B | 3.6 s |
+| SeaWiFS (multi-month measurement) | `94e7a5c0-b65f-4b20-971d-1b3d024353a7` | chlor_a, Colombian Pacific, 2000-06: **0.3359 mg/m³** | 12/12, all from full monthly files (OB.DAAC OPeNDAP answered 429) | **159,058,723 B** (13.3 MB per month) | **45.8 s**, one invocation |
+| ERA5 (new CDS job `6475ab8d-5d86-4120-a396-fa4a3bc5eca6`) | `d6cca1f5-cf8b-400f-b7e3-d65a13b2ec71` | 2 m temperature, Colombia box, 2011-06: **24.5257 °C** | 12/12 | 192,882 B | CDS queued 10 s, ran 10 s; fetched at the next poll (2-minute polling), 2 invocations |
+| NOAA CDO stations | `55935ade-ed83-4cea-9371-ac0208e4d9ac` | Station-mean TAVG, Colorado Front Range, 2005-06: **16.71 °C** | 120/120 | 307,971 B | 5.1 s |
+| Giovanni (GLDAS) via Harmony (job `532011fa-8c5d-49e8-8528-b6166069a29e`) | `65aebaee-a6f1-4869-8170-09301bcf91a4` | 2010-06: **36.2341 kg/m²** | 12/12 | 547 B | 2 invocations |
+| Giovanni (IMERG) via Harmony (job `e08f493f-0534-4107-8c1d-8507b9c80a25`) | `635b24ac-b81b-46b9-af03-536bc2d1e805` | 2010-06: **10.1168 mm/day** | 12/12 | 557 B | 2 invocations |
+
+SeaWiFS cost: a 12-month run downloads about 159 MB in 46 s while OB.DAAC OPeNDAP keeps answering 429. A 10-year range would need about 1.6 GB, so the fallback stays capped at 12 months per run, and the plan warns above that (D-30).
+
+### Still pending, with concrete cause
+
+1. **Per-PR preview wiring in CI.** Add `VERCEL_TOKEN` and `VERCEL_ORG_ID` as repository Actions secrets; until then the last step of `neon-preview.yml` fails with an annotation naming them. Branch creation, migrations, integration tests and branch deletion already run in CI.
+2. **OB.DAAC OPeNDAP.** It answered 429 to every request from both networks. SeaWiFS works through the capped cloud-file fallback; ranges longer than 12 months read at most 12 months per run.
