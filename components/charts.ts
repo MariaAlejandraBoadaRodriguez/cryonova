@@ -3,6 +3,7 @@
  * chart, tables, CSV, PDF and agent all read the same numbers.
  * Colors were validated with the dataviz palette checker (see docs/design).
  */
+import type { DiscoveryRow } from "@/src/analytics/discovery";
 import type { VariableResult } from "@/src/jobs/types";
 import { decimalsFor, fmtP, fmtSigned } from "@/src/lib/format";
 
@@ -184,6 +185,88 @@ export function seasonalCycleChart(v: VariableResult, fetchedTo: string | null) 
   const layout = baseLayout(`${v.name.en} (${a.units})`, sourceLine(v, fetchedTo));
   layout.hovermode = "closest";
   layout.showlegend = false;
+  return { data, layout };
+}
+
+/** Breaks a long category label into lines of at most `width` characters (Plotly uses <br>). */
+export function wrapLabel(text: string, width = 26): string {
+  const lines: string[] = [];
+  let line = "";
+  for (const word of text.split(/\s+/)) {
+    if (line && `${line} ${word}`.length > width) {
+      lines.push(line);
+      line = word;
+    } else line = line ? `${line} ${word}` : word;
+  }
+  if (line) lines.push(line);
+  return lines.join("<br>");
+}
+
+const ROW_PX = 34;
+const AXIS_PX = 52;
+const TOP_PX = 8;
+
+/**
+ * One compact figure comparing the trend per decade and its 95% interval of
+ * every variable with an estimate. Variables are grouped by unit: each unit
+ * gets its own stacked panel and x axis, sized to its rows, and every axis
+ * keeps zero in range so the zero line is always visible.
+ */
+export function comparisonChart(rows: readonly DiscoveryRow[]) {
+  const groups = new Map<string, DiscoveryRow[]>();
+  for (const r of rows) if (r.slopePerDecade !== null && r.ci95 !== null) groups.set(r.trendUnits, [...(groups.get(r.trendUnits) ?? []), r]);
+  const entries = [...groups.entries()];
+  const rowPx = (r: DiscoveryRow) => Math.max(ROW_PX, wrapLabel(r.name).split("<br>").length * 16 + 10);
+  const heights = entries.map(([, items]) => items.reduce((s, r) => s + rowPx(r), 0) + 12);
+  const total = heights.reduce((s, h) => s + h, 0) + entries.length * AXIS_PX + TOP_PX;
+  const data: unknown[] = [];
+  const layout: Record<string, unknown> = {
+    font: { ...FONT, size: 12 },
+    paper_bgcolor: "#FFFFFF",
+    plot_bgcolor: "#FFFFFF",
+    margin: { l: 8, r: 16, t: TOP_PX, b: 0 },
+    height: total,
+    hovermode: "closest",
+    showlegend: false,
+  };
+  let cursor = total - TOP_PX;
+  entries.forEach(([units, items], k) => {
+    const suffix = k === 0 ? "" : String(k + 1);
+    const top = cursor;
+    const bottom = cursor - (heights[k] ?? 0);
+    cursor = bottom - AXIS_PX;
+    const bounds = items.flatMap((r) => [r.ci95?.[0] ?? 0, r.ci95?.[1] ?? 0, r.slopePerDecade ?? 0]);
+    const lo = Math.min(0, ...bounds);
+    const hi = Math.max(0, ...bounds);
+    const pad = (hi - lo) * 0.08 || 1;
+    const decimals = Math.max(2, decimalsFor(items[0]?.unitGroup ?? ""));
+    data.push({
+      type: "scatter",
+      mode: "markers",
+      xaxis: `x${suffix}`,
+      yaxis: `y${suffix}`,
+      x: items.map((r) => r.slopePerDecade),
+      y: items.map((r) => wrapLabel(r.name)),
+      customdata: items.map((r) => [fmtSigned(r.ci95?.[0], decimals), fmtSigned(r.ci95?.[1], decimals)]),
+      error_x: { type: "data", symmetric: false, array: items.map((r) => (r.ci95 ? r.ci95[1] - (r.slopePerDecade ?? 0) : 0)), arrayminus: items.map((r) => (r.ci95 ? (r.slopePerDecade ?? 0) - r.ci95[0] : 0)), color: COLORS.series, thickness: 2, width: 6 },
+      marker: { size: 11, color: items.map((r) => (r.evidence === "significant" ? COLORS.series : "#FFFFFF")), line: { color: COLORS.series, width: 2 } },
+      hovertemplate: `%{x:+.${decimals}f} ${units} (95% interval %{customdata[0]} to %{customdata[1]})<extra></extra>`,
+    });
+    layout[`xaxis${suffix}`] = {
+      anchor: `y${suffix}`,
+      domain: [0, 1],
+      range: [lo - pad, hi + pad],
+      zeroline: true,
+      zerolinecolor: COLORS.ink,
+      zerolinewidth: 2,
+      gridcolor: COLORS.grid,
+      linecolor: COLORS.axis,
+      ticks: "outside",
+      tickcolor: COLORS.axis,
+      title: { text: `Trend per decade (${units})`, font: { ...FONT, size: 12 }, standoff: 4 },
+    };
+    layout[`yaxis${suffix}`] = { anchor: `x${suffix}`, domain: [Math.max(0, bottom / total), Math.min(1, top / total)], automargin: true, autorange: "reversed", type: "category", gridcolor: COLORS.grid, ticks: "" };
+  });
   return { data, layout };
 }
 

@@ -1,43 +1,54 @@
 "use client";
 
 /**
- * Trend discovery view for multi-variable runs: sortable table with evidence
- * after Benjamini–Hochberg correction, practical magnitude, exclusions, and a
- * slope-with-interval chart per unit group (only unit-compatible variables
- * are compared directly).
+ * Trend comparison for multi-variable runs: a compact sortable table (trend
+ * with its 95% interval in one column, evidence after Benjamini–Hochberg
+ * correction with a "How to read this" hint, adjusted p with the raw p as a
+ * hint, and the practical magnitude in each row's details), followed by one
+ * compact chart with a panel per unit (only unit-compatible variables share
+ * an axis). "No clear trend yet" results stay listed and explained.
  */
-import { useMemo, useState } from "react";
-import { discover, type DiscoveryRow } from "@/src/analytics/discovery";
+import { Fragment, useMemo, useState } from "react";
+import { discover } from "@/src/analytics/discovery";
 import type { RunResult } from "@/src/jobs/types";
-import { fmt, fmtP, fmtSigned } from "@/src/lib/format";
-import { COLORS } from "./charts";
+import { comparisonCaption } from "@/src/reports/captions";
+import { adjustedPCell, changeVsVariability, trendWithInterval } from "@/src/reports/comparison";
+import { NO_CLEAR_TREND_NOTE } from "@/src/reports/narrative";
+import { comparisonChart } from "./charts";
+import { EvidenceHint } from "./EvidenceHint";
 import { Plot } from "./Plot";
 import { TableWrap } from "./TableWrap";
 
-type SortKey = "evidence" | "name" | "slope" | "q" | "snr";
-const LABEL: Record<DiscoveryRow["evidence"], string> = { significant: "Significant (FDR)", nominal: "Nominal only", inconclusive: "Inconclusive", insufficient: "Insufficient data" };
+type SortKey = "evidence" | "name" | "slope" | "q";
+const COLUMNS = 6;
 
 export function DiscoveryTable({ result }: { result: RunResult }) {
   const discovery = useMemo(() => discover(result), [result]);
   const [sort, setSort] = useState<SortKey>("evidence");
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const rows = useMemo(() => {
     const copy = [...discovery.rows];
     if (sort === "name") copy.sort((a, b) => a.name.localeCompare(b.name));
     if (sort === "slope") copy.sort((a, b) => Math.abs(b.slopePerDecade ?? 0) - Math.abs(a.slopePerDecade ?? 0));
     if (sort === "q") copy.sort((a, b) => (a.qValue ?? 2) - (b.qValue ?? 2));
-    if (sort === "snr") copy.sort((a, b) => (b.signalToNoise ?? -1) - (a.signalToNoise ?? -1));
     return copy;
   }, [discovery, sort]);
+  const chart = useMemo(() => comparisonChart(discovery.rows), [discovery]);
+  const caption = useMemo(() => comparisonCaption(discovery.rows), [discovery]);
+  const corrected = discovery.evaluated > 1;
+  const hasChart = discovery.rows.some((r) => r.slopePerDecade !== null && r.ci95 !== null);
 
-  const groups = useMemo(() => {
-    const map = new Map<string, DiscoveryRow[]>();
-    for (const r of discovery.rows) if (r.slopePerDecade !== null) map.set(r.trendUnits, [...(map.get(r.trendUnits) ?? []), r]);
-    return [...map.entries()];
-  }, [discovery]);
+  const toggle = (key: string) =>
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
 
-  const header = (key: SortKey, label: string, numeric = false) => (
-    <th scope="col" className={numeric ? "num" : undefined} aria-sort={sort === key ? "descending" : "none"}>
-      <button type="button" className="btn btn-ghost btn-small" style={{ border: 0, padding: 0, minHeight: 0 }} onClick={() => setSort(key)}>
+  const header = (key: SortKey, label: string, className?: string) => (
+    <th scope="col" className={className} aria-sort={sort === key ? "descending" : "none"}>
+      <button type="button" className="sort-button" onClick={() => setSort(key)}>
         {label}
         {sort === key ? " ▾" : ""}
       </button>
@@ -46,54 +57,96 @@ export function DiscoveryTable({ result }: { result: RunResult }) {
 
   return (
     <section className="card stack" aria-labelledby="discovery-title" data-testid="discovery">
-      <h3 id="discovery-title">Trend discovery across {result.variables.length} variables</h3>
+      <h3 id="discovery-title">Trend comparison across {result.variables.length} variables</h3>
       <p className="field-help" style={{ margin: 0 }}>
-        {discovery.evaluated} trends evaluated · {discovery.correction}. Statistical evidence and practical magnitude (fitted change divided by year-to-year variability) are shown separately; inconclusive results stay listed.
+        {discovery.evaluated} trends evaluated · {discovery.correction}. Open a row&apos;s details for the change compared with year-to-year variability.
       </p>
       <TableWrap label="Trend per variable with uncertainty and multiple-comparison correction">
-        <table className="data">
+        <table className="data discovery-table" data-testid="discovery-table">
           <caption className="visually-hidden">Trend per variable with uncertainty and multiple-comparison correction</caption>
           <thead>
             <tr>
-              {header("name", "Variable")}
-              {header("evidence", "Evidence")}
-              {header("slope", "Trend per decade", true)}
-              <th scope="col" className="num">
-                95% CI
-              </th>
-              <th scope="col" className="num">
-                p
-              </th>
-              {header("q", "Adjusted p (BH q)", true)}
-              {header("snr", "Change / variability", true)}
-              <th scope="col" className="num">
+              {header("name", "Variable", "col-variable")}
+              {header("evidence", "Evidence", "col-evidence")}
+              {header("slope", "Trend per decade (95% interval)", "num col-trend")}
+              {header("q", "Adjusted p (BH q)", "num col-q")}
+              <th scope="col" className="num col-years">
                 Years
+              </th>
+              <th scope="col" className="col-details">
+                <span className="visually-hidden">Details</span>
               </th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
-              <tr key={r.key}>
-                <th scope="row">
-                  <a href={`#var-${result.variables.findIndex((v) => v.key === r.key)}`}>{r.name}</a>
-                  <div className="field-help mono" style={{ margin: 0 }}>
-                    {r.product}
-                  </div>
-                </th>
-                <td>
-                  <span className={r.evidence === "significant" ? "badge badge-strong" : "badge badge-neutral"}>{LABEL[r.evidence]}</span>
-                </td>
-                <td className="num">{r.slopePerDecade === null ? "—" : `${fmtSigned(r.slopePerDecade, 3)} ${r.trendUnits}`}</td>
-                <td className="num">{r.ci95 ? `${fmtSigned(r.ci95[0], 3)} to ${fmtSigned(r.ci95[1], 3)}` : "—"}</td>
-                <td className="num">{fmtP(r.pValue)}</td>
-                <td className="num">{fmtP(r.qValue)}</td>
-                <td className="num">{r.signalToNoise === null ? "—" : `${fmt(r.signalToNoise, 1)}×`}</td>
-                <td className="num">{r.n}</td>
-              </tr>
-            ))}
+            {rows.map((r) => {
+              const index = result.variables.findIndex((v) => v.key === r.key);
+              const trend = trendWithInterval(r);
+              const q = adjustedPCell(r);
+              const magnitude = changeVsVariability(r);
+              const open = expanded.has(r.key);
+              const detailsId = `discovery-details-${index}`;
+              return (
+                <Fragment key={r.key}>
+                  <tr data-testid={`discovery-row-${r.key}`}>
+                    <th scope="row" className="col-variable">
+                      <a href={`#var-${index}`}>{r.name}</a>
+                      <div className="field-help mono" style={{ margin: 0 }}>
+                        {r.product}
+                      </div>
+                    </th>
+                    <td className="col-evidence">
+                      <EvidenceHint level={r.evidence} corrected={corrected} />
+                    </td>
+                    <td className="num col-trend" data-testid="discovery-trend">
+                      {trend ? (
+                        <>
+                          <span className="nowrap">{trend.trend}</span> <span className="nowrap muted">{trend.interval}</span>
+                        </>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="num col-q">
+                      <span title={q.hint} data-testid="discovery-q">
+                        {q.text}
+                      </span>
+                      {r.pValue !== null && <span className="visually-hidden">. {q.hint}</span>}
+                    </td>
+                    <td className="num col-years">{r.n}</td>
+                    <td className="col-details">
+                      <button type="button" className="row-details-button" aria-expanded={open} aria-controls={detailsId} onClick={() => toggle(r.key)}>
+                        Details<span className="visually-hidden"> for {r.name}</span>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr id={detailsId} className="discovery-details" hidden={!open}>
+                    <td colSpan={COLUMNS}>
+                      <dl className="kv">
+                        <dt>Change vs. variability</dt>
+                        <dd>{magnitude ?? "Not available (no trend estimate or no year-to-year variation)."}</dd>
+                        <dt>Raw p</dt>
+                        <dd>{r.pValue === null ? "—" : q.hint}</dd>
+                        <dt>Valid months</dt>
+                        <dd>
+                          {r.monthsValid} of {r.monthsRequested}
+                        </dd>
+                        <dt>Chart and details</dt>
+                        <dd>
+                          <a href={`#var-${index}`}>Go to {r.name}</a>
+                        </dd>
+                      </dl>
+                    </td>
+                  </tr>
+                </Fragment>
+              );
+            })}
           </tbody>
         </table>
       </TableWrap>
+      <p className="field-help" style={{ margin: 0 }} data-testid="no-clear-trend-note">
+        {NO_CLEAR_TREND_NOTE}
+      </p>
       {discovery.excluded.length > 0 && (
         <div className="alert alert-info">
           <div>
@@ -108,33 +161,9 @@ export function DiscoveryTable({ result }: { result: RunResult }) {
           </div>
         </div>
       )}
-      {groups.map(([units, items]) => (
-        <Plot
-          key={units}
-          className="chart-frame"
-          ariaLabel={`Trend per decade with 95% intervals for variables measured in ${units}. Values are listed in the table above.`}
-          data={[
-            {
-              type: "scatter",
-              mode: "markers",
-              x: items.map((r) => r.slopePerDecade),
-              y: items.map((r) => r.name),
-              error_x: { type: "data", symmetric: false, array: items.map((r) => (r.ci95 ? r.ci95[1] - (r.slopePerDecade ?? 0) : 0)), arrayminus: items.map((r) => (r.ci95 ? (r.slopePerDecade ?? 0) - r.ci95[0] : 0)), color: COLORS.trend, thickness: 1.5, width: 6 },
-              marker: { size: 10, color: items.map((r) => (r.evidence === "significant" ? COLORS.series : "#FFFFFF")), line: { color: COLORS.series, width: 2 } },
-              hovertemplate: `%{y}: %{x:+.3f} ${units}<extra></extra>`,
-            },
-          ]}
-          layout={{
-            font: { family: "Overpass, system-ui, sans-serif", size: 12, color: COLORS.ink },
-            margin: { l: 220, r: 16, t: 28, b: 48 },
-            height: 80 + items.length * 36,
-            title: { text: `Trend per decade (${units}) · filled = significant after BH`, font: { size: 13 }, x: 0 },
-            xaxis: { zeroline: true, zerolinecolor: COLORS.ink, gridcolor: COLORS.grid, title: { text: units } },
-            yaxis: { automargin: true },
-            showlegend: false,
-          }}
-        />
-      ))}
+      {hasChart && (
+        <Plot {...chart} className="chart-frame-compact" testId="comparison-chart" caption={caption} ariaLabel="Trend per decade with 95% intervals for each variable, one panel per unit. Values are listed in the table above." />
+      )}
     </section>
   );
 }
