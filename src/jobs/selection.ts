@@ -4,6 +4,7 @@
  */
 import { z } from "zod";
 import { collectionOf, getVariable } from "@/src/catalog";
+import { getDerived } from "@/src/catalog/derived";
 import { validateBBox } from "@/src/providers/grid";
 import { monthsBetween } from "@/src/analytics/series";
 
@@ -34,6 +35,8 @@ export const SelectionSchema = z
     end: YearMonth,
     variables: z.array(z.string().max(60)).min(1, "Choose at least one variable").max(MAX_VARIABLES),
     mode: z.enum(["manual", "guided", "discovery"]).default("manual"),
+    /** Derived series computed from the selected variables (optional; older selections have none). */
+    derived: z.array(z.string().max(60)).max(MAX_VARIABLES).optional(),
   })
   .superRefine((s, ctx) => {
     if (s.start > s.end) {
@@ -47,6 +50,15 @@ export const SelectionSchema = z
     }
     if (new Set(s.variables).size !== s.variables.length) {
       ctx.addIssue({ code: "custom", path: ["variables"], message: "Each variable can be selected once." });
+    }
+    for (const key of s.derived ?? []) {
+      const metric = getDerived(key);
+      if (!metric) {
+        ctx.addIssue({ code: "custom", path: ["derived"], message: `Unknown derived series: ${key}` });
+        continue;
+      }
+      const missing = metric.inputs.filter((input) => !s.variables.includes(input));
+      if (missing.length > 0) ctx.addIssue({ code: "custom", path: ["derived"], message: `${metric.formula} needs ${missing.join(", ")} in the selection.` });
     }
     for (const key of s.variables) {
       const coverage = collectionOf(getVariable(key)!).temporal;
