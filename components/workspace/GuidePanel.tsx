@@ -6,7 +6,8 @@
  * live). Ready state: the investigation plan with Start analysis.
  */
 import Link from "next/link";
-import { useId, useState } from "react";
+import { type ReactNode, useId, useState } from "react";
+import { AutoGrowTextarea } from "@/components/AutoGrowTextarea";
 import { EXAMPLE, type ExampleInvestigation, FOLLOW_UPS } from "@/src/plan/examples";
 import type { Plan } from "@/src/plan/plan";
 
@@ -28,6 +29,8 @@ interface GuidePanelProps {
   onUseExample: (example: ExampleInvestigation) => void;
   onQuestion: (question: string) => void;
   onStart: () => void;
+  /** The assistant's latest proposal, shown above the guide or the plan. */
+  assistant?: ReactNode;
 }
 
 function GuideHead({ titleId }: { titleId: string }) {
@@ -86,6 +89,7 @@ export function GuidePanel(props: GuidePanelProps) {
   return (
     <aside className="ws-area-guide" aria-labelledby={`${id}-title`} data-testid="guide">
       <GuideHead titleId={`${id}-title`} />
+      {props.assistant}
 
       {view === "guide" ? (
         <>
@@ -149,7 +153,7 @@ export function GuidePanel(props: GuidePanelProps) {
           <label className="plan-label" htmlFor={`${id}-question`}>
             Question to answer
           </label>
-          <textarea id={`${id}-question`} rows={2} maxLength={600} value={plan.question} onChange={(e) => props.onQuestion(e.target.value)} data-testid="plan-question" />
+          <AutoGrowTextarea id={`${id}-question`} minRows={2} maxLength={600} value={plan.question} onChange={(e) => props.onQuestion(e.target.value)} data-testid="plan-question" />
           {!plan.question && suggestedQuestion && (
             <button type="button" className="ws-btn ws-btn-link" onClick={() => props.onQuestion(suggestedQuestion)}>
               Use “{suggestedQuestion}”
