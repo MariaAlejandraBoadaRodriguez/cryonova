@@ -93,6 +93,8 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
   const [reply, setReply] = useState<ThreadMessage[]>([]);
   const [answered, setAnswered] = useState(false);
   const [askError, setAskError] = useState<string | null>(null);
+  // The assistant's latest proposal; the setup only changes when the user applies it, so their own choices (dates included) are never overwritten unasked.
+  const [pending, setPending] = useState<{ proposal: Proposal; question: string; applied: boolean } | null>(null);
   const [preferGuide, setPreferGuide] = useState(false);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
@@ -144,11 +146,35 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
       const message: ThreadMessage = { id: crypto.randomUUID(), role: "assistant", text: `Loaded “${example.question}”. Edit anything on the left, then review the plan and press Start analysis.`, badge: "Example" };
       setThread((t) => [...t, message]);
       setReply([message]);
+      setPending(null);
       setAnswered(false);
       setAskError(null);
     },
     [applyDraft],
   );
+
+  /** Fills the setup with the pending proposal, on the user's request only. */
+  const applyProposal = useCallback(() => {
+    if (!pending) return;
+    const { proposal, question } = pending;
+    const sel = proposal.selection;
+    setDraft((d) => {
+      let nextLocation = d.location;
+      if (sel.region?.regionId && getRegion(sel.region.regionId)) nextLocation = { mode: "country", regionId: sel.region.regionId, customBBox: d.location.customBBox };
+      else if (sel.region?.bbox) nextLocation = { mode: "custom", regionId: d.location.regionId, customBBox: sel.region.bbox as BBox };
+      const variables = sel.variables.length > 0 ? sel.variables : d.variables;
+      const next: PlanDraft = { ...d, variables, derived: reconcileDerived(variables, d.derived), start: sel.start, end: sel.end, location: nextLocation };
+      const restated = proposal.source === "ai" && sel.question ? sel.question : looksLikeQuestion(question) ? question : (suggestQuestion(next) ?? d.question);
+      return { ...next, question: restated };
+    });
+    setTopicId(matchTopic(sel.variables));
+    setPeriodTouched(true);
+    setPreferGuide(false);
+    setDrawing(false);
+    setGlobeNote(null);
+    setFocusKey(`agent:${Date.now()}`);
+    setPending({ ...pending, applied: true });
+  }, [pending]);
 
   /** Ask the assistant; it sees the current setup and the earlier conversation. */
   const askAssistant = useCallback(
@@ -180,23 +206,10 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
           return;
         }
         const proposal = data as Proposal;
-        const sel = proposal.selection;
-        setDraft((d) => {
-          let nextLocation = d.location;
-          if (sel.region?.regionId && getRegion(sel.region.regionId)) nextLocation = { mode: "country", regionId: sel.region.regionId, customBBox: d.location.customBBox };
-          else if (sel.region?.bbox) nextLocation = { mode: "custom", regionId: d.location.regionId, customBBox: sel.region.bbox as BBox };
-          const variables = sel.variables.length > 0 ? sel.variables : d.variables;
-          const next: PlanDraft = { ...d, variables, derived: reconcileDerived(variables, d.derived), start: sel.start, end: sel.end, location: nextLocation };
-          const restated = proposal.source === "ai" && sel.question ? sel.question : looksLikeQuestion(question) ? question : (suggestQuestion(next) ?? d.question);
-          return { ...next, question: restated };
-        });
-        setTopicId(matchTopic(sel.variables));
-        setPeriodTouched(true);
-        setPreferGuide(false);
-        setFocusKey(`agent:${Date.now()}`);
         const messages = proposalReply(proposal);
         setThread((t) => [...t, ...messages]);
         setReply(messages);
+        setPending({ proposal, question, applied: false });
         setAnswered(true);
       } catch {
         setAskError("The assistant could not be reached. You can still fill the setup by hand.");
@@ -340,7 +353,7 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
         onUseExample={useExample}
         onQuestion={(question) => update({ question })}
         onStart={startAnalysis}
-        assistant={<AssistantProposal reply={reply} asking={asking} />}
+        assistant={<AssistantProposal reply={reply} asking={asking} applied={pending?.applied ?? false} onApply={pending ? applyProposal : undefined} />}
       />
     </div>
   );

@@ -1564,6 +1564,19 @@ code,
   color: #3b5368;
 }
 
+.proposal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 10px;
+}
+
+.proposal-applied {
+  font-size: 13px;
+  color: #3b5368;
+}
+
 .guide-why {
   display: block;
   font-size: 12.5px;

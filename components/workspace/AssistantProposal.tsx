@@ -2,9 +2,11 @@
 
 /**
  * Right panel, top: the assistant's latest reply as a readable card (what it
- * proposed, why, and that everything on the left stays editable). The wrapper
- * is a polite live region that is always mounted, so screen readers hear each
- * new proposal even though it appears away from the question field.
+ * proposed, why, and that everything on the left stays editable). A proposal
+ * changes nothing until the user presses "Apply proposal". The wrapper is a
+ * polite live region that is always mounted, so screen readers hear each new
+ * proposal even though it appears away from the question field; it is not
+ * atomic, so applying announces only the short "Applied" line.
  */
 
 export interface ThreadMessage {
@@ -22,12 +24,15 @@ interface AssistantProposalProps {
   /** The assistant's latest turn: the proposal, then an optional clarifying question. */
   reply: ThreadMessage[];
   asking: boolean;
+  /** Present while a proposal can be applied to the setup. */
+  onApply?: () => void;
+  applied?: boolean;
 }
 
-export function AssistantProposal({ reply, asking }: AssistantProposalProps) {
+export function AssistantProposal({ reply, asking, onApply, applied = false }: AssistantProposalProps) {
   const [main, ...rest] = reply;
   return (
-    <div role="status" aria-live="polite" className="proposal-live">
+    <div role="status" aria-live="polite" aria-atomic="false" className="proposal-live">
       {(asking || main) && (
         <article className="guide-card proposal-card" id={PROPOSAL_ID} tabIndex={-1} aria-labelledby={`${PROPOSAL_ID}-title`} data-testid="assistant-proposal">
           <div className="proposal-head">
@@ -54,6 +59,16 @@ export function AssistantProposal({ reply, asking }: AssistantProposalProps) {
                   {m.text}
                 </p>
               ))}
+              {onApply && (
+                <div className="proposal-actions">
+                  <button type="button" className="ws-btn ws-btn-primary" onClick={onApply} data-testid="apply-proposal">
+                    Apply proposal
+                  </button>
+                  <span className="proposal-applied" data-testid="proposal-status">
+                    {applied ? "Applied to the setup and the plan." : "Nothing on the left changes until you apply it."}
+                  </span>
+                </div>
+              )}
             </>
           )}
         </article>
