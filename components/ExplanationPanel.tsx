@@ -3,19 +3,17 @@
 /**
  * Interpretation of a finished run. Explanations come only from the run's
  * computed facts; every cited figure is checked and the result is shown.
+ * Always in English (D-35); older non-English summaries are not shown.
  * "Ask about a chart" sends the selected chart with the question (or that
  * chart's default question when the box is empty) and shows the answer.
  */
 import { useEffect, useState } from "react";
 import { askAboutChart, CHART_KINDS, CHART_LABELS, type ChartKind, chartQuestion, DEFAULT_QUESTIONS, isChartKind, MAX_QUESTION_LENGTH } from "@/src/agent/ask-chart";
 import type { Explanation } from "@/src/agent/explain";
-import type { Language } from "@/src/agent/proposal";
+import { englishSummary, type StoredExplanations } from "@/src/agent/stored-explanations";
 import { ErrorIcon } from "./icons";
 
-const SECTION_TITLES: Record<Language, Record<string, string>> = {
-  en: { chart: "What the chart shows", pattern: "Pattern", change: "How much it changed", uncertainty: "Uncertainty", source: "Where the data come from", limitations: "Limitations" },
-  es: { chart: "Qué muestra el gráfico", pattern: "Patrón", change: "Cuánto cambió", uncertainty: "Incertidumbre", source: "De dónde vienen los datos", limitations: "Limitaciones" },
-};
+const SECTION_TITLES: Record<string, string> = { chart: "What the chart shows", pattern: "Pattern", change: "How much it changed", uncertainty: "Uncertainty", source: "Where the data come from", limitations: "Limitations" };
 
 function Verification({ e }: { e: Explanation }) {
   const v = e.verification;
@@ -29,17 +27,17 @@ function Verification({ e }: { e: Explanation }) {
   );
 }
 
-/** The run's summary interpretation (series chart) in one language. */
-async function request(body: { runId: string; language: Language }): Promise<Explanation> {
-  const response = await fetch(`/api/runs/${body.runId}/explanation?language=${body.language}`, { cache: "no-store", signal: AbortSignal.timeout(90_000) });
+/** The run's summary interpretation (series chart), always in English. */
+async function request(body: { runId: string }): Promise<Explanation> {
+  const response = await fetch(`/api/runs/${body.runId}/explanation`, { cache: "no-store", signal: AbortSignal.timeout(90_000) });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error?.detail ?? data.error?.title ?? "The explanation could not be produced.");
   return data as Explanation;
 }
 
 /** One answered question about a chart, with its source, AI status and figure check. */
-function ChartAnswer({ f, language }: { f: Explanation; language: Language }) {
-  const label = CHART_LABELS[isChartKind(f.chart) ? f.chart : "series"][language];
+function ChartAnswer({ f }: { f: Explanation }) {
+  const label = CHART_LABELS[isChartKind(f.chart) ? f.chart : "series"].en;
   return (
     <article className="stack" data-testid="ask-chart-answer" data-chart={f.chart} data-source={f.source} style={{ borderTop: "1px solid var(--border)", paddingTop: 10 }}>
       <p style={{ margin: 0 }}>
@@ -65,45 +63,30 @@ function ChartAnswer({ f, language }: { f: Explanation; language: Language }) {
   );
 }
 
-export function ExplanationPanel({ runId, initialLanguage, stored }: { runId: string; initialLanguage: Language; stored?: { summary?: Explanation; summaries?: Partial<Record<Language, Explanation>>; followUps?: Explanation[] } | null }) {
-  const [language, setLanguage] = useState<Language>(stored?.summary?.language ?? initialLanguage);
-  const [summary, setSummary] = useState<Explanation | null>(stored?.summaries?.[stored?.summary?.language ?? initialLanguage] ?? stored?.summary ?? null);
+export function ExplanationPanel({ runId, stored }: { runId: string; stored?: StoredExplanations | null }) {
+  // Only an English summary is shown; without one (e.g. an older run), a fresh English one is requested.
+  const [summary, setSummary] = useState<Explanation | null>(() => englishSummary(stored));
   const [followUps, setFollowUps] = useState<Explanation[]>(stored?.followUps ?? []);
-  const [loading, setLoading] = useState(() => !(stored?.summary && stored.summary.language === (stored?.summary?.language ?? initialLanguage)));
+  const [loading, setLoading] = useState(() => !englishSummary(stored));
   const [error, setError] = useState<string | null>(null);
   const [question, setQuestion] = useState("");
   const [chart, setChart] = useState<ChartKind>("series");
   const [asking, setAsking] = useState<ChartKind | null>(null);
   const [askError, setAskError] = useState<string | null>(null);
 
-  const load = (lang: Language) =>
-    request({ runId, language: lang })
-      .then((e) => setSummary(e))
-      .catch((e: Error) => setError(e.message))
-      .finally(() => setLoading(false));
-
   useEffect(() => {
     if (summary) return;
     let cancelled = false;
-    request({ runId, language })
+    request({ runId })
       .then((e) => !cancelled && setSummary(e))
       .catch((e: Error) => !cancelled && setError(e.message))
       .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
     };
-    // Load once per mounted run; language switches load from the click handler.
+    // Load once per mounted run.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const switchLanguage = (next: Language) => {
-    if (next === language) return;
-    setLanguage(next);
-    setSummary(null);
-    setLoading(true);
-    setError(null);
-    void load(next);
-  };
 
   // An empty box asks the selected chart's default question, so every option answers on Ask.
   const ask = async () => {
@@ -112,7 +95,7 @@ export function ExplanationPanel({ runId, initialLanguage, stored }: { runId: st
     setAsking(selected);
     setAskError(null);
     try {
-      const e = await askAboutChart({ runId, language, chart: selected, followUp: chartQuestion(selected, question) });
+      const e = await askAboutChart({ runId, chart: selected, followUp: chartQuestion(selected, question) });
       setFollowUps((list) => [...list, e]);
       setQuestion("");
     } catch (e) {
@@ -122,22 +105,14 @@ export function ExplanationPanel({ runId, initialLanguage, stored }: { runId: st
     }
   };
 
-  const titles = SECTION_TITLES[language];
   return (
     <section className="card stack" aria-labelledby="explain-title" data-testid="explanation">
       <div className="panel-title">
         <h3 id="explain-title" style={{ margin: 0 }}>
-          {language === "es" ? "Interpretación" : "Interpretation"}
+          Interpretation
         </h3>
-        <div className="row" role="group" aria-label="Explanation language">
-          {(["en", "es"] as const).map((l) => (
-            <button key={l} type="button" className={l === language ? "btn btn-primary btn-small" : "btn btn-ghost btn-small"} aria-pressed={l === language} onClick={() => switchLanguage(l)}>
-              {l === "en" ? "English" : "Español"}
-            </button>
-          ))}
-        </div>
       </div>
-      {loading && <p role="status">{language === "es" ? "Interpretando los resultados…" : "Interpreting the results…"}</p>}
+      {loading && <p role="status">Interpreting the results…</p>}
       {error && (
         <p className="alert alert-error" role="alert">
           <ErrorIcon /> {error} The charts and tables above remain valid.
@@ -146,7 +121,7 @@ export function ExplanationPanel({ runId, initialLanguage, stored }: { runId: st
       {summary && (
         <>
           <div className="row">
-            <span className={summary.source === "ai" ? "badge badge-strong" : "badge badge-neutral"}>{summary.source === "ai" ? `Claude · ${summary.ai?.model}` : language === "es" ? "Explicación automática (sin IA)" : "Automatic explanation (no AI)"}</span>
+            <span className={summary.source === "ai" ? "badge badge-strong" : "badge badge-neutral"}>{summary.source === "ai" ? `Claude · ${summary.ai?.model}` : "Automatic explanation (no AI)"}</span>
             <Verification e={summary} />
           </div>
           {summary.aiStatus && (
@@ -158,7 +133,7 @@ export function ExplanationPanel({ runId, initialLanguage, stored }: { runId: st
             <dl className="kv">
               {Object.entries(summary.sections).map(([key, text]) => (
                 <div key={key} style={{ display: "contents" }}>
-                  <dt>{titles[key]}</dt>
+                  <dt>{SECTION_TITLES[key] ?? key}</dt>
                   <dd>{text}</dd>
                 </div>
               ))}
@@ -167,7 +142,7 @@ export function ExplanationPanel({ runId, initialLanguage, stored }: { runId: st
         </>
       )}
       <div className="stack" data-testid="ask-chart">
-        <label htmlFor="followup">{language === "es" ? "Pregunta sobre un gráfico" : "Ask about a chart"}</label>
+        <label htmlFor="followup">Ask about a chart</label>
         <p id="followup-help" className="field-help" style={{ margin: 0 }}>
           Pick a chart and press Ask, or type your own question about it.
         </p>
@@ -175,13 +150,13 @@ export function ExplanationPanel({ runId, initialLanguage, stored }: { runId: st
           <select aria-label="Chart" data-testid="ask-chart-select" value={chart} disabled={asking !== null} onChange={(e) => isChartKind(e.target.value) && setChart(e.target.value)} style={{ maxWidth: 200 }}>
             {CHART_KINDS.map((kind) => (
               <option key={kind} value={kind}>
-                {CHART_LABELS[kind][language]}
+                {CHART_LABELS[kind].en}
               </option>
             ))}
           </select>
           <input id="followup" data-testid="ask-chart-input" type="text" maxLength={MAX_QUESTION_LENGTH} value={question} placeholder={DEFAULT_QUESTIONS[chart]} aria-describedby="followup-help" onChange={(e) => setQuestion(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void ask()} style={{ flex: "1 1 220px" }} />
           <button type="button" className="btn btn-secondary btn-small" data-testid="ask-chart-button" onClick={() => void ask()} disabled={asking !== null} aria-busy={asking !== null}>
-            {asking ? "Asking…" : language === "es" ? "Preguntar" : "Ask"}
+            {asking ? "Asking…" : "Ask"}
           </button>
         </div>
         {asking && (
@@ -196,7 +171,7 @@ export function ExplanationPanel({ runId, initialLanguage, stored }: { runId: st
         )}
         <div className="stack" aria-live="polite">
           {followUps.map((f, i) => (
-            <ChartAnswer key={i} f={f} language={language} />
+            <ChartAnswer key={i} f={f} />
           ))}
         </div>
       </div>

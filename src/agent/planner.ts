@@ -30,8 +30,8 @@ export const PLAN_SYSTEM = `You are the research planner of Cryonova, a web app 
 Your job: read the user's question and propose an editable selection (variables, region, period) that answers it. You never compute or quote data values; the app queries providers only after the user confirms your proposal.
 
 Work with the tools:
-1. search_catalog to find catalog variables (search in English or Spanish; try a single word and a phrase).
-2. resolve_region to turn place names into gazetteer regions; use the returned region_id.
+1. search_catalog to find catalog variables (search in English; try a single word and a phrase).
+2. resolve_region to turn place names into gazetteer regions (English names); use the returned region_id.
 3. check_coverage to confirm the period is published for the chosen variables.
 4. Finish by calling propose_selection exactly once.
 
@@ -41,7 +41,7 @@ Rules:
 - If the region is ambiguous or missing, still propose your best default and put one short clarification question in "clarification"; otherwise leave it empty. Ask only what changes the investigation materially.
 - Use region_id when resolve_region found the place; set bbox only for explicit coordinates in the question or to keep a custom area from <current_setup> (west, south, east, north in degrees), otherwise all zeros.
 - The message may include <current_setup> (the user's own choices in the workspace, manual edits included) and <earlier_conversation>. Keep the current setup unless the new message asks for something different; when the message omits the place, period or variables, take them from the current setup or the earlier conversation. A short reply such as a place name answers your earlier clarification question.
-- Write rationales, analysis and assumptions in the user's language (English or Spanish) and keep each rationale under 25 words.
+- Cryonova is an English-only platform. Write rationales, analysis, assumptions, the clarification and the restated question in English, and keep each rationale under 25 words. If the user writes in another language, still answer in English, and translate search terms and place names to English before calling the tools.
 - The analysis field states the method: live monthly regional means (cos-latitude weighted), complete-year annual means, OLS trend with HAC uncertainty, plus seasonal or anomaly views when relevant.
 
 Verified catalog topics (variable keys):
@@ -52,13 +52,13 @@ const nullBBox = { type: "object", properties: { west: { type: "number" }, south
 export const PLAN_TOOLS: Anthropic.Beta.BetaTool[] = [
   {
     name: "search_catalog",
-    description: "Search the live-verified Cryonova catalog (NASA MERRA-2 and GPM IMERG monthly variables) by word or phrase in English or Spanish. Returns keys, names, units, product, coverage and domain.",
+    description: "Search the live-verified Cryonova catalog (NASA MERRA-2 and GPM IMERG monthly variables) by English word or phrase. Returns keys, names, units, product, coverage and domain.",
     strict: true,
-    input_schema: { type: "object", properties: { query: { type: "string", description: "A word or short phrase, e.g. 'air temperature' or 'lluvia'." } }, required: ["query"], additionalProperties: false },
+    input_schema: { type: "object", properties: { query: { type: "string", description: "A word or short phrase in English, e.g. 'air temperature' or 'rain'." } }, required: ["query"], additionalProperties: false },
   },
   {
     name: "resolve_region",
-    description: "Resolve a place name (country, basin, continent, hemisphere; English or Spanish) to gazetteer regions with ids and bounding boxes.",
+    description: "Resolve an English place name (country, basin, continent, hemisphere) to gazetteer regions with ids and bounding boxes.",
     strict: true,
     input_schema: { type: "object", properties: { name: { type: "string" } }, required: ["name"], additionalProperties: false },
   },
@@ -80,7 +80,6 @@ export const PLAN_TOOLS: Anthropic.Beta.BetaTool[] = [
     input_schema: {
       type: "object",
       properties: {
-        language: { type: "string", enum: ["en", "es"] },
         variables: {
           type: "array",
           items: { type: "object", properties: { key: { type: "string" }, rationale: { type: "string" } }, required: ["key", "rationale"], additionalProperties: false },
@@ -93,16 +92,15 @@ export const PLAN_TOOLS: Anthropic.Beta.BetaTool[] = [
         analysis: { type: "string" },
         assumptions: { type: "array", items: { type: "string" } },
         clarification: { type: "string", description: "One short question, or empty." },
-        question: { type: "string", description: "The investigation question restated in the user's language, naming the variable, place and period you propose." },
+        question: { type: "string", description: "The investigation question restated in English, naming the variable, place and period you propose." },
       },
-      required: ["language", "variables", "region_id", "region_name", "bbox", "start", "end", "analysis", "assumptions", "clarification", "question"],
+      required: ["variables", "region_id", "region_name", "bbox", "start", "end", "analysis", "assumptions", "clarification", "question"],
       additionalProperties: false,
     },
   },
 ];
 
 interface ProposeInput {
-  language: "en" | "es";
   variables: Array<{ key: string; rationale: string }>;
   region_id: string;
   region_name: string;
@@ -132,7 +130,7 @@ async function runTool(name: string, input: Record<string, unknown>, signal: Abo
     return { result: { hits }, summary: `${hits.length} matches for "${input.query}"` };
   }
   if (name === "resolve_region") {
-    const regions = searchRegions(String(input.name ?? ""), 5).map(({ region }) => ({ region_id: region.id, name: region.names.en, name_es: region.names.es, kind: region.kind, bbox: region.bbox }));
+    const regions = searchRegions(String(input.name ?? ""), 5).map(({ region }) => ({ region_id: region.id, name: region.names.en, kind: region.kind, bbox: region.bbox }));
     return { result: { regions }, summary: `${regions.length} regions for "${input.name}"` };
   }
   if (name === "check_coverage") {
@@ -219,7 +217,6 @@ export async function planWithClaude(question: string, options: { signal?: Abort
       trace.push({ tool: "propose_selection", input: { variables: p.variables.map((v) => v.key), region: p.region_id || p.region_name, start: p.start, end: p.end }, summary: "final proposal" });
       const hasBox = p.bbox && !(p.bbox.west === 0 && p.bbox.east === 0 && p.bbox.south === 0 && p.bbox.north === 0);
       const raw: RawProposal = {
-        language: p.language === "es" ? "es" : "en",
         variables: p.variables,
         regionId: p.region_id,
         regionName: p.region_name,

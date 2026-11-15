@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { COLLECTIONS, getVariable, publicCatalog, TOPICS, VARIABLES } from "@/src/catalog";
 import { DERIVED, derivePoints, getDerived } from "@/src/catalog/derived";
-import { findRegionsInText, getRegion, searchRegions } from "@/src/catalog/regions";
+import { countryOptions, findRegionsInText, getRegion, REGIONS, searchRegions } from "@/src/catalog/regions";
 import { normalizeText, searchCatalog } from "@/src/catalog/search";
 
 describe("catalog", () => {
@@ -71,41 +71,50 @@ describe("catalog", () => {
     expect(COLLECTIONS.M2TMNXAER?.fieldCount).toBe(100);
   });
 
-  it("has unique keys and separate per-language words and phrases", () => {
+  it("has unique keys and English words and phrases", () => {
     expect(new Set(VARIABLES.map((v) => v.key)).size).toBe(VARIABLES.length);
     for (const v of VARIABLES) {
-      expect(v.words.en.length + v.words.es.length).toBeGreaterThan(0);
+      expect(v.words.en.length, v.key).toBeGreaterThan(0);
       expect(v.phrases.en.every((p) => p.includes(" ") || p.length > 2)).toBe(true);
     }
   });
 
+  it("holds English text only (English-only platform, D-35)", () => {
+    const shapes = [
+      ...VARIABLES.flatMap((v) => [v.name, v.description, v.words, v.phrases]),
+      ...TOPICS.flatMap((t) => [t.title, t.question, t.words, t.phrases]),
+      ...DERIVED.flatMap((d) => [d.name, d.description]),
+    ];
+    for (const shape of shapes) expect(Object.keys(shape)).toEqual(["en"]);
+  });
+
   it.each([
-    ["temperatura del aire", "merra2.T2M"],
+    ["air temperature", "merra2.T2M"],
     ["near-surface air temperature", "merra2.T2M"],
     ["T2M", "merra2.T2M"],
     // GLDAS (a dedicated land-surface model, added 2026-11-15) is the best match for soil moisture.
     ["soil moisture", "gldas.SoilMoi0_10cm_inst"],
-    ["humedad del suelo", "gldas.SoilMoi0_10cm_inst"],
+    ["topsoil moisture", "gldas.SoilMoi0_10cm_inst"],
     ["surface soil wetness", "merra2.GWETTOP"],
     ["ocean chlorophyll", "seawifs.chlor_a"],
-    ["clorofila", "seawifs.chlor_a"],
+    ["chlorophyll", "seawifs.chlor_a"],
     ["weather stations temperature", "noaa.TAVG"],
     ["era5 temperature", "era5.t2m"],
     ["ozone layer", "merra2.TO3"],
-    ["polvo del sahara", "merra2.DUEXTTAU"],
+    ["saharan dust", "merra2.DUEXTTAU"],
   ])("finds %s", (query, key) => {
     expect(searchCatalog(query)[0]?.variable.key).toBe(key);
   });
 
   it("returns several precipitation sources for rain", () => {
-    const keys = searchCatalog("lluvia").map((h) => h.variable.key);
+    const keys = searchCatalog("rain").map((h) => h.variable.key);
     expect(keys).toContain("merra2.PRECTOTCORR");
     expect(keys).toContain("imerg.precipitation");
     expect(searchCatalog("")).toEqual([]);
   });
 
   it("normalizes accents and case", () => {
-    expect(normalizeText("  Precipitación  TOTAL ")).toBe("precipitacion total");
+    expect(normalizeText("  Türkiye  TOTAL ")).toBe("turkiye total");
   });
 
   it("exposes a serializable public catalog", () => {
@@ -116,17 +125,25 @@ describe("catalog", () => {
 });
 
 describe("regions", () => {
-  it("resolves countries in English and Spanish", () => {
+  it("resolves countries by English name, alias or ISO code", () => {
     expect(searchRegions("Colombia")[0]?.region.iso2).toBe("CO");
-    expect(searchRegions("Brasil")[0]?.region.iso2).toBe("BR");
-    expect(searchRegions("Estados Unidos")[0]?.region.iso2).toBe("US");
+    expect(searchRegions("Brazil")[0]?.region.iso2).toBe("BR");
+    expect(searchRegions("United States")[0]?.region.iso2).toBe("US");
+    expect(searchRegions("USA")[0]?.region.iso2).toBe("US");
     expect(searchRegions("x")).toEqual([]);
+  });
+
+  it("shows English names only", () => {
+    for (const region of REGIONS) expect(Object.keys(region.names), region.id).toEqual(["en"]);
+    const names = countryOptions().map((r) => r.names.en);
+    expect(names).toContain("Spain");
+    expect(names).not.toContain("España");
   });
 
   it("finds the region mentioned in a question", () => {
     const found = findRegionsInText("Did near-surface air temperature in Colombia change between 2005 and 2025?");
     expect(found[0]?.iso2).toBe("CO");
-    expect(findRegionsInText("¿Llueve más en la cuenca amazónica?")[0]?.id).toBe("region:amazon");
+    expect(findRegionsInText("Is it raining more in the Amazon basin?")[0]?.id).toBe("region:amazon");
   });
 
   it("keeps antimeridian-crossing boxes with west > east", () => {

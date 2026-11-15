@@ -287,16 +287,31 @@ test("location modes: country list, custom coordinates and a sample place, all w
   await expect(globe).toBeFocused();
 });
 
-test("the assistant answers in Spanish and fills the setup as an editable proposal", async ({ page }) => {
+test("the assistant answers in English and fills the setup as an editable proposal", async ({ page }) => {
   await page.goto("/");
-  await page.getByTestId("assistant-input").fill("¿Ha cambiado la precipitación en Perú desde 2001?");
+  await page.getByTestId("assistant-input").fill("Has precipitation changed in Peru since 2001?");
   await page.getByTestId("investigate-button").click();
-  await expect(page.getByTestId("assistant-proposal")).toContainText(/Propuesta:/, { timeout: 60_000 });
+  await expect(page.getByTestId("assistant-proposal")).toContainText(/Proposal:/, { timeout: 60_000 });
   await page.getByTestId("apply-proposal").click();
   await expect(page.getByText("Selected: Peru", { exact: false })).toBeVisible();
   await expect(page.getByTestId("plan")).toBeVisible();
   await expect(page.getByTestId("plan-period")).toContainText("Jan 2001");
-  await expect(page.getByTestId("plan-question")).toHaveValue("¿Ha cambiado la precipitación en Perú desde 2001?");
+  await expect(page.getByTestId("plan-question")).toHaveValue("Has precipitation changed in Peru since 2001?");
+});
+
+test("a question in another language gets an English answer", async ({ page }) => {
+  // Spanish input on purpose: Cryonova is English-only (D-35) and must still reply in English.
+  await page.goto("/");
+  await page.getByTestId("assistant-input").fill("¿Ha cambiado la precipitación en Perú desde 2001?");
+  await page.getByTestId("investigate-button").click();
+  const card = page.getByTestId("assistant-proposal");
+  await expect(card).toContainText(/Proposal:/, { timeout: 60_000 });
+  await expect(card).toContainText("Which variable are you interested in?");
+  await expect(card).not.toContainText(/Propuesta|Puedes editar|Reglas|Pregunta/);
+  await page.getByTestId("apply-proposal").click();
+  await expect(page.getByText("Selected: Peru", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Español" })).toHaveCount(0);
+  await expectAccessible(page);
 });
 
 test("old links redirect: /investigate?q= asks the assistant on the workspace", async ({ page }) => {

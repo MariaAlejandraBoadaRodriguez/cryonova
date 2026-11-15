@@ -1,7 +1,7 @@
 /**
- * Catalog search over single words and phrases, in English and Spanish.
- * Matching is accent- and case-insensitive. Both languages are always searched;
- * the language only decides which names are shown.
+ * Catalog search over single words and phrases, in English (the platform is
+ * English-only, D-35).
+ * Matching is accent- and case-insensitive.
  */
 import { TOPICS, VARIABLES } from "./index";
 import type { CatalogVariable } from "./types";
@@ -42,14 +42,14 @@ export function searchCatalog(query: string, limit = 12): SearchHit[] {
       score += 10;
       matched.add(variable.dapName);
     }
-    for (const phrase of [...variable.phrases.en, ...variable.phrases.es]) {
+    for (const phrase of variable.phrases.en) {
       const p = normalizeText(phrase);
       if (q.includes(p) || (q.length >= 4 && p.includes(q))) {
         score += 6;
         matched.add(phrase);
       }
     }
-    for (const word of [...variable.words.en, ...variable.words.es]) {
+    for (const word of variable.words.en) {
       const w = normalizeText(word);
       if (queryTokens.has(w)) {
         score += 3;
@@ -59,15 +59,13 @@ export function searchCatalog(query: string, limit = 12): SearchHit[] {
         matched.add(word);
       }
     }
-    for (const name of [variable.name.en, variable.name.es]) {
-      if (q.length >= 4 && normalizeText(name).includes(q)) {
-        score += 4;
-        matched.add(name);
-      }
+    if (q.length >= 4 && normalizeText(variable.name.en).includes(q)) {
+      score += 4;
+      matched.add(variable.name.en);
     }
     for (const topic of TOPICS) {
       if (!topic.variables.includes(variable.key)) continue;
-      const topicTerms = [...topic.words.en, ...topic.words.es, ...topic.phrases.en, ...topic.phrases.es].map(normalizeText);
+      const topicTerms = [...topic.words.en, ...topic.phrases.en].map(normalizeText);
       if (topicTerms.some((t) => queryTokens.has(t) || q.includes(t))) {
         score += 2;
         matched.add(topic.title.en);
@@ -89,7 +87,7 @@ const SOURCE_WORDS: Record<string, string[]> = {
   gldas: ["gldas", "noah"],
   seawifs: ["seawifs"],
   era5: ["era5", "copernicus", "ecmwf"],
-  noaa: ["noaa", "ghcn", "gsom", "station", "stations", "estacion", "estaciones"],
+  noaa: ["noaa", "ghcn", "gsom", "station", "stations"],
   giovanni: ["giovanni", "harmony"],
 };
 

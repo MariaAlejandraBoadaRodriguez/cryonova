@@ -135,7 +135,7 @@ const TREND: TrendSummary = {
 function fixedVariable(trend: VariableResult["analysis"]["trend"] = TREND): VariableResult {
   return {
     key: "merra2.T2M",
-    name: { en: "Near-surface air temperature (2 m)", es: "Temperatura del aire (2 m)" },
+    name: { en: "Near-surface air temperature (2 m)" },
     unitGroup: "temperature",
     analysis: {
       units: "°C",
@@ -208,7 +208,7 @@ describe("evidence labels", () => {
     const result = syntheticResult();
     const facts = buildFacts(result);
     expect(facts.variables.find((v) => v.key === "merra2.T2M")?.evidence).toBe(EVIDENCE_LABEL.significant);
-    const rules = explainWithRules(result, "en");
+    const rules = explainWithRules(result);
     expect(rules.verification.unverified).toEqual([]);
     expect(rules.verification.checked).toBeGreaterThan(5);
   });

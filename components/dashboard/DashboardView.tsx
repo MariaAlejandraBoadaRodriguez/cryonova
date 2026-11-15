@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Explanation } from "@/src/agent/explain";
 import type { StoredExplanations } from "@/src/agent/explain-service";
-import { detectLanguage } from "@/src/agent/language";
+import { englishSummary } from "@/src/agent/stored-explanations";
 import type { RunResult, VariableResult } from "@/src/jobs/types";
 import { fmtMonth, fmtUtc } from "@/src/lib/format";
 import { setupHref } from "@/src/plan/url";
@@ -39,12 +39,13 @@ export type DashboardMode =
 type InvestigationExplanation = { summary?: Explanation; summaries?: Record<string, Explanation> };
 
 function SavedInterpretation({ explanation }: { explanation: InvestigationExplanation | null }) {
-  const e = (explanation?.summaries?.en ?? explanation?.summary ?? Object.values(explanation?.summaries ?? {})[0] ?? null) as Explanation | null;
+  // English only (D-35): an older snapshot whose only summary is in another language shows the note below.
+  const e = englishSummary(explanation);
   if (!e?.sections) {
     return (
       <section className="card" aria-labelledby="saved-explain">
         <h3 id="saved-explain">Interpretation</h3>
-        <p className="muted">No interpretation was saved with this investigation. The charts and tables are the complete result.</p>
+        <p className="muted">No interpretation in English was saved with this investigation. The charts and tables are the complete result.</p>
       </section>
     );
   }
@@ -156,7 +157,7 @@ export function DashboardView({ result, question, mode }: { result: RunResult; q
       ))}
 
       {mode.kind === "live" ? (
-        <ExplanationPanel key={mode.runId} runId={mode.runId} initialLanguage={detectLanguage(question ?? "")} stored={mode.stored} />
+        <ExplanationPanel key={mode.runId} runId={mode.runId} stored={mode.stored} />
       ) : (
         <SavedInterpretation explanation={mode.explanation} />
       )}
