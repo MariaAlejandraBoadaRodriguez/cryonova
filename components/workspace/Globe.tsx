@@ -16,7 +16,7 @@
  * same choices as lists and coordinate fields.
  */
 import { geoBounds, geoCentroid, geoContains, geoOrthographic, geoPath, type GeoPermissibleObjects } from "d3-geo";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { feature, mesh } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import topology from "world-atlas/countries-110m.json";
@@ -217,6 +217,7 @@ export function Globe(props: GlobeProps) {
   const { activeCountryNumeric, activeBox, drawing, showOutlines, markers, focusKey, onPickCountry, onDrawBox, onPickMarker } = props;
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const helpId = useId();
   const [size, setSize] = useState(520);
   const [center, setCenter] = useState<[number, number]>(HOME);
   const [zoom, setZoom] = useState(1);
@@ -519,7 +520,8 @@ export function Globe(props: GlobeProps) {
           tabIndex={0}
           role="application"
           aria-roledescription="interactive globe"
-          aria-label="Interactive globe. Arrow keys rotate, plus and minus zoom. Click a country to select it, or use Draw a custom area to drag a rectangle. The setup column offers the same choices as a list and coordinate fields."
+          aria-label="Choose a location"
+          aria-describedby={helpId}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -532,6 +534,10 @@ export function Globe(props: GlobeProps) {
           onPointerLeave={() => setHover(null)}
           onKeyDown={onKeyDown}
         />
+        <span className="visually-hidden" id={helpId}>
+          Drag to rotate, scroll or pinch to zoom, and click a country to select it. Arrow keys rotate and the plus and minus keys zoom. To set a custom area, use Draw a custom area and drag a
+          rectangle; Esc cancels. The setup column offers the same choices as a list and coordinate fields.
+        </span>
         {pins.map(({ marker, x, y, visible }) => (
           <button key={marker.id} type="button" className="globe-pin" hidden={!visible} style={{ left: x, top: y }} onClick={() => onPickMarker(marker)} aria-label={`Select ${marker.label}`}>
             {marker.label}
