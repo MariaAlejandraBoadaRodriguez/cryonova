@@ -109,12 +109,12 @@ export function suggestQuestion(draft: PlanDraft): string | null {
   return `Did ${subject} in ${location.mode === "custom" ? "the selected area" : location.label} change between ${draft.start.slice(0, 4)} and ${draft.end.slice(0, 4)}?`;
 }
 
-const INTERROGATIVE = /^(¿|did|does|do|has|have|is|are|was|were|how|what|which|when|where|why|can|could|will|ha|han|hay|es|son|está|están|cómo|qué|cuál|cuánto|cuánta|dónde|por qué|cuándo)\b/i;
+const INTERROGATIVE = /^(did|does|do|has|have|is|are|was|were|how|what|which|when|where|why|can|could|will)\b/i;
 
 /** True for text that reads as a research question rather than a short reply ("Colombia", "use rain instead"). */
 export function looksLikeQuestion(text: string): boolean {
   const t = text.trim();
-  return t.length >= 12 && (t.endsWith("?") || t.startsWith("¿") || INTERROGATIVE.test(t));
+  return t.length >= 12 && (t.endsWith("?") || INTERROGATIVE.test(t));
 }
 
 function completeYears(start: string, end: string): number {

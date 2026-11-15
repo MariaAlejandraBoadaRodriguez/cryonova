@@ -83,8 +83,8 @@ describe("investigation plan", () => {
     expect(suggestQuestion(EXAMPLE)).toBe("Did near-surface air temperature (2 m) in Colombia change between 2005 and 2024?");
   });
 
-  it("tells research questions from short replies in English and Spanish", () => {
-    expect(looksLikeQuestion("¿Ha cambiado la lluvia en Perú?")).toBe(true);
+  it("tells research questions from short replies", () => {
+    expect(looksLikeQuestion("Has rainfall changed in Peru?")).toBe(true);
     expect(looksLikeQuestion("How has rainfall changed in Peru")).toBe(true);
     expect(looksLikeQuestion("Colombia")).toBe(false);
     expect(looksLikeQuestion("use rain instead")).toBe(false);

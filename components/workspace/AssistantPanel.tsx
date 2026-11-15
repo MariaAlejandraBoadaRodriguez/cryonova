@@ -1,6 +1,6 @@
 "use client";
 
-/** Center top: the research assistant. Questions in English or Spanish; replies fill the setup as an editable proposal. */
+/** Center top: the research assistant. Replies are in English and fill the setup as an editable proposal. */
 import { useEffect, useId, useRef } from "react";
 
 export interface ThreadMessage {
@@ -57,7 +57,7 @@ export function AssistantPanel({ value, asking, thread, contextLine, onChange, o
           </div>
         </form>
         <p className="ws-hint ws-context" id={`${id}-help`}>
-          English or Spanish. {contextLine ? <>The assistant sees your setup: {contextLine}.</> : "The assistant proposes variables, a period and a location; you review and edit them."}
+          {contextLine ? <>The assistant sees your setup: {contextLine}.</> : "The assistant proposes variables, a period and a location; you review and edit them."}
         </p>
         {asking && (
           <p className="ws-hint" role="status">
