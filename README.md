@@ -2,11 +2,16 @@
 
 AI-assisted Earth system trend research (NASA Space Apps 2026 · Earth System Trend Detective).
 
-Cryonova turns questions into reproducible analyses of **live NASA data**. Teachers and students pick a
-region, a period and one or many variables (or ask a question in English or Spanish), and Cryonova queries
-the provider at that moment, computes regional series, trends with uncertainty and climate diagnostics, explains
-the charts with every cited figure verified, and saves the investigation under a random code that anyone can
-reopen without an account. CSV and PDF exports come from the same stored result.
+Cryonova turns questions into reproducible analyses of **live NASA data**. In a three-column workspace,
+teachers and students ask a question in English or Spanish (the assistant fills the setup as an editable
+proposal), or pick variables, a period and a country or custom area on an interactive globe. The plan on the
+right lists the analyses and checks data sufficiency; "Start analysis" queries the provider at that moment and
+opens a results dashboard with trends and uncertainty, climate diagnostics, an interpretation whose cited figures
+are verified, and provenance. Investigations are saved under a random code that anyone can reopen read-only
+without an account, and CSV and PDF exports come from the same stored result.
+
+- Workspace: `/` · results: `/investigations/{runId}` · reopen by code: `/open` · sources: `/sources`
+- Visual reference and original catalog: `docs/design/prototype/cryonova-earth-trend-detective.html`
 
 - Production: https://cryonova-maria-alejandra-boada-rodriguezs-projects.vercel.app (see `docs/runbooks/access-matrix.md` for the access-protection status)
 - Evidence of live reads: `docs/benchmarks/live-reads.md`
@@ -17,12 +22,13 @@ reopen without an account. CSV and PDF exports come from the same stored result.
 
 | Capability | Where |
 |---|---|
-| Map (draw/edit/delete a rectangle, antimeridian-aware), region by name (EN/ES gazetteer), coordinates, month/year period, catalog with single- or multi-variable selection and removable tags | `components/RegionPicker.tsx`, `components/MapSelector.tsx`, `components/VariablePicker.tsx`, `src/catalog/` |
-| Research agent: question → editable proposal (variables, region, period) using catalog, gazetteer and live coverage tools; rule-based fallback | `src/agent/planner.ts`, `src/agent/fallback.ts`, `app/api/agent/plan` |
+| Workspace: setup rail (original 22-topic catalog plus verified extensions, searchable, removable tags, derived series), period with archive coverage and suggested period, country/territory or custom area; assistant; globe; guide that becomes the investigation plan | `components/workspace/`, `src/plan/`, `src/catalog/` |
+| Interactive globe: Blue Marble texture served by the app, d3-geo + world-atlas bundled (no CDN), drag/zoom/click country/draw rectangle, keyboard and list alternatives | `components/workspace/Globe.tsx` |
+| Research agent: question (+ current setup and earlier turns) → editable proposal (variables, region, period) using catalog, gazetteer and live coverage tools; rule-based fallback | `src/agent/planner.ts`, `src/agent/fallback.ts`, `app/api/agent/plan` |
 | Live queries: CMR discovery + Cloud OPeNDAP DAP2 subsets, cosine-latitude weighted regional means, durable resumable jobs with cancellation | `src/providers/`, `src/jobs/runner.ts`, `app/api/runs` |
-| Statistics: OLS trend on complete-year means with Newey–West HAC (1 lag), seasonal cycle, anomalies, ranking, period comparison (Welch), seasonal trends, streaks, Benjamini–Hochberg discovery | `src/analytics/` (parity with statsmodels in `analytics/`) |
+| Statistics: OLS trend on complete-year means with Newey–West HAC (1 lag), seasonal cycle, anomalies, ranking, period comparison (Welch), seasonal trends, streaks, Benjamini–Hochberg discovery; derived series (differences, wind-vector magnitudes) | `src/analytics/`, `src/catalog/derived.ts` (parity with statsmodels in `analytics/`) |
 | Interpretation in the user's language with numeric citation check | `src/agent/explain.ts`, `src/agent/verify.ts` |
-| Save to Neon and reopen by code (hashed, throttled), refresh with live data | `src/db/investigations.ts`, `components/OpenWithCode.tsx` |
+| Results dashboard (live progress, headline finding, analyses, comparison table, interpretation, provenance, save, CSV/PDF, refresh, back to setup); reopen by code on the same dashboard, read-only | `components/dashboard/`, `src/db/investigations.ts` |
 | CSV (results, monthly series) and vector PDF report | `src/reports/` , `app/api/exports` |
 | Connector status (live probes) | `src/providers/status.ts`, `/sources`, `/api/connectors/status` |
 
@@ -30,7 +36,7 @@ reopen without an account. CSV and PDF exports come from the same stored result.
 
 ```mermaid
 flowchart TD
-  Browser["Browser (Next.js UI, Leaflet, Plotly)"] --> Web["Next.js route handlers on Vercel"]
+  Browser["Browser (Next.js UI, canvas globe with d3-geo, Plotly)"] --> Web["Next.js route handlers on Vercel"]
   Web -->|"tool loop, explanations"| Claude["Claude API (server only)"]
   Web -->|"runs, reads, investigations, AI usage"| Neon["Neon PostgreSQL (Drizzle, SQL migrations)"]
   Web -->|"after(): durable executor, 6 workers"| Runner["Run executor (leases, per-month rows, budgets)"]
@@ -84,7 +90,8 @@ logged, or committed (`scripts/check-secrets.sh` runs in CI).
 |---|---|
 | `npm run lint`, `npm run typecheck` | ESLint 9, TypeScript 5.9 |
 | `npm test`, `npm run test:coverage` | Vitest unit tests; coverage gate 80% lines / 75% branches on critical modules |
-| `npm run test:e2e` | Playwright (desktop + mobile, axe); `LIVE_E2E=1` adds live provider journeys |
+| `npm run test:e2e` | Playwright (desktop + mobile, axe, same-origin check); `LIVE_E2E=1` adds the live journey (Start analysis → dashboard → save → reopen by code → CSV/PDF) |
+| `npm run catalog:verify -- --report docs/benchmarks/catalog-verification.md` | Checks every catalog variable against the live OPeNDAP DDS/DAS (add `--inventory` to list all fields) |
 | `python -m pytest analytics/tests` | statsmodels/scipy reference and fixture reproducibility |
 | `npm run db:generate` / `npm run db:migrate` | Drizzle migration generation / application (`-- --database NAME --create-database` for a test DB) |
 | `npm run smoke:live -- --start 2005-01 --end 2024-12` | One real investigation through the executor (add `--neon` to persist) |
@@ -102,4 +109,6 @@ PR → CI green (`.github/workflows/ci.yml`) → preview `/api/health?deep=ai` h
 
 MERRA-2 (GMAO/GES DISC, doi:10.5067/AP1B0BA5PD2K and sibling collections) and GPM IMERG V07
 (doi:10.5067/GPM/IMERG/3B-MONTH/07), accessed live through NASA Earthdata CMR and Cloud OPeNDAP. Country
-boxes from Natural Earth (public domain) via `world-atlas`. Map tiles © OpenStreetMap contributors.
+boxes and borders from Natural Earth (public domain) via `world-atlas`. Globe texture: NASA Visible Earth Blue
+Marble (public domain), from the `three-globe` package (MIT). NASA Space Apps Challenge logo, detective artwork
+and orbit pattern come from the approved prototype.
