@@ -33,14 +33,21 @@ export async function explainRun(input: { runId: string; clientKey: string; lang
   const cached = stored.summaries?.[language] ?? (stored.summary?.language === language ? stored.summary : undefined);
   if (!input.followUp && cached && cached.chart === chart) return { ok: true, explanation: cached };
 
-  const fallback = (status: string): Explanation => ({ ...explainWithRules(result, language, chart), followUp: input.followUp ?? null, aiStatus: status });
+  // Follow-ups get a rule-based answer about the selected chart; summaries get the rule-based sections.
+  const automatic = input.followUp ? "this automatic answer is built from the selected chart's data" : "showing an automatic explanation built from the results";
+  const fallback = (status: string, aiError?: string): Explanation => ({
+    ...explainWithRules(result, language, chart, input.followUp),
+    followUp: input.followUp ?? null,
+    aiStatus: status,
+    ...(aiError ? { aiError } : {}),
+  });
   let explanation: Explanation;
   if (!config.anthropicKey) {
-    explanation = fallback("AI is not configured on this deployment; showing an automatic explanation built from the results.");
+    explanation = fallback(`AI is not configured on this deployment; ${automatic}.`);
   } else {
     const quota = await checkAiQuota(input.clientKey);
     if (!quota.allowed) {
-      explanation = fallback(`${quota.reason}; showing an automatic explanation built from the results.`);
+      explanation = fallback(`${quota.reason}; ${automatic}.`);
     } else {
       const started = Date.now();
       const kind = input.followUp ? "ask" : "explain";
@@ -60,12 +67,10 @@ export async function explainRun(input: { runId: string; clientKey: string; lang
         const { reason, message } = describeAgentError(error);
         const usage = (error as { usage?: ReturnType<typeof emptyUsage> }).usage ?? emptyUsage();
         await recordAiUsage({ kind, model: config.anthropicModel, usage, ok: false, latencyMs: Date.now() - started, error: reason, runId: run.id, clientKey: input.clientKey });
-        explanation = fallback(`${message} Showing an automatic explanation built from the results.`);
+        logger.warn("agent.explain.failed", { runId: run.id, kind, chart, reason });
+        explanation = fallback(`${message} ${automatic.charAt(0).toUpperCase()}${automatic.slice(1)}.`, message);
       }
     }
-  }
-  if (input.followUp && explanation.source === "rules" && !explanation.answer) {
-    explanation = { ...explanation, sections: null, answer: `${explanation.aiStatus ?? "AI is unavailable."} Free-form questions need the AI assistant; the interpretation above and the tables answer the main points.` };
   }
   const next: StoredExplanations = input.followUp
     ? { ...stored, followUps: [...(stored.followUps ?? []), explanation].slice(-10) }
