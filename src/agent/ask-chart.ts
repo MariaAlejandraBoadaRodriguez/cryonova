@@ -47,11 +47,13 @@ export interface AskRequest {
 
 type ProblemBody = { error?: { title?: string; detail?: string } } | null;
 
+const sentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`);
+
 /** A readable message for a failed request; the dashboard stays usable either way. */
 export function askErrorMessage(status: number, body: ProblemBody): string {
   const title = body?.error?.title;
   const detail = body?.error?.detail;
-  if (title || detail) return [title, detail].filter(Boolean).join(": ");
+  if (title || detail) return sentence([title, detail].filter(Boolean).join(": "));
   if (status === 504 || status === 408) return "The answer took too long to arrive.";
   if (status >= 500) return `The server could not produce an answer (HTTP ${status}).`;
   return `The question was not accepted (HTTP ${status}).`;
