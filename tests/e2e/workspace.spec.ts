@@ -114,6 +114,7 @@ test("the assistant answers in Spanish and fills the setup as an editable propos
   await page.getByTestId("assistant-input").fill("¿Ha cambiado la precipitación en Perú desde 2001?");
   await page.getByTestId("investigate-button").click();
   await expect(page.getByTestId("assistant-proposal")).toContainText(/Propuesta:/, { timeout: 60_000 });
+  await page.getByTestId("apply-proposal").click();
   await expect(page.getByText("Selected: Peru", { exact: false })).toBeVisible();
   await expect(page.getByTestId("plan")).toBeVisible();
   await expect(page.getByTestId("plan-period")).toContainText("Jan 2001");
@@ -124,7 +125,26 @@ test("old links redirect: /investigate?q= asks the assistant on the workspace", 
   await page.goto(`/investigate?q=${encodeURIComponent("Is it getting warmer in Chile since 2001?")}`);
   await expect(page).toHaveURL(/\/\?q=/);
   await expect(page.getByTestId("assistant-proposal")).toContainText(/Proposal:/, { timeout: 60_000 });
+  await page.getByTestId("apply-proposal").click();
   await expect(page.getByText("Selected: Chile", { exact: false })).toBeVisible();
+});
+
+test("a proposal never overwrites the dates in the setup unless it is applied", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("use-example").click();
+  const period = page.getByTestId("plan-period");
+  await expect(period).toContainText("Jan 2005");
+
+  await page.getByTestId("assistant-input").fill("What about since 2015?");
+  await page.getByTestId("assistant-input").press("Enter");
+  await expect(page.getByTestId("assistant-proposal")).toContainText("Jan 2015", { timeout: 60_000 });
+  // Shown, not applied: the period in the setup and the plan stays as it was.
+  await expect(period).toContainText("Jan 2005");
+  await expect(period).not.toContainText("Jan 2015");
+
+  await page.getByTestId("apply-proposal").click();
+  await expect(period).toContainText("Jan 2015");
+  await expect(page.getByTestId("plan-location")).toContainText("Colombia");
 });
 
 test("the proposal is a readable card in the right panel; the center keeps the question and the globe", async ({ page }) => {
@@ -146,6 +166,14 @@ test("the proposal is a readable card in the right panel; the center keeps the q
   await expect(center).not.toContainText("Proposal:");
   await expect(center.getByRole("link", { name: "Review the proposal" })).toHaveAttribute("href", "#assistant-proposal");
   await expect(page.getByTestId("assistant-input")).toHaveValue("");
+
+  // Nothing changes until the proposal is applied.
+  await expect(page.getByTestId("proposal-status")).toHaveText("Nothing on the left changes until you apply it.");
+  await expect(page.getByText("No location selected yet.")).toBeVisible();
+  await expect(page.getByTestId("plan")).toHaveCount(0);
+  await page.getByTestId("apply-proposal").click();
+  await expect(page.getByTestId("proposal-status")).toHaveText("Applied to the setup and the plan.");
+  await expect(page.getByText("Selected: Colombia", { exact: false })).toBeVisible();
   await expect(page.getByTestId("plan")).toBeVisible();
   await expectAccessible(page);
   await card.scrollIntoViewIfNeeded();
@@ -205,7 +233,8 @@ test("long questions: the question grows to four lines, Shift+Enter adds a line,
   await expect(input).toHaveValue("");
   expect(await input.evaluate(visibleLines)).toBeCloseTo(initial, 1);
 
-  // The plan's question shows the whole text, without an inner scrollbar.
+  // Once applied, the plan's question shows the whole text, without an inner scrollbar.
+  await page.getByTestId("apply-proposal").click();
   const planQuestion = page.getByTestId("plan-question");
   await expect(planQuestion).toHaveValue(LONG_QUESTION);
   expect(await planQuestion.evaluate((el) => el.scrollHeight <= el.clientHeight + 1)).toBe(true);
