@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/", label: "New investigation" },
   { href: "/open", label: "Open with code" },
   { href: "/sources", label: "Data sources" },
+  { href: "/catalog", label: "Catalog" },
 ];
 
 export function SiteNav() {
