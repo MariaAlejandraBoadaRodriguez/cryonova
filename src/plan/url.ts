@@ -4,6 +4,7 @@
  * Parsing only accepts catalog variables, gazetteer regions and valid boxes.
  */
 import { getVariable } from "@/src/catalog";
+import { getDerived } from "@/src/catalog/derived";
 import { getRegion } from "@/src/catalog/regions";
 import type { Selection } from "@/src/jobs/selection";
 import { validateBBox } from "@/src/providers/grid";
@@ -11,12 +12,13 @@ import type { PlanDraft } from "./plan";
 
 const YM = /^\d{4}-(0[1-9]|1[0-2])$/;
 
-type SetupSource = Pick<Selection, "variables" | "start" | "end" | "region"> & { question?: string | null };
+type SetupSource = Pick<Selection, "variables" | "start" | "end" | "region" | "derived"> & { question?: string | null };
 
 export function setupHref(selection: SetupSource): string {
   const params = new URLSearchParams();
   if (selection.question) params.set("q", selection.question.slice(0, 600));
   params.set("vars", selection.variables.join(","));
+  if (selection.derived && selection.derived.length > 0) params.set("derived", selection.derived.join(","));
   params.set("start", selection.start);
   params.set("end", selection.end);
   const regionId = selection.region.regionId;
@@ -47,5 +49,6 @@ export function draftFromParams(params: Record<string, string | string[] | undef
       if (!validateBBox(bbox)) location = { mode: "custom", regionId: null, customBBox: bbox };
     }
   }
-  return { question: (one("q") ?? "").slice(0, 600), variables, start, end, location };
+  const derived = [...new Set((one("derived") ?? "").split(",").map((k) => k.trim()))].filter((k) => getDerived(k)?.inputs.every((input) => variables.includes(input)));
+  return { question: (one("q") ?? "").slice(0, 600), variables, derived, start, end, location };
 }

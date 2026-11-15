@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Proposal } from "@/src/agent/proposal";
 import { getVariable, TOPICS } from "@/src/catalog";
+import { getDerived } from "@/src/catalog/derived";
 import { type BBox, getRegion, regionByNumeric } from "@/src/catalog/regions";
 import type { PublicRun } from "@/src/jobs/service";
 import { fmtBBox, fmtMonth } from "@/src/lib/format";
@@ -22,12 +23,22 @@ import { SetupPanel } from "./SetupPanel";
 
 export function emptyDraft(): PlanDraft {
   const last = lastCompleteYear();
-  return { question: "", variables: [], start: `${last - 19}-01`, end: `${last}-12`, location: { mode: "country", regionId: null, customBBox: null } };
+  return { question: "", variables: [], derived: [], start: `${last - 19}-01`, end: `${last}-12`, location: { mode: "country", regionId: null, customBBox: null } };
 }
 
 function matchTopic(variables: string[]): string {
   const topic = TOPICS.find((t) => t.variables.length === variables.length && t.variables.every((k) => variables.includes(k)));
   return topic?.id ?? "";
+}
+
+/**
+ * Derived series after the variables change: keep the chosen ones whose inputs
+ * are still selected and add those of a topic the selection now matches.
+ */
+function reconcileDerived(variables: string[], previous: string[]): string[] {
+  const kept = previous.filter((key) => getDerived(key)?.inputs.every((k) => variables.includes(k)));
+  const topic = TOPICS.find((t) => t.id === matchTopic(variables));
+  return [...new Set([...kept, ...(topic?.derived ?? [])])];
 }
 
 const MONTHS_ES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -123,7 +134,7 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
 
   const useExample = useCallback(
     (example: ExampleInvestigation) => {
-      applyDraft({ question: example.question, variables: [...example.variables], start: example.start, end: example.end, location: { ...example.location } });
+      applyDraft({ question: example.question, variables: [...example.variables], derived: reconcileDerived(example.variables, example.derived), start: example.start, end: example.end, location: { ...example.location } });
       setThread((t) => [...t, { id: crypto.randomUUID(), role: "assistant", text: `Loaded “${example.question}”. Edit anything on the left, then review the plan and press Start analysis.`, badge: "Example" }]);
     },
     [applyDraft],
@@ -162,7 +173,8 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
           let nextLocation = d.location;
           if (sel.region?.regionId && getRegion(sel.region.regionId)) nextLocation = { mode: "country", regionId: sel.region.regionId, customBBox: d.location.customBBox };
           else if (sel.region?.bbox) nextLocation = { mode: "custom", regionId: d.location.regionId, customBBox: sel.region.bbox as BBox };
-          const next: PlanDraft = { ...d, variables: sel.variables.length > 0 ? sel.variables : d.variables, start: sel.start, end: sel.end, location: nextLocation };
+          const variables = sel.variables.length > 0 ? sel.variables : d.variables;
+          const next: PlanDraft = { ...d, variables, derived: reconcileDerived(variables, d.derived), start: sel.start, end: sel.end, location: nextLocation };
           const restated = proposal.source === "ai" && sel.question ? sel.question : looksLikeQuestion(question) ? question : (suggestQuestion(next) ?? d.question);
           return { ...next, question: restated };
         });
@@ -244,13 +256,14 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
           const topic = TOPICS.find((t) => t.id === id);
           if (!topic) return;
           const period = suggestedPeriod(topic.variables);
-          update({ variables: [...topic.variables], start: period.start, end: period.end });
+          update({ variables: [...topic.variables], derived: [...topic.derived], start: period.start, end: period.end });
           setPeriodTouched(true);
         }}
         onVariables={(variables) => {
-          update({ variables });
+          setDraft((d) => ({ ...d, variables, derived: reconcileDerived(variables, d.derived) }));
           setTopicId(matchTopic(variables));
         }}
+        onDerived={(derived) => update({ derived })}
         onPeriod={(start, end) => {
           update({ start, end });
           setPeriodTouched(true);

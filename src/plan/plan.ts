@@ -5,6 +5,7 @@
  */
 import { monthsBetween } from "@/src/analytics/series";
 import { collectionOf, getCollection, getVariable, TOPICS } from "@/src/catalog";
+import { getDerived } from "@/src/catalog/derived";
 import { type BBox, getRegion } from "@/src/catalog/regions";
 import { groupByCollection, MAX_PROVIDER_READS, type Selection, SelectionSchema } from "@/src/jobs/selection";
 import { fmtBBox, fmtMonth } from "@/src/lib/format";
@@ -21,6 +22,8 @@ export interface LocationState {
 export interface PlanDraft {
   question: string;
   variables: string[];
+  /** Derived series (differences, wind-vector magnitudes) computed from the selected variables. */
+  derived: string[];
   start: string;
   end: string;
   location: LocationState;
@@ -38,6 +41,7 @@ export interface Plan {
   period: { start: string; end: string; months: number; years: number; completeYears: number; label: string };
   location: { label: string; bbox: BBox; mode: LocationMode; detail: string } | null;
   variables: Array<{ key: string; name: string; product: string; source: string; units: string; coverage: string; domain: string }>;
+  derived: Array<{ key: string; name: string; formula: string; units: string }>;
   analyses: { primary: string; additional: string[] };
   checks: PlanCheck[];
   reads: number;
@@ -76,10 +80,18 @@ export function sharedCoverage(variables: string[], now = new Date()): { start: 
   return { start, end };
 }
 
+/** The topic matching the variables exactly, else the smallest topic that contains all of them. */
+export function topicFor(variables: string[]): (typeof TOPICS)[number] | undefined {
+  if (variables.length === 0) return undefined;
+  const exact = TOPICS.find((t) => t.variables.length === variables.length && variables.every((k) => t.variables.includes(k)));
+  if (exact) return exact;
+  return TOPICS.filter((t) => variables.every((k) => t.variables.includes(k))).sort((a, b) => a.variables.length - b.variables.length)[0];
+}
+
 /** Topic period when every variable shares a topic, else the last 20 complete years inside coverage. */
 export function suggestedPeriod(variables: string[], now = new Date()): { start: string; end: string } {
   const coverage = sharedCoverage(variables, now);
-  const topic = TOPICS.find((t) => variables.length > 0 && variables.every((k) => t.variables.includes(k)));
+  const topic = topicFor(variables);
   let end = `${lastCompleteYear(now)}-12`;
   if (coverage.end < end) end = `${Number(coverage.end.slice(0, 4)) - (coverage.end.endsWith("-12") ? 0 : 1)}-12`;
   let start = topic ? topic.suggestedPeriod.start : `${Number(end.slice(0, 4)) - 19}-01`;
@@ -133,6 +145,11 @@ export function buildPlan(draft: PlanDraft): Plan {
     });
   if (variables.length === 0) blockers.push("Choose at least one variable.");
 
+  const derived = draft.derived
+    .map((key) => getDerived(key))
+    .filter((d) => d !== undefined && d.inputs.every((k) => draft.variables.includes(k)))
+    .map((d) => ({ key: d!.key, name: d!.name.en, formula: d!.formula, units: d!.display.units }));
+
   const location = activeLocation(draft.location);
   if (!location) blockers.push(draft.location.mode === "country" ? "Choose a country or territory, or switch to a custom area." : "Draw or type the custom area.");
 
@@ -143,7 +160,13 @@ export function buildPlan(draft: PlanDraft): Plan {
   else if (months < 12) blockers.push("Choose at least 12 months.");
 
   const coverage = sharedCoverage(draft.variables);
-  if (variables.length > 0) checks.push({ level: "info", text: `Archive coverage for the selected variables: ${fmtMonth(coverage.start)} – ${fmtMonth(coverage.end)}.` });
+  const ongoing = draft.variables.every((k) => {
+    const v = getVariable(k);
+    return !v || collectionOf(v).temporal.end === null;
+  });
+  if (variables.length > 0) {
+    checks.push({ level: "info", text: `Archive coverage for the selected variables: ${fmtMonth(coverage.start)} – ${ongoing ? "ongoing (latest month NASA has published)" : fmtMonth(coverage.end)}.` });
+  }
   if (validPeriod && months >= 12) {
     if (complete < MIN_TREND_YEARS) checks.push({ level: "warn", text: `Only ${complete} complete calendar years: the annual trend needs at least ${MIN_TREND_YEARS}. Extend the period or use the suggested one.` });
     else checks.push({ level: "ok", text: `${complete} complete years: enough for the annual trend and seasonal trends.` });
@@ -174,6 +197,7 @@ export function buildPlan(draft: PlanDraft): Plan {
       start: draft.start,
       end: draft.end,
       variables: draft.variables,
+      ...(derived.length > 0 ? { derived: derived.map((d) => d.key) } : {}),
       mode: draft.variables.length > 2 ? "discovery" : "manual",
     });
     if (parsed.success) selection = parsed.data;
@@ -188,7 +212,9 @@ export function buildPlan(draft: PlanDraft): Plan {
     "Period comparison: first vs second half (Welch t-test)",
     "Annual ranking and runs of positive anomalies",
   ];
-  if (variables.length > 1) additional.push(`Benjamini–Hochberg multiple-comparison correction across ${variables.length} trends`);
+  for (const d of derived) additional.push(`Derived series ${d.formula} (${d.name.toLowerCase()}), from the regional monthly means`);
+  const trends = variables.length + derived.length;
+  if (trends > 1) additional.push(`Benjamini–Hochberg multiple-comparison correction across ${trends} trends`);
 
   return {
     ready: blockers.length === 0 && selection !== null,
@@ -197,6 +223,7 @@ export function buildPlan(draft: PlanDraft): Plan {
     period: { start: draft.start, end: draft.end, months, years: Math.round((months / 12) * 10) / 10, completeYears: complete, label: validPeriod ? `${fmtMonth(draft.start)} → ${fmtMonth(draft.end)}` : "—" },
     location,
     variables,
+    derived,
     analyses: { primary: "Annual trend: OLS on complete-year means with Newey–West HAC uncertainty (1 lag); slope per decade with 95% CI", additional },
     checks,
     reads,
