@@ -5,6 +5,7 @@
  */
 import { discover } from "@/src/analytics/discovery";
 import type { RunResult } from "@/src/jobs/types";
+import { EVIDENCE_NAME, NO_CLEAR_TREND_NOTE } from "./narrative";
 
 function cell(value: unknown): string {
   if (value === null || value === undefined) return "";
@@ -36,7 +37,11 @@ export function resultsCsv(result: RunResult, ids: { investigationId?: string | 
   const discovery = discover(result);
   const lines = header(result, "results table", ids);
   lines.push(
-    row(["variable_key", "variable_name", "product", "slope_per_decade", "slope_units", "ci95_low", "ci95_high", "p_value", "q_value_bh", "evidence", "complete_years", "first_year", "last_year", "fitted_change", "value_units", "period_mean", "months_valid", "months_requested", "mean_valid_cell_percent", "status"]),
+    `# evidence: "${EVIDENCE_NAME.significant}" = the 95% interval excludes zero (and the trend stays significant after the Benjamini-Hochberg correction when several trends are compared); "${EVIDENCE_NAME.nominal}" = the interval excludes zero but not after the correction; "${EVIDENCE_NAME.inconclusive}" = the interval includes zero; "${EVIDENCE_NAME.insufficient}" = too few complete years for a trend; evidence_level is the stable code`,
+    `# ${NO_CLEAR_TREND_NOTE}`,
+  );
+  lines.push(
+    row(["variable_key", "variable_name", "product", "slope_per_decade", "slope_units", "ci95_low", "ci95_high", "p_value", "q_value_bh", "evidence", "complete_years", "first_year", "last_year", "fitted_change", "value_units", "period_mean", "months_valid", "months_requested", "mean_valid_cell_percent", "status", "evidence_level"]),
   );
   for (const r of discovery.rows) {
     const v = result.variables.find((x) => x.key === r.key)!;
@@ -44,10 +49,11 @@ export function resultsCsv(result: RunResult, ids: { investigationId?: string | 
     const cov = v.analysis.coverage;
     lines.push(
       row([
-        r.key, r.name, r.product, r.slopePerDecade, r.trendUnits, r.ci95?.[0], r.ci95?.[1], r.pValue, r.qValue, r.evidence, r.n,
+        r.key, r.name, r.product, r.slopePerDecade, r.trendUnits, r.ci95?.[0], r.ci95?.[1], r.pValue, r.qValue, EVIDENCE_NAME[r.evidence], r.n,
         t.status === "ok" ? t.firstYear : null, t.status === "ok" ? t.lastYear : null, t.status === "ok" ? t.totalChange : null, r.units,
         v.analysis.stats.mean, cov.monthsValid, cov.requestedMonths, cov.meanValidCellFraction === null ? null : cov.meanValidCellFraction * 100,
         t.status === "ok" ? "ok" : `insufficient: ${t.reason}`,
+        r.evidence,
       ]),
     );
   }

@@ -17,7 +17,8 @@ import { subscribeAddVariable } from "@/src/lib/catalog-bridge";
 import { fmtBBox, fmtMonth } from "@/src/lib/format";
 import { type ExampleInvestigation, samplePlaces } from "@/src/plan/examples";
 import { activeLocation, addVariable, buildPlan, keepDerived, lastCompleteYear, type LocationState, looksLikeQuestion, type PlanDraft, suggestedPeriod, suggestQuestion } from "@/src/plan/plan";
-import { AssistantPanel, type ThreadMessage } from "./AssistantPanel";
+import { AssistantPanel } from "./AssistantPanel";
+import { AssistantProposal, type ThreadMessage } from "./AssistantProposal";
 import { Globe, type GlobeMarker } from "./Globe";
 import { GuidePanel, type ProgressItem } from "./GuidePanel";
 import { SetupPanel } from "./SetupPanel";
@@ -81,6 +82,12 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
   const [ask, setAsk] = useState(initialDraft ? "" : initialQuestion);
   const [asking, setAsking] = useState(false);
   const [thread, setThread] = useState<ThreadMessage[]>([]);
+  // The latest assistant turn (card in the right panel); the center only acknowledges it or shows an error.
+  const [reply, setReply] = useState<ThreadMessage[]>([]);
+  const [answered, setAnswered] = useState(false);
+  const [askError, setAskError] = useState<string | null>(null);
+  // The assistant's latest proposal; the setup only changes when the user applies it, so their own choices (dates included) are never overwritten unasked.
+  const [pending, setPending] = useState<{ proposal: Proposal; question: string; applied: boolean } | null>(null);
   // Manual setup keeps the guide (with its checklist) until "Review summary"; examples, proposals and setup links open the plan.
   const [preferGuide, setPreferGuide] = useState(!initialDraft);
   const [notice, setNotice] = useState<string | null>(null);
@@ -173,10 +180,38 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
   const useExample = useCallback(
     (example: ExampleInvestigation) => {
       applyDraft({ question: example.question, variables: [...example.variables], derived: reconcileDerived(example.variables, example.derived), start: example.start, end: example.end, location: { ...example.location } });
-      setThread((t) => [...t, { id: crypto.randomUUID(), role: "assistant", text: `Loaded “${example.question}”. Edit anything on the left, then review the plan and press Start analysis.`, badge: "Example" }]);
+      const message: ThreadMessage = { id: crypto.randomUUID(), role: "assistant", text: `Loaded “${example.question}”. Edit anything on the left, then review the plan and press Start analysis.`, badge: "Example" };
+      setThread((t) => [...t, message]);
+      setReply([message]);
+      setPending(null);
+      setAnswered(false);
+      setAskError(null);
     },
     [applyDraft],
   );
+
+  /** Fills the setup with the pending proposal, on the user's request only. */
+  const applyProposal = useCallback(() => {
+    if (!pending) return;
+    const { proposal, question } = pending;
+    const sel = proposal.selection;
+    setDraft((d) => {
+      let nextLocation = d.location;
+      if (sel.region?.regionId && getRegion(sel.region.regionId)) nextLocation = { mode: "country", regionId: sel.region.regionId, customBBox: d.location.customBBox };
+      else if (sel.region?.bbox) nextLocation = { mode: "custom", regionId: d.location.regionId, customBBox: sel.region.bbox as BBox };
+      const variables = sel.variables.length > 0 ? sel.variables : d.variables;
+      const next: PlanDraft = { ...d, variables, derived: reconcileDerived(variables, d.derived), start: sel.start, end: sel.end, location: nextLocation };
+      const restated = proposal.source === "ai" && sel.question ? sel.question : looksLikeQuestion(question) ? question : (suggestQuestion(next) ?? d.question);
+      return { ...next, question: restated };
+    });
+    setTopicId(matchTopic(sel.variables));
+    setPeriodTouched(true);
+    setPreferGuide(false);
+    setDrawing(false);
+    setGlobeNote(null);
+    setFocusKey(`agent:${Date.now()}`);
+    setPending({ ...pending, applied: true });
+  }, [pending]);
 
   /** Ask the assistant; it sees the current setup and the earlier conversation. */
   const askAssistant = useCallback(
@@ -193,6 +228,8 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
       setThread((t) => [...t, { id: crypto.randomUUID(), role: "user", text: question }]);
       setAsk("");
       setAsking(true);
+      setAnswered(false);
+      setAskError(null);
       try {
         const response = await fetch("/api/agent/plan", {
           method: "POST",
@@ -202,27 +239,17 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
         });
         const data = await response.json();
         if (!response.ok) {
-          setThread((t) => [...t, { id: crypto.randomUUID(), role: "assistant", text: data.error?.detail ?? data.error?.title ?? "The proposal could not be produced. You can still fill the setup by hand." }]);
+          setAskError(data.error?.detail ?? data.error?.title ?? "The proposal could not be produced. You can still fill the setup by hand.");
           return;
         }
         const proposal = data as Proposal;
-        const sel = proposal.selection;
-        setDraft((d) => {
-          let nextLocation = d.location;
-          if (sel.region?.regionId && getRegion(sel.region.regionId)) nextLocation = { mode: "country", regionId: sel.region.regionId, customBBox: d.location.customBBox };
-          else if (sel.region?.bbox) nextLocation = { mode: "custom", regionId: d.location.regionId, customBBox: sel.region.bbox as BBox };
-          const variables = sel.variables.length > 0 ? sel.variables : d.variables;
-          const next: PlanDraft = { ...d, variables, derived: reconcileDerived(variables, d.derived), start: sel.start, end: sel.end, location: nextLocation };
-          const restated = proposal.source === "ai" && sel.question ? sel.question : looksLikeQuestion(question) ? question : (suggestQuestion(next) ?? d.question);
-          return { ...next, question: restated };
-        });
-        setTopicId(matchTopic(sel.variables));
-        setPeriodTouched(true);
-        setPreferGuide(false);
-        setFocusKey(`agent:${Date.now()}`);
-        setThread((t) => [...t, ...proposalReply(proposal)]);
+        const messages = proposalReply(proposal);
+        setThread((t) => [...t, ...messages]);
+        setReply(messages);
+        setPending({ proposal, question, applied: false });
+        setAnswered(true);
       } catch {
-        setThread((t) => [...t, { id: crypto.randomUUID(), role: "assistant", text: "The assistant could not be reached. You can still fill the setup by hand." }]);
+        setAskError("The assistant could not be reached. You can still fill the setup by hand.");
       } finally {
         setAsking(false);
       }
@@ -273,15 +300,9 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
     }
   };
 
-  const contextLine = [
-    draft.variables.length > 0 ? `${draft.variables.length} variable${draft.variables.length === 1 ? "" : "s"}` : null,
-    location ? location.label : null,
-    periodTouched ? plan.period.label : null,
-  ].filter(Boolean);
-
   return (
     <div className="ws" data-testid="workspace">
-      <AssistantPanel value={ask} asking={asking} thread={thread} contextLine={contextLine.length > 0 ? contextLine.join(" · ") : null} onChange={setAsk} onAsk={() => askAssistant(ask)} />
+      <AssistantPanel value={ask} asking={asking} answered={answered} error={askError} onChange={setAsk} onAsk={() => askAssistant(ask)} />
 
       <SetupPanel
         draft={draft}
@@ -330,9 +351,12 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
           <button type="button" className={drawing ? "ws-btn ws-btn-ghost is-active" : "ws-btn ws-btn-ghost"} aria-pressed={drawing} onClick={() => setDrawing((d) => !d)} data-testid="draw-toggle">
             Draw a custom area
           </button>
-          <span className="ws-hint" style={{ margin: 0 }}>
-            {drawing ? "Drag a rectangle on the globe. Esc cancels." : "Drag to rotate · scroll or pinch to zoom · click a country · arrow keys and +/− work too"}
-          </span>
+          {/* How to rotate, zoom and pick is part of the globe's accessible description; only drawing mode gets a visible hint. */}
+          {drawing && (
+            <span className="ws-hint" style={{ margin: 0 }}>
+              Drag a rectangle on the globe. Esc cancels.
+            </span>
+          )}
         </div>
         <Globe
           activeCountryNumeric={activeCountryNumeric}
@@ -372,6 +396,7 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
         onUseExample={useExample}
         onQuestion={(question) => update({ question })}
         onStart={startAnalysis}
+        assistant={<AssistantProposal reply={reply} asking={asking} applied={pending?.applied ?? false} onApply={pending ? applyProposal : undefined} />}
       />
     </div>
   );

@@ -1,86 +1,77 @@
 "use client";
 
-/** Center top: the research assistant. Replies are in English and fill the setup as an editable proposal. */
-import { useEffect, useId, useRef } from "react";
-
-export interface ThreadMessage {
-  id: string;
-  role: "user" | "assistant";
-  text: string;
-  details?: string[];
-  badge?: string;
-}
+/**
+ * Center top: the question for the research assistant. Its reply fills the
+ * setup as an editable proposal and is shown as a card in the right panel;
+ * here only a short acknowledgement (with a link to that card) or an error.
+ */
+import { useId } from "react";
+import { AutoGrowTextarea } from "@/components/AutoGrowTextarea";
+import { PROPOSAL_ID } from "./AssistantProposal";
 
 interface AssistantPanelProps {
   value: string;
   asking: boolean;
-  thread: ThreadMessage[];
-  /** What the assistant will see of the current setup, e.g. "1 variable · Colombia · Jan 2005 → Dec 2024". */
-  contextLine: string | null;
+  /** A proposal from the last question is shown in the right panel. */
+  answered: boolean;
+  error: string | null;
   onChange: (value: string) => void;
   onAsk: () => void;
 }
 
-export function AssistantPanel({ value, asking, thread, contextLine, onChange, onAsk }: AssistantPanelProps) {
+export function AssistantPanel({ value, asking, answered, error, onChange, onAsk }: AssistantPanelProps) {
   const id = useId();
-  const end = useRef<HTMLDivElement>(null);
-  // A block body: scrollIntoView returns a Promise in current Chromium, and an effect may only return a cleanup function.
-  useEffect(() => {
-    end.current?.scrollIntoView({ block: "nearest" });
-  }, [thread.length]);
+  const canAsk = !asking && value.trim().length >= 2;
   return (
     <section className="ws-area-assistant" aria-labelledby={`${id}-label`} data-testid="assistant">
       <div className="ws-ask-wrap">
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            onAsk();
+            if (canAsk) onAsk();
           }}
         >
           <label className="ws-step" id={`${id}-label`} htmlFor={`${id}-q`}>
             <span className="ws-step-num">02 / </span>Ask a climate question
           </label>
           <div className="ws-ask">
-            <input
+            <AutoGrowTextarea
               id={`${id}-q`}
-              type="text"
+              minRows={1}
+              maxRows={4}
               value={value}
               maxLength={600}
+              enterKeyHint="send"
               placeholder="How has temperature changed in Colombia since 2005?"
-              aria-describedby={`${id}-help`}
+              aria-describedby={`${id}-keys`}
               onChange={(e) => onChange(e.target.value)}
+              onKeyDown={(e) => {
+                // Enter asks; Shift+Enter keeps the default (a new line). Never while an IME is composing.
+                if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
+                e.preventDefault();
+                if (canAsk) e.currentTarget.form?.requestSubmit();
+              }}
               data-testid="assistant-input"
             />
-            <button type="submit" className="ws-btn ws-btn-neon" disabled={asking || value.trim().length < 2} data-testid="investigate-button">
+            <button type="submit" className="ws-btn ws-btn-neon" disabled={!canAsk} data-testid="investigate-button">
               {asking ? "Thinking…" : "Investigate"}
             </button>
           </div>
+          <span className="visually-hidden" id={`${id}-keys`}>
+            Enter asks the assistant; Shift+Enter adds a new line.
+          </span>
         </form>
-        <p className="ws-hint ws-context" id={`${id}-help`}>
-          {contextLine ? <>The assistant sees your setup: {contextLine}.</> : "The assistant proposes variables, a period and a location; you review and edit them."}
-        </p>
-        {asking && (
-          <p className="ws-hint" role="status">
-            Searching the catalog, resolving the place and checking live coverage…
+        {error ? (
+          <p className="alert alert-error ws-ask-note" role="alert">
+            {error}
           </p>
-        )}
-        {thread.length > 0 && (
-          <div className="ws-thread" role="log" aria-live="polite" aria-label="Conversation with the research assistant" tabIndex={0}>
-            {thread.map((m) => (
-              <div key={m.id} className={`ws-msg ${m.role === "user" ? "ws-msg-user" : "ws-msg-assistant"}`}>
-                {m.badge && <span className="ws-msg-badge">{m.badge}</span>}
-                {m.text}
-                {m.details && m.details.length > 0 && (
-                  <ul>
-                    {m.details.map((d) => (
-                      <li key={d}>{d}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-            <div ref={end} />
-          </div>
+        ) : (
+          answered &&
+          !asking && (
+            <p className="ws-ask-note ws-ack">
+              <span aria-hidden="true">✓ </span>Proposal ready. <a href={`#${PROPOSAL_ID}`}>Review the proposal</a>
+            </p>
+          )
         )}
       </div>
     </section>

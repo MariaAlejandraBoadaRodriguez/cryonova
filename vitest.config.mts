@@ -30,6 +30,8 @@ export default defineConfig({
         "src/agent/fallback.ts",
         "src/jobs/selection.ts",
         "src/reports/csv.ts",
+        "src/reports/captions.ts",
+        "src/reports/comparison.ts",
       ],
       thresholds: { lines: 80, branches: 75 },
     },
