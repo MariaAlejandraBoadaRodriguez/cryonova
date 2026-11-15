@@ -143,3 +143,27 @@ test("Add to investigation reaches a workspace tab subscribed with subscribeAddV
   await expectAccessible(page);
   await workspace.close();
 });
+
+test("end to end: Browse all variables opens the catalog, and Add to investigation puts the variable in the workspace setup", async ({ page }) => {
+  await page.goto("/");
+  // The workspace subscribes once hydrated; the globe texture loads after that.
+  await expect(page.getByTestId("globe")).toHaveAttribute("data-texture", "loaded", { timeout: 20_000 });
+  const tags = page.locator('[data-testid^="variable-tag-"]');
+  await expect(page.getByTestId("variable-tag-merra2.T2M")).toHaveCount(0);
+
+  const [catalog] = await Promise.all([page.context().waitForEvent("page"), page.getByTestId("browse-catalog").click()]);
+  await catalog.waitForLoadState();
+  await expect(catalog).toHaveURL(/\/catalog$/);
+  await expect(catalog.getByRole("heading", { level: 1, name: "Variable catalog" })).toBeVisible();
+
+  await catalog.getByTestId("catalog-add-merra2.T2M").click();
+  await expect(catalog.getByTestId("catalog-added-merra2.T2M")).toHaveText("Added to your investigation");
+  await expect(page.getByTestId("variable-tag-merra2.T2M")).toBeVisible();
+  await expect(tags).toHaveCount(1);
+
+  // A derived series' inputs: TS is added, T2M is already there and is not duplicated.
+  await catalog.getByTestId("catalog-add-inputs-derived.TS-T2M").click();
+  await expect(page.getByTestId("variable-tag-merra2.TS")).toBeVisible();
+  await expect(tags).toHaveCount(2);
+  await catalog.close();
+});
