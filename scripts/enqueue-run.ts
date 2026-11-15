@@ -4,7 +4,7 @@
  * deployment then executes it (stalled-run resume), which exercises the real
  * provider path from that deployment. Prints the run id only.
  *
- *   npx tsx scripts/enqueue-run.ts [--start 2005-01] [--end 2024-12] [--vars merra2.T2M] [--name Colombia] [--region country:CO]
+ *   npx tsx scripts/enqueue-run.ts [--start 2005-01] [--end 2024-12] [--vars merra2.T2M] [--derived derived.TS-T2M] [--region country:CO]
  */
 import { randomUUID } from "node:crypto";
 import { enableDevProxy } from "./lib/dev-proxy";
@@ -28,6 +28,7 @@ async function main(): Promise<void> {
     start: arg("start", "2005-01"),
     end: arg("end", "2024-12"),
     variables: arg("vars", "merra2.T2M").split(","),
+    ...(arg("derived", "") ? { derived: arg("derived", "").split(",") } : {}),
     mode: "manual",
   });
   const { run } = await new NeonRunStore().createRun({ id: randomUUID(), selection, idempotencyKey: `smoke-${randomUUID()}`, clientKey: "ops-smoke" });

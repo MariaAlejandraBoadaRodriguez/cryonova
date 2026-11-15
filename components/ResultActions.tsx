@@ -2,7 +2,7 @@
 
 /** Save to Neon (random read-only code) and CSV/PDF downloads of the same run. */
 import { useState } from "react";
-import { ErrorIcon } from "./RegionPicker";
+import { ErrorIcon } from "./icons";
 
 async function download(body: Record<string, string>, fallbackName: string): Promise<void> {
   const response = await fetch("/api/exports", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(60_000) });

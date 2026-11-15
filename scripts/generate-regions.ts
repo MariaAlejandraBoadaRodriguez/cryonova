@@ -75,6 +75,7 @@ for (const f of features) {
     id: `country:${alpha2 ?? f.properties.name.toLowerCase().replace(/\W+/g, "-")}`,
     kind: "country",
     iso2: alpha2 ?? null,
+    numeric: f.id ?? null,
     names: { en, es },
     aliases: [...aliases].filter((a) => a !== en && a !== es),
     bbox: { west: round(west), south: round(Math.min(...lats)), east: round(east), north: round(Math.max(...lats)) },

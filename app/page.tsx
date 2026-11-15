@@ -1,67 +1,15 @@
-import Link from "next/link";
-import { OpenWithCode } from "@/components/OpenWithCode";
+import type { Metadata } from "next";
+import { WorkspaceShell } from "@/components/workspace/WorkspaceShell";
+import { draftFromParams } from "@/src/plan/url";
 
-const EXAMPLES = [
-  "Did near-surface air temperature in Colombia change between 2005 and 2024?",
-  "¿Ha cambiado la precipitación en la cuenca amazónica desde 2001?",
-  "Is soil moisture declining in the Sahel?",
-];
+export const metadata: Metadata = { title: "Cryonova · Earth Trend Detective" };
 
-export default function Home() {
-  return (
-    <>
-      <section className="hero on-dark">
-        <div className="page">
-          <p className="step-label" style={{ color: "#9fd3ff" }}>
-            NASA Space Apps 2026 · Earth System Trend Detective
-          </p>
-          <h1>
-            Ask the Earth a question. <span className="accent">Get the evidence.</span>
-          </h1>
-          <p className="lead">
-            Cryonova turns questions into reproducible analyses of live NASA data: it selects variables, a region and a period, queries the provider at that moment, and shows trends with
-            uncertainty, coverage and full provenance. No account needed.
-          </p>
-        </div>
-      </section>
-      <div className="page">
-        <div className="landing-grid">
-          <section className="card stack" aria-labelledby="ask-title">
-            <h2 id="ask-title">Start with a question</h2>
-            <form action="/investigate" method="get" className="stack">
-              <label htmlFor="q">Your question (English or Spanish)</label>
-              <textarea id="q" name="q" maxLength={600} required placeholder={EXAMPLES[0]} />
-              <button type="submit" className="btn btn-primary">
-                Start investigation
-              </button>
-            </form>
-            <div>
-              <p className="label">Examples</p>
-              <ul style={{ margin: 0, paddingLeft: 18 }}>
-                {EXAMPLES.map((q) => (
-                  <li key={q}>
-                    <Link href={`/investigate?q=${encodeURIComponent(q)}`}>{q}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-          <div>
-            <section className="card stack" aria-labelledby="new-title">
-              <h2 id="new-title">Explore data directly</h2>
-              <p>Pick a region on the map, a period, and one or many variables from the live-verified NASA catalog.</p>
-              <Link href="/investigate" className="btn btn-secondary">
-                New investigation
-              </Link>
-            </section>
-            <section className="card stack" id="open-with-code" aria-labelledby="open-title">
-              <h2 id="open-title">Open with code</h2>
-              <p className="muted">Enter the code you received when saving. No sign-up, read-only.</p>
-              <OpenWithCode />
-            </section>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+type Params = Record<string, string | string[] | undefined>;
+
+/** The workspace. "?q=" asks the assistant on arrival; setup parameters (from "Back to setup") restore a selection. */
+export default async function Home({ searchParams }: { searchParams: Promise<Params> }) {
+  const params = await searchParams;
+  const q = typeof params.q === "string" ? params.q.slice(0, 600) : "";
+  const draft = draftFromParams(params);
+  return <WorkspaceShell key={JSON.stringify(params)} initialQuestion={q} initialDraft={draft} />;
 }

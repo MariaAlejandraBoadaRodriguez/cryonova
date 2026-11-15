@@ -58,6 +58,7 @@ export function fmtUtc(iso: string | null | undefined): string {
 const DECIMALS: Record<string, number> = {
   temperature: 2, precip_rate: 3, pressure: 2, specific_humidity: 3, water_column: 3, wind: 3,
   energy_flux: 2, fraction: 4, percent: 2, optical_depth: 4, height: 1, ozone: 2, snow_mass: 2,
+  temperature_variance: 3, vertical_velocity: 4, column_mass: 3, trace_humidity: 2,
 };
 
 /** Display precision per unit group, shared by UI, reports and the agent verifier. */

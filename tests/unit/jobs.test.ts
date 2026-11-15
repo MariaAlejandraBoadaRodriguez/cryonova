@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { MemoryRunStore } from "@/src/db/store";
-import { executeRun } from "@/src/jobs/runner";
+import { buildResult, executeRun } from "@/src/jobs/runner";
 import { groupByCollection, SelectionSchema } from "@/src/jobs/selection";
 import { isStalled, publicRun, startRun } from "@/src/jobs/service";
 import { cornersToBBox, bboxToCorners, bboxAreaDeg2, wrapLongitude } from "@/src/lib/geo";
@@ -202,5 +202,49 @@ describe("map geometry", () => {
       [-10, 190],
     ]);
     expect(bboxAreaDeg2({ west: 170, south: -20, east: -170, north: -10 })).toBe(200);
+  });
+});
+
+describe("derived series", () => {
+  const runRow = { id: "11111111-1111-4111-8111-111111111111", createdAt: new Date("2026-01-01T00:00:00Z"), startedAt: new Date("2026-01-01T00:00:01Z") };
+  const sel = SelectionSchema.parse({ region: { bbox: colombia, name: "Colombia", source: "named" }, start: "2001-01", end: "2012-12", variables: ["merra2.TS", "merra2.T2M"], derived: ["derived.TS-T2M"] });
+  const samples = months("2001-01", 144).map((month, i) => ({
+    runId: runRow.id,
+    collection: "M2TMNXSLV",
+    month,
+    status: "ok" as const,
+    granuleId: `G${month}`,
+    granuleTitle: `MERRA2.${month}.nc4`,
+    opendapUrl: `https://opendap.earthdata.nasa.gov/granules/${month}`,
+    // TS warms 0.02 K per month faster than T2M, so TS − T2M rises 2.4 K per decade.
+    values: [
+      { key: "merra2.TS", mean: 300 + i * 0.03, validCells: 100, totalCells: 100 },
+      { key: "merra2.T2M", mean: 299 + i * 0.01, validCells: 100, totalCells: 100 },
+    ],
+    bytes: 1000,
+    durationMs: 1000,
+    attempts: 1,
+    error: null,
+    fetchedAt: new Date("2026-01-01T00:01:00Z"),
+  }));
+
+  it("validates derived series against the selected variables", () => {
+    expect(SelectionSchema.safeParse({ ...sel, derived: ["derived.T2M-T2MDEW"] }).success).toBe(false);
+    expect(SelectionSchema.safeParse({ ...sel, derived: ["derived.unknown"] }).success).toBe(false);
+    const older: Record<string, unknown> = { ...sel };
+    delete older.derived;
+    expect(SelectionSchema.parse(older).derived).toBeUndefined();
+  });
+
+  it("analyzes the difference like a variable, with its formula as provenance", () => {
+    const result = buildResult(runRow as never, sel, samples as never, { analysisStart: Date.now(), invocationStart: Date.now(), concurrency: 6, invocations: 1 });
+    const derived = result.variables.find((v) => v.key === "derived.TS-T2M");
+    expect(derived).toBeDefined();
+    expect(derived!.dapName).toBe("TS − T2M");
+    expect(derived!.analysis.units).toBe("°C");
+    expect(derived!.analysis.monthly[0]!.value).toBeCloseTo(1, 9);
+    expect(derived!.analysis.trend.status).toBe("ok");
+    if (derived!.analysis.trend.status === "ok") expect(derived!.analysis.trend.slopePerDecade).toBeCloseTo(2.4, 6);
+    expect(result.variables.map((v) => v.key)).toEqual(["merra2.TS", "merra2.T2M", "derived.TS-T2M"]);
   });
 });

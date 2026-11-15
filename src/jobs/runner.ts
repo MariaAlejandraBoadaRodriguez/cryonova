@@ -10,6 +10,7 @@ import { randomUUID } from "node:crypto";
 import { analyzeVariable } from "@/src/analytics/analyze";
 import { monthsBetween, type MonthlyPoint } from "@/src/analytics/series";
 import { collectionOf, getCollection, getVariable } from "@/src/catalog";
+import { derivedVariable, derivePoints, getDerived } from "@/src/catalog/derived";
 import { crossesAntimeridian } from "@/src/catalog/regions";
 import type { CatalogVariable } from "@/src/catalog/types";
 import type { RunStore } from "@/src/db/store";
@@ -288,6 +289,33 @@ export function buildResult(run: RunRow, selection: Selection, samples: SampleRo
         aggregation: variable.aggregation, analysis,
       });
     }
+  }
+
+  // Derived series (differences, wind-vector magnitudes) from the regional monthly means above.
+  for (const key of selection.derived ?? []) {
+    const metric = getDerived(key);
+    if (!metric) continue;
+    const inputs = metric.inputs.map((k) => variables.find((v) => v.key === k));
+    if (inputs.some((v) => v === undefined)) {
+      warnings.push(`${metric.formula}: an input variable is missing, so the derived series was not computed.`);
+      continue;
+    }
+    const present = inputs as VariableResult[];
+    const firstInput = getVariable(present[0]!.key)!;
+    const collection = getCollection(firstInput.collection)!;
+    const variable = derivedVariable(metric, firstInput);
+    const analysis = analyzeVariable({
+      variable,
+      points: derivePoints(metric, present.map((v) => v.analysis.monthly)),
+      monthsWithGranule: Math.min(...present.map((v) => v.analysis.coverage.monthsWithGranule)),
+      failedMonths: [...new Set(present.flatMap((v) => v.analysis.coverage.failedMonths))].sort(),
+      window: planWindow(collection, selection.region.bbox),
+    });
+    variables.push({
+      key: metric.key, name: metric.name, source: firstInput.source, collection: collection.shortName, product: collection.shortName, version: collection.version,
+      dapName: metric.formula, providerLongName: metric.description.en, domain: variable.domain, unitGroup: metric.display.group,
+      aggregation: variable.aggregation, analysis,
+    });
   }
 
   const anyValid = variables.some((v) => v.analysis.coverage.monthsValid > 0);

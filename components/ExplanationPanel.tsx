@@ -7,7 +7,7 @@
 import { useEffect, useState } from "react";
 import type { ChartKind, Explanation } from "@/src/agent/explain";
 import type { Language } from "@/src/agent/proposal";
-import { ErrorIcon } from "./RegionPicker";
+import { ErrorIcon } from "./icons";
 
 const SECTION_TITLES: Record<Language, Record<string, string>> = {
   en: { chart: "What the chart shows", pattern: "Pattern", change: "How much it changed", uncertainty: "Uncertainty", source: "Where the data come from", limitations: "Limitations" },

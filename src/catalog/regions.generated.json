@@ -5,6 +5,7 @@
    "id": "country:AF",
    "kind": "country",
    "iso2": "AF",
+   "numeric": "004",
    "names": {
     "en": "Afghanistan",
     "es": "Afganistán"
@@ -24,6 +25,7 @@
    "id": "country:AL",
    "kind": "country",
    "iso2": "AL",
+   "numeric": "008",
    "names": {
     "en": "Albania",
     "es": "Albania"
@@ -43,6 +45,7 @@
    "id": "country:DZ",
    "kind": "country",
    "iso2": "DZ",
+   "numeric": "012",
    "names": {
     "en": "Algeria",
     "es": "Argelia"
@@ -62,6 +65,7 @@
    "id": "country:AO",
    "kind": "country",
    "iso2": "AO",
+   "numeric": "024",
    "names": {
     "en": "Angola",
     "es": "Angola"
@@ -81,6 +85,7 @@
    "id": "country:AQ",
    "kind": "country",
    "iso2": "AQ",
+   "numeric": "010",
    "names": {
     "en": "Antarctica",
     "es": "Antártida"
@@ -100,6 +105,7 @@
    "id": "country:AR",
    "kind": "country",
    "iso2": "AR",
+   "numeric": "032",
    "names": {
     "en": "Argentina",
     "es": "Argentina"
@@ -119,6 +125,7 @@
    "id": "country:AM",
    "kind": "country",
    "iso2": "AM",
+   "numeric": "051",
    "names": {
     "en": "Armenia",
     "es": "Armenia"
@@ -138,6 +145,7 @@
    "id": "country:AU",
    "kind": "country",
    "iso2": "AU",
+   "numeric": "036",
    "names": {
     "en": "Australia",
     "es": "Australia"
@@ -157,6 +165,7 @@
    "id": "country:AT",
    "kind": "country",
    "iso2": "AT",
+   "numeric": "040",
    "names": {
     "en": "Austria",
     "es": "Austria"
@@ -176,6 +185,7 @@
    "id": "country:AZ",
    "kind": "country",
    "iso2": "AZ",
+   "numeric": "031",
    "names": {
     "en": "Azerbaijan",
     "es": "Azerbaiyán"
@@ -195,6 +205,7 @@
    "id": "country:BS",
    "kind": "country",
    "iso2": "BS",
+   "numeric": "044",
    "names": {
     "en": "Bahamas",
     "es": "Bahamas"
@@ -214,6 +225,7 @@
    "id": "country:BD",
    "kind": "country",
    "iso2": "BD",
+   "numeric": "050",
    "names": {
     "en": "Bangladesh",
     "es": "Bangladesh"
@@ -233,6 +245,7 @@
    "id": "country:BY",
    "kind": "country",
    "iso2": "BY",
+   "numeric": "112",
    "names": {
     "en": "Belarus",
     "es": "Bielorrusia"
@@ -252,6 +265,7 @@
    "id": "country:BE",
    "kind": "country",
    "iso2": "BE",
+   "numeric": "056",
    "names": {
     "en": "Belgium",
     "es": "Bélgica"
@@ -271,6 +285,7 @@
    "id": "country:BZ",
    "kind": "country",
    "iso2": "BZ",
+   "numeric": "084",
    "names": {
     "en": "Belize",
     "es": "Belice"
@@ -290,6 +305,7 @@
    "id": "country:BJ",
    "kind": "country",
    "iso2": "BJ",
+   "numeric": "204",
    "names": {
     "en": "Benin",
     "es": "Benin"
@@ -309,6 +325,7 @@
    "id": "country:BT",
    "kind": "country",
    "iso2": "BT",
+   "numeric": "064",
    "names": {
     "en": "Bhutan",
     "es": "Bután"
@@ -328,6 +345,7 @@
    "id": "country:BO",
    "kind": "country",
    "iso2": "BO",
+   "numeric": "068",
    "names": {
     "en": "Bolivia",
     "es": "Bolivia"
@@ -347,6 +365,7 @@
    "id": "country:BA",
    "kind": "country",
    "iso2": "BA",
+   "numeric": "070",
    "names": {
     "en": "Bosnia and Herzegovina",
     "es": "Bosnia y Herzegovina"
@@ -367,6 +386,7 @@
    "id": "country:BW",
    "kind": "country",
    "iso2": "BW",
+   "numeric": "072",
    "names": {
     "en": "Botswana",
     "es": "Botswana"
@@ -386,6 +406,7 @@
    "id": "country:BR",
    "kind": "country",
    "iso2": "BR",
+   "numeric": "076",
    "names": {
     "en": "Brazil",
     "es": "Brasil"
@@ -405,6 +426,7 @@
    "id": "country:BN",
    "kind": "country",
    "iso2": "BN",
+   "numeric": "096",
    "names": {
     "en": "Brunei Darussalam",
     "es": "Brunei Darussalam"
@@ -425,6 +447,7 @@
    "id": "country:BG",
    "kind": "country",
    "iso2": "BG",
+   "numeric": "100",
    "names": {
     "en": "Bulgaria",
     "es": "Bulgaria"
@@ -444,6 +467,7 @@
    "id": "country:BF",
    "kind": "country",
    "iso2": "BF",
+   "numeric": "854",
    "names": {
     "en": "Burkina Faso",
     "es": "Burkina Faso"
@@ -463,6 +487,7 @@
    "id": "country:BI",
    "kind": "country",
    "iso2": "BI",
+   "numeric": "108",
    "names": {
     "en": "Burundi",
     "es": "Burundi"
@@ -482,6 +507,7 @@
    "id": "country:KH",
    "kind": "country",
    "iso2": "KH",
+   "numeric": "116",
    "names": {
     "en": "Cambodia",
     "es": "Camboya"
@@ -501,6 +527,7 @@
    "id": "country:CM",
    "kind": "country",
    "iso2": "CM",
+   "numeric": "120",
    "names": {
     "en": "Cameroon",
     "es": "Camerún"
@@ -520,6 +547,7 @@
    "id": "country:CA",
    "kind": "country",
    "iso2": "CA",
+   "numeric": "124",
    "names": {
     "en": "Canada",
     "es": "Canadá"
@@ -539,6 +567,7 @@
    "id": "country:CF",
    "kind": "country",
    "iso2": "CF",
+   "numeric": "140",
    "names": {
     "en": "Central African Republic",
     "es": "República Centroafricana"
@@ -559,6 +588,7 @@
    "id": "country:TD",
    "kind": "country",
    "iso2": "TD",
+   "numeric": "148",
    "names": {
     "en": "Chad",
     "es": "Chad"
@@ -578,6 +608,7 @@
    "id": "country:CL",
    "kind": "country",
    "iso2": "CL",
+   "numeric": "152",
    "names": {
     "en": "Chile",
     "es": "Chile"
@@ -597,6 +628,7 @@
    "id": "country:CO",
    "kind": "country",
    "iso2": "CO",
+   "numeric": "170",
    "names": {
     "en": "Colombia",
     "es": "Colombia"
@@ -616,6 +648,7 @@
    "id": "country:CR",
    "kind": "country",
    "iso2": "CR",
+   "numeric": "188",
    "names": {
     "en": "Costa Rica",
     "es": "Costa Rica"
@@ -635,6 +668,7 @@
    "id": "country:CI",
    "kind": "country",
    "iso2": "CI",
+   "numeric": "384",
    "names": {
     "en": "Cote d'Ivoire",
     "es": "Costa de Marfil"
@@ -656,6 +690,7 @@
    "id": "country:HR",
    "kind": "country",
    "iso2": "HR",
+   "numeric": "191",
    "names": {
     "en": "Croatia",
     "es": "Croacia"
@@ -675,6 +710,7 @@
    "id": "country:CU",
    "kind": "country",
    "iso2": "CU",
+   "numeric": "192",
    "names": {
     "en": "Cuba",
     "es": "Cuba"
@@ -694,6 +730,7 @@
    "id": "country:CY",
    "kind": "country",
    "iso2": "CY",
+   "numeric": "196",
    "names": {
     "en": "Cyprus",
     "es": "Chipre"
@@ -713,6 +750,7 @@
    "id": "country:CZ",
    "kind": "country",
    "iso2": "CZ",
+   "numeric": "203",
    "names": {
     "en": "Czech Republic",
     "es": "República Checa"
@@ -733,6 +771,7 @@
    "id": "country:CD",
    "kind": "country",
    "iso2": "CD",
+   "numeric": "180",
    "names": {
     "en": "Democratic Republic of the Congo",
     "es": "Congo (República Democrática del)"
@@ -754,6 +793,7 @@
    "id": "country:DK",
    "kind": "country",
    "iso2": "DK",
+   "numeric": "208",
    "names": {
     "en": "Denmark",
     "es": "Dinamarca"
@@ -773,6 +813,7 @@
    "id": "country:DJ",
    "kind": "country",
    "iso2": "DJ",
+   "numeric": "262",
    "names": {
     "en": "Djibouti",
     "es": "Yibuti"
@@ -792,6 +833,7 @@
    "id": "country:DO",
    "kind": "country",
    "iso2": "DO",
+   "numeric": "214",
    "names": {
     "en": "Dominican Republic",
     "es": "República Dominicana"
@@ -812,6 +854,7 @@
    "id": "country:EC",
    "kind": "country",
    "iso2": "EC",
+   "numeric": "218",
    "names": {
     "en": "Ecuador",
     "es": "Ecuador"
@@ -831,6 +874,7 @@
    "id": "country:EG",
    "kind": "country",
    "iso2": "EG",
+   "numeric": "818",
    "names": {
     "en": "Egypt",
     "es": "Egipto"
@@ -850,6 +894,7 @@
    "id": "country:SV",
    "kind": "country",
    "iso2": "SV",
+   "numeric": "222",
    "names": {
     "en": "El Salvador",
     "es": "El Salvador"
@@ -869,6 +914,7 @@
    "id": "country:GQ",
    "kind": "country",
    "iso2": "GQ",
+   "numeric": "226",
    "names": {
     "en": "Equatorial Guinea",
     "es": "Guinea Ecuatorial"
@@ -889,6 +935,7 @@
    "id": "country:ER",
    "kind": "country",
    "iso2": "ER",
+   "numeric": "232",
    "names": {
     "en": "Eritrea",
     "es": "Eritrea"
@@ -908,6 +955,7 @@
    "id": "country:EE",
    "kind": "country",
    "iso2": "EE",
+   "numeric": "233",
    "names": {
     "en": "Estonia",
     "es": "Estonia"
@@ -927,6 +975,7 @@
    "id": "country:SZ",
    "kind": "country",
    "iso2": "SZ",
+   "numeric": "748",
    "names": {
     "en": "Eswatini",
     "es": "Esuatini"
@@ -947,6 +996,7 @@
    "id": "country:ET",
    "kind": "country",
    "iso2": "ET",
+   "numeric": "231",
    "names": {
     "en": "Ethiopia",
     "es": "Etiopía"
@@ -966,6 +1016,7 @@
    "id": "country:FK",
    "kind": "country",
    "iso2": "FK",
+   "numeric": "238",
    "names": {
     "en": "Falkland Islands (Malvinas)",
     "es": "Islas Malvinas"
@@ -986,6 +1037,7 @@
    "id": "country:FJ",
    "kind": "country",
    "iso2": "FJ",
+   "numeric": "242",
    "names": {
     "en": "Fiji",
     "es": "Fiji"
@@ -1005,6 +1057,7 @@
    "id": "country:FI",
    "kind": "country",
    "iso2": "FI",
+   "numeric": "246",
    "names": {
     "en": "Finland",
     "es": "Finlandia"
@@ -1024,6 +1077,7 @@
    "id": "country:FR",
    "kind": "country",
    "iso2": "FR",
+   "numeric": "250",
    "names": {
     "en": "France",
     "es": "Francia"
@@ -1043,6 +1097,7 @@
    "id": "country:TF",
    "kind": "country",
    "iso2": "TF",
+   "numeric": "260",
    "names": {
     "en": "French Southern Territories",
     "es": "Tierras Australes Francesas"
@@ -1063,6 +1118,7 @@
    "id": "country:GA",
    "kind": "country",
    "iso2": "GA",
+   "numeric": "266",
    "names": {
     "en": "Gabon",
     "es": "Gabón"
@@ -1082,6 +1138,7 @@
    "id": "country:GE",
    "kind": "country",
    "iso2": "GE",
+   "numeric": "268",
    "names": {
     "en": "Georgia",
     "es": "Georgia"
@@ -1101,6 +1158,7 @@
    "id": "country:DE",
    "kind": "country",
    "iso2": "DE",
+   "numeric": "276",
    "names": {
     "en": "Germany",
     "es": "Alemania"
@@ -1120,6 +1178,7 @@
    "id": "country:GH",
    "kind": "country",
    "iso2": "GH",
+   "numeric": "288",
    "names": {
     "en": "Ghana",
     "es": "Ghana"
@@ -1139,6 +1198,7 @@
    "id": "country:GR",
    "kind": "country",
    "iso2": "GR",
+   "numeric": "300",
    "names": {
     "en": "Greece",
     "es": "Grecia"
@@ -1158,6 +1218,7 @@
    "id": "country:GL",
    "kind": "country",
    "iso2": "GL",
+   "numeric": "304",
    "names": {
     "en": "Greenland",
     "es": "Groenlandia"
@@ -1177,6 +1238,7 @@
    "id": "country:GT",
    "kind": "country",
    "iso2": "GT",
+   "numeric": "320",
    "names": {
     "en": "Guatemala",
     "es": "Guatemala"
@@ -1196,6 +1258,7 @@
    "id": "country:GN",
    "kind": "country",
    "iso2": "GN",
+   "numeric": "324",
    "names": {
     "en": "Guinea",
     "es": "Guinea"
@@ -1215,6 +1278,7 @@
    "id": "country:GW",
    "kind": "country",
    "iso2": "GW",
+   "numeric": "624",
    "names": {
     "en": "Guinea-Bissau",
     "es": "Guinea Bissau"
@@ -1234,6 +1298,7 @@
    "id": "country:GY",
    "kind": "country",
    "iso2": "GY",
+   "numeric": "328",
    "names": {
     "en": "Guyana",
     "es": "Guyana"
@@ -1253,6 +1318,7 @@
    "id": "country:HT",
    "kind": "country",
    "iso2": "HT",
+   "numeric": "332",
    "names": {
     "en": "Haiti",
     "es": "Haití"
@@ -1272,6 +1338,7 @@
    "id": "country:HN",
    "kind": "country",
    "iso2": "HN",
+   "numeric": "340",
    "names": {
     "en": "Honduras",
     "es": "Honduras"
@@ -1291,6 +1358,7 @@
    "id": "country:HU",
    "kind": "country",
    "iso2": "HU",
+   "numeric": "348",
    "names": {
     "en": "Hungary",
     "es": "Hungría"
@@ -1310,6 +1378,7 @@
    "id": "country:IS",
    "kind": "country",
    "iso2": "IS",
+   "numeric": "352",
    "names": {
     "en": "Iceland",
     "es": "Islandia"
@@ -1329,6 +1398,7 @@
    "id": "country:IN",
    "kind": "country",
    "iso2": "IN",
+   "numeric": "356",
    "names": {
     "en": "India",
     "es": "India"
@@ -1348,6 +1418,7 @@
    "id": "country:ID",
    "kind": "country",
    "iso2": "ID",
+   "numeric": "360",
    "names": {
     "en": "Indonesia",
     "es": "Indonesia"
@@ -1367,6 +1438,7 @@
    "id": "country:IQ",
    "kind": "country",
    "iso2": "IQ",
+   "numeric": "368",
    "names": {
     "en": "Iraq",
     "es": "Iraq"
@@ -1386,6 +1458,7 @@
    "id": "country:IE",
    "kind": "country",
    "iso2": "IE",
+   "numeric": "372",
    "names": {
     "en": "Ireland",
     "es": "Irlanda"
@@ -1405,6 +1478,7 @@
    "id": "country:IR",
    "kind": "country",
    "iso2": "IR",
+   "numeric": "364",
    "names": {
     "en": "Islamic Republic of Iran",
     "es": "Irán"
@@ -1426,6 +1500,7 @@
    "id": "country:IL",
    "kind": "country",
    "iso2": "IL",
+   "numeric": "376",
    "names": {
     "en": "Israel",
     "es": "Israel"
@@ -1445,6 +1520,7 @@
    "id": "country:IT",
    "kind": "country",
    "iso2": "IT",
+   "numeric": "380",
    "names": {
     "en": "Italy",
     "es": "Italia"
@@ -1464,6 +1540,7 @@
    "id": "country:JM",
    "kind": "country",
    "iso2": "JM",
+   "numeric": "388",
    "names": {
     "en": "Jamaica",
     "es": "Jamaica"
@@ -1483,6 +1560,7 @@
    "id": "country:JP",
    "kind": "country",
    "iso2": "JP",
+   "numeric": "392",
    "names": {
     "en": "Japan",
     "es": "Japón"
@@ -1502,6 +1580,7 @@
    "id": "country:JO",
    "kind": "country",
    "iso2": "JO",
+   "numeric": "400",
    "names": {
     "en": "Jordan",
     "es": "Jordania"
@@ -1521,6 +1600,7 @@
    "id": "country:KZ",
    "kind": "country",
    "iso2": "KZ",
+   "numeric": "398",
    "names": {
     "en": "Kazakhstan",
     "es": "Kazajistán"
@@ -1540,6 +1620,7 @@
    "id": "country:KE",
    "kind": "country",
    "iso2": "KE",
+   "numeric": "404",
    "names": {
     "en": "Kenya",
     "es": "Kenia"
@@ -1559,6 +1640,7 @@
    "id": "country:kosovo",
    "kind": "country",
    "iso2": null,
+   "numeric": null,
    "names": {
     "en": "Kosovo",
     "es": "Kosovo"
@@ -1575,6 +1657,7 @@
    "id": "country:KW",
    "kind": "country",
    "iso2": "KW",
+   "numeric": "414",
    "names": {
     "en": "Kuwait",
     "es": "Kuwait"
@@ -1594,6 +1677,7 @@
    "id": "country:KG",
    "kind": "country",
    "iso2": "KG",
+   "numeric": "417",
    "names": {
     "en": "Kyrgyzstan",
     "es": "Kirguistán"
@@ -1613,6 +1697,7 @@
    "id": "country:LA",
    "kind": "country",
    "iso2": "LA",
+   "numeric": "418",
    "names": {
     "en": "Lao People's Democratic Republic",
     "es": "República Democrática Popular de Lao"
@@ -1633,6 +1718,7 @@
    "id": "country:LV",
    "kind": "country",
    "iso2": "LV",
+   "numeric": "428",
    "names": {
     "en": "Latvia",
     "es": "Letonia"
@@ -1652,6 +1738,7 @@
    "id": "country:LB",
    "kind": "country",
    "iso2": "LB",
+   "numeric": "422",
    "names": {
     "en": "Lebanon",
     "es": "Líbano"
@@ -1671,6 +1758,7 @@
    "id": "country:LS",
    "kind": "country",
    "iso2": "LS",
+   "numeric": "426",
    "names": {
     "en": "Lesotho",
     "es": "Lesoto"
@@ -1690,6 +1778,7 @@
    "id": "country:LR",
    "kind": "country",
    "iso2": "LR",
+   "numeric": "430",
    "names": {
     "en": "Liberia",
     "es": "Liberia"
@@ -1709,6 +1798,7 @@
    "id": "country:LY",
    "kind": "country",
    "iso2": "LY",
+   "numeric": "434",
    "names": {
     "en": "Libya",
     "es": "Libia"
@@ -1728,6 +1818,7 @@
    "id": "country:LT",
    "kind": "country",
    "iso2": "LT",
+   "numeric": "440",
    "names": {
     "en": "Lithuania",
     "es": "Lituania"
@@ -1747,6 +1838,7 @@
    "id": "country:LU",
    "kind": "country",
    "iso2": "LU",
+   "numeric": "442",
    "names": {
     "en": "Luxembourg",
     "es": "Luxemburgo"
@@ -1766,6 +1858,7 @@
    "id": "country:MG",
    "kind": "country",
    "iso2": "MG",
+   "numeric": "450",
    "names": {
     "en": "Madagascar",
     "es": "Madagascar"
@@ -1785,6 +1878,7 @@
    "id": "country:MW",
    "kind": "country",
    "iso2": "MW",
+   "numeric": "454",
    "names": {
     "en": "Malawi",
     "es": "Malaui"
@@ -1804,6 +1898,7 @@
    "id": "country:MY",
    "kind": "country",
    "iso2": "MY",
+   "numeric": "458",
    "names": {
     "en": "Malaysia",
     "es": "Malasia"
@@ -1823,6 +1918,7 @@
    "id": "country:ML",
    "kind": "country",
    "iso2": "ML",
+   "numeric": "466",
    "names": {
     "en": "Mali",
     "es": "Malí"
@@ -1842,6 +1938,7 @@
    "id": "country:MR",
    "kind": "country",
    "iso2": "MR",
+   "numeric": "478",
    "names": {
     "en": "Mauritania",
     "es": "Mauritania"
@@ -1861,6 +1958,7 @@
    "id": "country:MX",
    "kind": "country",
    "iso2": "MX",
+   "numeric": "484",
    "names": {
     "en": "Mexico",
     "es": "México"
@@ -1880,6 +1978,7 @@
    "id": "country:MD",
    "kind": "country",
    "iso2": "MD",
+   "numeric": "498",
    "names": {
     "en": "Moldova, Republic of",
     "es": "Moldavia"
@@ -1900,6 +1999,7 @@
    "id": "country:MN",
    "kind": "country",
    "iso2": "MN",
+   "numeric": "496",
    "names": {
     "en": "Mongolia",
     "es": "Mongolia"
@@ -1919,6 +2019,7 @@
    "id": "country:ME",
    "kind": "country",
    "iso2": "ME",
+   "numeric": "499",
    "names": {
     "en": "Montenegro",
     "es": "Montenegro"
@@ -1938,6 +2039,7 @@
    "id": "country:MA",
    "kind": "country",
    "iso2": "MA",
+   "numeric": "504",
    "names": {
     "en": "Morocco",
     "es": "Marruecos"
@@ -1957,6 +2059,7 @@
    "id": "country:MZ",
    "kind": "country",
    "iso2": "MZ",
+   "numeric": "508",
    "names": {
     "en": "Mozambique",
     "es": "Mozambique"
@@ -1976,6 +2079,7 @@
    "id": "country:MM",
    "kind": "country",
    "iso2": "MM",
+   "numeric": "104",
    "names": {
     "en": "Myanmar",
     "es": "Myanmar"
@@ -1995,6 +2099,7 @@
    "id": "country:n-cyprus",
    "kind": "country",
    "iso2": null,
+   "numeric": null,
    "names": {
     "en": "N. Cyprus",
     "es": "N. Cyprus"
@@ -2011,6 +2116,7 @@
    "id": "country:NA",
    "kind": "country",
    "iso2": "NA",
+   "numeric": "516",
    "names": {
     "en": "Namibia",
     "es": "Namibia"
@@ -2030,6 +2136,7 @@
    "id": "country:NP",
    "kind": "country",
    "iso2": "NP",
+   "numeric": "524",
    "names": {
     "en": "Nepal",
     "es": "Nepal"
@@ -2049,6 +2156,7 @@
    "id": "country:NL",
    "kind": "country",
    "iso2": "NL",
+   "numeric": "528",
    "names": {
     "en": "Netherlands",
     "es": "Países Bajos"
@@ -2070,6 +2178,7 @@
    "id": "country:NC",
    "kind": "country",
    "iso2": "NC",
+   "numeric": "540",
    "names": {
     "en": "New Caledonia",
     "es": "Nueva Caledonia"
@@ -2089,6 +2198,7 @@
    "id": "country:NZ",
    "kind": "country",
    "iso2": "NZ",
+   "numeric": "554",
    "names": {
     "en": "New Zealand",
     "es": "Nueva Zelanda"
@@ -2108,6 +2218,7 @@
    "id": "country:NI",
    "kind": "country",
    "iso2": "NI",
+   "numeric": "558",
    "names": {
     "en": "Nicaragua",
     "es": "Nicaragua"
@@ -2127,6 +2238,7 @@
    "id": "country:NE",
    "kind": "country",
    "iso2": "NE",
+   "numeric": "562",
    "names": {
     "en": "Niger",
     "es": "Níger"
@@ -2146,6 +2258,7 @@
    "id": "country:NG",
    "kind": "country",
    "iso2": "NG",
+   "numeric": "566",
    "names": {
     "en": "Nigeria",
     "es": "Nigeria"
@@ -2165,6 +2278,7 @@
    "id": "country:KP",
    "kind": "country",
    "iso2": "KP",
+   "numeric": "408",
    "names": {
     "en": "North Korea",
     "es": "República Popular Democrática de Corea"
@@ -2184,6 +2298,7 @@
    "id": "country:NO",
    "kind": "country",
    "iso2": "NO",
+   "numeric": "578",
    "names": {
     "en": "Norway",
     "es": "Noruega"
@@ -2203,6 +2318,7 @@
    "id": "country:OM",
    "kind": "country",
    "iso2": "OM",
+   "numeric": "512",
    "names": {
     "en": "Oman",
     "es": "Omán"
@@ -2222,6 +2338,7 @@
    "id": "country:PK",
    "kind": "country",
    "iso2": "PK",
+   "numeric": "586",
    "names": {
     "en": "Pakistan",
     "es": "Pakistán"
@@ -2241,6 +2358,7 @@
    "id": "country:PA",
    "kind": "country",
    "iso2": "PA",
+   "numeric": "591",
    "names": {
     "en": "Panama",
     "es": "Panamá"
@@ -2260,6 +2378,7 @@
    "id": "country:PG",
    "kind": "country",
    "iso2": "PG",
+   "numeric": "598",
    "names": {
     "en": "Papua New Guinea",
     "es": "Papua Nueva Guinea"
@@ -2279,6 +2398,7 @@
    "id": "country:PY",
    "kind": "country",
    "iso2": "PY",
+   "numeric": "600",
    "names": {
     "en": "Paraguay",
     "es": "Paraguay"
@@ -2298,6 +2418,7 @@
    "id": "country:CN",
    "kind": "country",
    "iso2": "CN",
+   "numeric": "156",
    "names": {
     "en": "People's Republic of China",
     "es": "China"
@@ -2317,6 +2438,7 @@
    "id": "country:PE",
    "kind": "country",
    "iso2": "PE",
+   "numeric": "604",
    "names": {
     "en": "Peru",
     "es": "Perú"
@@ -2336,6 +2458,7 @@
    "id": "country:PH",
    "kind": "country",
    "iso2": "PH",
+   "numeric": "608",
    "names": {
     "en": "Philippines",
     "es": "Filipinas"
@@ -2355,6 +2478,7 @@
    "id": "country:PL",
    "kind": "country",
    "iso2": "PL",
+   "numeric": "616",
    "names": {
     "en": "Poland",
     "es": "Polonia"
@@ -2374,6 +2498,7 @@
    "id": "country:PT",
    "kind": "country",
    "iso2": "PT",
+   "numeric": "620",
    "names": {
     "en": "Portugal",
     "es": "Portugal"
@@ -2393,6 +2518,7 @@
    "id": "country:PR",
    "kind": "country",
    "iso2": "PR",
+   "numeric": "630",
    "names": {
     "en": "Puerto Rico",
     "es": "Puerto Rico"
@@ -2412,6 +2538,7 @@
    "id": "country:QA",
    "kind": "country",
    "iso2": "QA",
+   "numeric": "634",
    "names": {
     "en": "Qatar",
     "es": "Catar"
@@ -2431,6 +2558,7 @@
    "id": "country:CG",
    "kind": "country",
    "iso2": "CG",
+   "numeric": "178",
    "names": {
     "en": "Republic of the Congo",
     "es": "Congo"
@@ -2450,6 +2578,7 @@
    "id": "country:GM",
    "kind": "country",
    "iso2": "GM",
+   "numeric": "270",
    "names": {
     "en": "Republic of The Gambia",
     "es": "Gambia"
@@ -2470,6 +2599,7 @@
    "id": "country:RO",
    "kind": "country",
    "iso2": "RO",
+   "numeric": "642",
    "names": {
     "en": "Romania",
     "es": "Rumanía"
@@ -2489,6 +2619,7 @@
    "id": "country:RU",
    "kind": "country",
    "iso2": "RU",
+   "numeric": "643",
    "names": {
     "en": "Russian Federation",
     "es": "Rusia"
@@ -2509,6 +2640,7 @@
    "id": "country:RW",
    "kind": "country",
    "iso2": "RW",
+   "numeric": "646",
    "names": {
     "en": "Rwanda",
     "es": "Ruanda"
@@ -2528,6 +2660,7 @@
    "id": "country:SA",
    "kind": "country",
    "iso2": "SA",
+   "numeric": "682",
    "names": {
     "en": "Saudi Arabia",
     "es": "Arabia Saudita"
@@ -2547,6 +2680,7 @@
    "id": "country:SN",
    "kind": "country",
    "iso2": "SN",
+   "numeric": "686",
    "names": {
     "en": "Senegal",
     "es": "Senegal"
@@ -2566,6 +2700,7 @@
    "id": "country:RS",
    "kind": "country",
    "iso2": "RS",
+   "numeric": "688",
    "names": {
     "en": "Serbia",
     "es": "Serbia"
@@ -2585,6 +2720,7 @@
    "id": "country:SL",
    "kind": "country",
    "iso2": "SL",
+   "numeric": "694",
    "names": {
     "en": "Sierra Leone",
     "es": "Sierra Leona"
@@ -2604,6 +2740,7 @@
    "id": "country:SK",
    "kind": "country",
    "iso2": "SK",
+   "numeric": "703",
    "names": {
     "en": "Slovakia",
     "es": "Eslovaquia"
@@ -2623,6 +2760,7 @@
    "id": "country:SI",
    "kind": "country",
    "iso2": "SI",
+   "numeric": "705",
    "names": {
     "en": "Slovenia",
     "es": "Eslovenia"
@@ -2642,6 +2780,7 @@
    "id": "country:SB",
    "kind": "country",
    "iso2": "SB",
+   "numeric": "090",
    "names": {
     "en": "Solomon Islands",
     "es": "Islas Salomón"
@@ -2662,6 +2801,7 @@
    "id": "country:SO",
    "kind": "country",
    "iso2": "SO",
+   "numeric": "706",
    "names": {
     "en": "Somalia",
     "es": "Somalia"
@@ -2681,6 +2821,7 @@
    "id": "country:somaliland",
    "kind": "country",
    "iso2": null,
+   "numeric": null,
    "names": {
     "en": "Somaliland",
     "es": "Somaliland"
@@ -2697,6 +2838,7 @@
    "id": "country:ZA",
    "kind": "country",
    "iso2": "ZA",
+   "numeric": "710",
    "names": {
     "en": "South Africa",
     "es": "Sudáfrica"
@@ -2716,6 +2858,7 @@
    "id": "country:KR",
    "kind": "country",
    "iso2": "KR",
+   "numeric": "410",
    "names": {
     "en": "South Korea",
     "es": "República de Corea"
@@ -2737,6 +2880,7 @@
    "id": "country:SS",
    "kind": "country",
    "iso2": "SS",
+   "numeric": "728",
    "names": {
     "en": "South Sudan",
     "es": "Sudán del Sur"
@@ -2757,6 +2901,7 @@
    "id": "country:ES",
    "kind": "country",
    "iso2": "ES",
+   "numeric": "724",
    "names": {
     "en": "Spain",
     "es": "España"
@@ -2776,6 +2921,7 @@
    "id": "country:LK",
    "kind": "country",
    "iso2": "LK",
+   "numeric": "144",
    "names": {
     "en": "Sri Lanka",
     "es": "Sri Lanka"
@@ -2795,6 +2941,7 @@
    "id": "country:PS",
    "kind": "country",
    "iso2": "PS",
+   "numeric": "275",
    "names": {
     "en": "State of Palestine",
     "es": "Palestina"
@@ -2815,6 +2962,7 @@
    "id": "country:SD",
    "kind": "country",
    "iso2": "SD",
+   "numeric": "729",
    "names": {
     "en": "Sudan",
     "es": "Sudán"
@@ -2834,6 +2982,7 @@
    "id": "country:SR",
    "kind": "country",
    "iso2": "SR",
+   "numeric": "740",
    "names": {
     "en": "Suriname",
     "es": "Suriname"
@@ -2853,6 +3002,7 @@
    "id": "country:SE",
    "kind": "country",
    "iso2": "SE",
+   "numeric": "752",
    "names": {
     "en": "Sweden",
     "es": "Suecia"
@@ -2872,6 +3022,7 @@
    "id": "country:CH",
    "kind": "country",
    "iso2": "CH",
+   "numeric": "756",
    "names": {
     "en": "Switzerland",
     "es": "Suiza"
@@ -2891,6 +3042,7 @@
    "id": "country:SY",
    "kind": "country",
    "iso2": "SY",
+   "numeric": "760",
    "names": {
     "en": "Syrian Arab Republic",
     "es": "República Árabe Siria"
@@ -2911,6 +3063,7 @@
    "id": "country:TW",
    "kind": "country",
    "iso2": "TW",
+   "numeric": "158",
    "names": {
     "en": "Taiwan, Province of China",
     "es": "Taiwán"
@@ -2931,6 +3084,7 @@
    "id": "country:TJ",
    "kind": "country",
    "iso2": "TJ",
+   "numeric": "762",
    "names": {
     "en": "Tajikistan",
     "es": "Tayikistán"
@@ -2950,6 +3104,7 @@
    "id": "country:TH",
    "kind": "country",
    "iso2": "TH",
+   "numeric": "764",
    "names": {
     "en": "Thailand",
     "es": "Tailandia"
@@ -2969,6 +3124,7 @@
    "id": "country:MK",
    "kind": "country",
    "iso2": "MK",
+   "numeric": "807",
    "names": {
     "en": "The Republic of North Macedonia",
     "es": "Macedonia del Norte"
@@ -2990,6 +3146,7 @@
    "id": "country:TL",
    "kind": "country",
    "iso2": "TL",
+   "numeric": "626",
    "names": {
     "en": "Timor-Leste",
     "es": "Timor-Leste"
@@ -3009,6 +3166,7 @@
    "id": "country:TG",
    "kind": "country",
    "iso2": "TG",
+   "numeric": "768",
    "names": {
     "en": "Togo",
     "es": "Togo"
@@ -3028,6 +3186,7 @@
    "id": "country:TT",
    "kind": "country",
    "iso2": "TT",
+   "numeric": "780",
    "names": {
     "en": "Trinidad and Tobago",
     "es": "Trinidad y Tobago"
@@ -3047,6 +3206,7 @@
    "id": "country:TN",
    "kind": "country",
    "iso2": "TN",
+   "numeric": "788",
    "names": {
     "en": "Tunisia",
     "es": "Túnez"
@@ -3066,6 +3226,7 @@
    "id": "country:TR",
    "kind": "country",
    "iso2": "TR",
+   "numeric": "792",
    "names": {
     "en": "Türkiye",
     "es": "Turquía"
@@ -3086,6 +3247,7 @@
    "id": "country:TM",
    "kind": "country",
    "iso2": "TM",
+   "numeric": "795",
    "names": {
     "en": "Turkmenistan",
     "es": "Turkmenistán"
@@ -3105,6 +3267,7 @@
    "id": "country:UG",
    "kind": "country",
    "iso2": "UG",
+   "numeric": "800",
    "names": {
     "en": "Uganda",
     "es": "Uganda"
@@ -3124,6 +3287,7 @@
    "id": "country:UA",
    "kind": "country",
    "iso2": "UA",
+   "numeric": "804",
    "names": {
     "en": "Ukraine",
     "es": "Ucrania"
@@ -3143,6 +3307,7 @@
    "id": "country:AE",
    "kind": "country",
    "iso2": "AE",
+   "numeric": "784",
    "names": {
     "en": "United Arab Emirates",
     "es": "Emiratos Árabes Unidos"
@@ -3163,6 +3328,7 @@
    "id": "country:GB",
    "kind": "country",
    "iso2": "GB",
+   "numeric": "826",
    "names": {
     "en": "United Kingdom",
     "es": "Reino Unido"
@@ -3184,6 +3350,7 @@
    "id": "country:TZ",
    "kind": "country",
    "iso2": "TZ",
+   "numeric": "834",
    "names": {
     "en": "United Republic of Tanzania",
     "es": "Tanzania"
@@ -3203,6 +3370,7 @@
    "id": "country:US",
    "kind": "country",
    "iso2": "US",
+   "numeric": "840",
    "names": {
     "en": "United States of America",
     "es": "Estados Unidos"
@@ -3225,6 +3393,7 @@
    "id": "country:UY",
    "kind": "country",
    "iso2": "UY",
+   "numeric": "858",
    "names": {
     "en": "Uruguay",
     "es": "Uruguay"
@@ -3244,6 +3413,7 @@
    "id": "country:UZ",
    "kind": "country",
    "iso2": "UZ",
+   "numeric": "860",
    "names": {
     "en": "Uzbekistan",
     "es": "Uzbekistán"
@@ -3263,6 +3433,7 @@
    "id": "country:VU",
    "kind": "country",
    "iso2": "VU",
+   "numeric": "548",
    "names": {
     "en": "Vanuatu",
     "es": "Vanuatu"
@@ -3282,6 +3453,7 @@
    "id": "country:VE",
    "kind": "country",
    "iso2": "VE",
+   "numeric": "862",
    "names": {
     "en": "Venezuela",
     "es": "Venezuela"
@@ -3301,6 +3473,7 @@
    "id": "country:VN",
    "kind": "country",
    "iso2": "VN",
+   "numeric": "704",
    "names": {
     "en": "Vietnam",
     "es": "Vietnam"
@@ -3320,6 +3493,7 @@
    "id": "country:EH",
    "kind": "country",
    "iso2": "EH",
+   "numeric": "732",
    "names": {
     "en": "Western Sahara",
     "es": "Sahara Occidental"
@@ -3340,6 +3514,7 @@
    "id": "country:YE",
    "kind": "country",
    "iso2": "YE",
+   "numeric": "887",
    "names": {
     "en": "Yemen",
     "es": "Yemen"
@@ -3359,6 +3534,7 @@
    "id": "country:ZM",
    "kind": "country",
    "iso2": "ZM",
+   "numeric": "894",
    "names": {
     "en": "Zambia",
     "es": "Zambia"
@@ -3378,6 +3554,7 @@
    "id": "country:ZW",
    "kind": "country",
    "iso2": "ZW",
+   "numeric": "716",
    "names": {
     "en": "Zimbabwe",
     "es": "Zimbabue"

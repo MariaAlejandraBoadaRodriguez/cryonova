@@ -17,6 +17,8 @@ export interface Region {
   id: string;
   kind: "country" | "region";
   iso2: string | null;
+  /** ISO 3166-1 numeric code as used by world-atlas feature ids (countries only). */
+  numeric?: string | null;
   names: { en: string; es: string };
   aliases: string[];
   bbox: BBox;
@@ -79,6 +81,18 @@ export function findRegionsInText(text: string): Region[] {
     if (hit) found.push({ region, length: hit.length });
   }
   return found.sort((a, b) => b.length - a.length).map((f) => f.region);
+}
+
+/** Country for a world-atlas feature id (ISO numeric), if it is in the gazetteer. */
+export function regionByNumeric(numeric: string | number | undefined): Region | undefined {
+  if (numeric === undefined) return undefined;
+  const key = String(numeric).padStart(3, "0");
+  return REGIONS.find((r) => r.numeric === key);
+}
+
+/** Countries and territories sorted by English name, for the location dropdown. */
+export function countryOptions(): Region[] {
+  return REGIONS.filter((r) => r.kind === "country").sort((a, b) => a.names.en.localeCompare(b.names.en));
 }
 
 export function getRegion(id: string): Region | undefined {

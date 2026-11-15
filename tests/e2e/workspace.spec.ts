@@ -1,0 +1,194 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, type Page, test } from "@playwright/test";
+
+/** WCAG 2.x A/AA checks; serious and critical findings fail the test. */
+async function expectAccessible(page: Page) {
+  const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+  expect(axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? "")).map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(" | ")}`)).toEqual([]);
+}
+
+const shot = (name: string) => `docs/benchmarks/screenshots/${name}-${test.info().project.name}.png`;
+
+test("initial workspace: guide with an example and follow-ups, accessible", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Investigation setup" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Earth Trend Detective" })).toBeVisible();
+  await expect(page.getByTestId("example-card")).toContainText("Did near-surface air temperature in Colombia change between 2005 and 2024?");
+  await expect(page.getByTestId("example-card")).toContainText(/Saved run, fetched 2026-11-14/);
+  await expect(page.locator('[data-testid^="follow-up-"]')).toHaveCount(5);
+  await expect(page.getByTestId("plan")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Open with code" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Data sources" })).toBeVisible();
+  await expect(page.getByTestId("globe")).toHaveAttribute("data-texture", "loaded", { timeout: 20_000 });
+  await expectAccessible(page);
+  await page.screenshot({ path: shot("workspace-initial"), fullPage: false });
+});
+
+test("the workspace makes no requests outside its own origin (no CDN)", async ({ page, baseURL }) => {
+  const origin = new URL(baseURL!).host;
+  const foreign: string[] = [];
+  page.on("request", (r) => {
+    const host = new URL(r.url()).host;
+    if (host && host !== origin) foreign.push(host);
+  });
+  await page.goto("/");
+  await expect(page.getByTestId("globe")).toHaveAttribute("data-texture", "loaded", { timeout: 20_000 });
+  await page.getByTestId("use-example").click();
+  await expect(page.getByTestId("plan")).toBeVisible();
+  expect(foreign).toEqual([]);
+});
+
+test("example pre-fills the setup; edits update the plan; Start analysis explains why it is disabled", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("use-example").click();
+  const plan = page.getByTestId("plan");
+  await expect(plan).toBeVisible();
+  await expect(page.getByTestId("plan-question")).toHaveValue("Did near-surface air temperature in Colombia change between 2005 and 2024?");
+  await expect(page.getByTestId("plan-location")).toContainText("Colombia");
+  await expect(page.getByTestId("plan-period")).toContainText("240 months · 20 complete years");
+  await expect(page.getByTestId("plan-variables")).toContainText("Near-surface air temperature (2 m)");
+  await expect(page.getByRole("button", { name: "Remove Near-surface air temperature (2 m)" })).toBeVisible();
+  await expect(page.getByTestId("start-analysis")).toBeEnabled();
+  await expect(page.getByText("Selected: Colombia", { exact: false })).toBeVisible();
+
+  // Edit the period: the plan follows, and a short period is flagged.
+  await page.getByLabel("Start year").selectOption("2015");
+  await expect(page.getByTestId("plan-period")).toContainText("120 months · 10 complete years");
+  await page.getByLabel("Start year").selectOption("2021");
+  await expect(page.getByTestId("plan-checks")).toContainText("the annual trend needs at least 10");
+  await expect(page.getByTestId("setup")).toContainText("Period comparison needs at least 6 complete years.");
+
+  // An impossible period keeps the plan visible and disables Start analysis with the reason.
+  await page.getByLabel("End year").selectOption("2019");
+  await expect(page.getByTestId("plan-blockers")).toContainText("The end month must not be before the start month.");
+  const start = page.getByTestId("start-analysis");
+  await expect(start).toBeDisabled();
+  await expect(start).toHaveAttribute("aria-describedby", /.+/);
+
+  // Back to a valid edit, with an extra variable from the catalog.
+  await page.getByRole("button", { name: /Use suggested \d+ years/ }).click();
+  await page.getByLabel("Browse or search the catalog").fill("dew point");
+  await page.getByRole("checkbox", { name: /Dew point temperature \(2 m\)/ }).check();
+  await expect(page.getByTestId("plan-variables")).toContainText("Dew point temperature (2 m)");
+  await expect(start).toBeEnabled();
+  await expectAccessible(page);
+});
+
+test("ready state screenshot and plan details", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("use-example").click();
+  await expect(page.getByTestId("plan")).toContainText("Annual trend: OLS on complete-year means with Newey–West HAC uncertainty");
+  await expect(page.getByTestId("plan-checks")).toContainText("20 complete years");
+  await expect(page.getByTestId("globe")).toHaveAttribute("data-texture", "loaded", { timeout: 20_000 });
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: shot("workspace-ready"), fullPage: false });
+});
+
+test("location modes: country list, custom coordinates and a sample place, all without the mouse", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("combobox", { name: "Country or territory" }).selectOption({ label: "Brazil" });
+  await expect(page.getByText("Selected: Brazil", { exact: false })).toBeVisible();
+
+  await page.getByRole("radio", { name: "Custom area" }).check();
+  await expect(page.getByRole("combobox", { name: "Country or territory" })).toHaveCount(0);
+  await page.getByLabel("North (°)").fill("13");
+  await page.getByLabel("South (°)").fill("-5");
+  await page.getByLabel("West (°)").fill("-80");
+  await page.getByLabel("East (°)").fill("-66");
+  await page.getByRole("button", { name: "Apply coordinates" }).press("Enter");
+  await expect(page.getByText("Selected: Custom area", { exact: false })).toBeVisible();
+
+  await page.getByRole("button", { name: "Select Colombia" }).press("Enter");
+  await expect(page.getByText("Selected: Colombia", { exact: false })).toBeVisible();
+  await expect(page.getByRole("radio", { name: "Country or territory" })).toBeChecked();
+
+  const globe = page.getByRole("application");
+  await globe.focus();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("+");
+  await expect(globe).toBeFocused();
+});
+
+test("the assistant answers in Spanish and fills the setup as an editable proposal", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("assistant-input").fill("¿Ha cambiado la precipitación en Perú desde 2001?");
+  await page.getByTestId("investigate-button").click();
+  await expect(page.getByRole("log")).toContainText(/Propuesta:/, { timeout: 60_000 });
+  await expect(page.getByText("Selected: Peru", { exact: false })).toBeVisible();
+  await expect(page.getByTestId("plan")).toBeVisible();
+  await expect(page.getByTestId("plan-period")).toContainText("Jan 2001");
+  await expect(page.getByTestId("plan-question")).toHaveValue("¿Ha cambiado la precipitación en Perú desde 2001?");
+});
+
+test("old links redirect: /investigate?q= asks the assistant on the workspace", async ({ page }) => {
+  await page.goto(`/investigate?q=${encodeURIComponent("Is it getting warmer in Chile since 2001?")}`);
+  await expect(page).toHaveURL(/\/\?q=/);
+  await expect(page.getByRole("log")).toContainText(/Proposal:/, { timeout: 60_000 });
+  await expect(page.getByText("Selected: Chile", { exact: false })).toBeVisible();
+});
+
+test("unknown runs and wrong codes are handled without revealing anything", async ({ page }) => {
+  await page.goto("/investigations/00000000-0000-4000-8000-000000000000");
+  await expect(page.getByText("This run does not exist.")).toBeVisible();
+  await page.goto("/open");
+  await expect(page.getByRole("heading", { name: "Open with code" })).toBeVisible();
+  await page.getByLabel("Retrieval code").fill("ZZZZ-ZZZZ-ZZZZ");
+  await page.getByRole("button", { name: "Open investigation" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "No investigation matches this code" })).toBeVisible();
+  await expectAccessible(page);
+});
+
+test("live flow: example → edit → plan → Start analysis → dashboard → save → reopen by code → CSV and PDF", async ({ page, browser }) => {
+  test.skip(!process.env.LIVE_E2E, "Live provider journey: set LIVE_E2E=1 (queries NASA and Neon).");
+  test.setTimeout(300_000);
+  await page.goto("/");
+  await page.getByTestId("use-example").click();
+  await page.getByLabel("Start year").selectOption("2015");
+  await expect(page.getByTestId("plan-period")).toContainText("120 months");
+  await page.getByTestId("start-analysis").click();
+
+  await expect(page).toHaveURL(/\/investigations\/[0-9a-f-]{36}$/);
+  await expect(page.getByTestId("dashboard")).toBeVisible({ timeout: 240_000 });
+  await expect(page.getByTestId("headline-finding")).toContainText("Near-surface air temperature (2 m) · Colombia");
+  const trend = (await page.getByTestId("headline-finding").getByTestId("trend-value").textContent())?.trim() ?? "";
+  expect(trend).toMatch(/°C\/decade/);
+  await expect(page.locator('[data-testid="series-chart"] .main-svg').first()).toBeVisible();
+  await expect(page.getByTestId("provenance")).toContainText("120 of 120 months read");
+  await expect(page.getByTestId("dashboard-status")).toContainText("Live run");
+  await expect(page.getByTestId("explanation")).toContainText(/figures checked against the computed results/, { timeout: 90_000 });
+  await expectAccessible(page);
+  await page.screenshot({ path: shot("dashboard"), fullPage: false });
+
+  // CSV and PDF from the dashboard buttons.
+  const [csv] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "Download CSV (monthly series)" }).click()]);
+  expect(csv.suggestedFilename()).toMatch(/\.csv$/);
+  const [pdf] = await Promise.all([page.waitForEvent("download"), page.getByTestId("pdf-button").click()]);
+  expect(pdf.suggestedFilename()).toMatch(/\.pdf$/);
+
+  await page.getByTestId("save-button").click();
+  const code = (await page.getByTestId("retrieval-code").textContent())?.trim() ?? "";
+  expect(code).toMatch(/^[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}$/);
+
+  // A fresh browser context (no shared state) reopens it read-only on the same dashboard.
+  const other = await browser.newContext();
+  const page2 = await other.newPage();
+  await page2.goto("/open");
+  await page2.getByLabel("Retrieval code").fill(code.toLowerCase());
+  await page2.getByRole("button", { name: "Open investigation" }).click();
+  await expect(page2.getByTestId("saved-investigation")).toBeVisible();
+  await expect(page2.getByTestId("dashboard-status")).toContainText("Saved investigation · read-only");
+  await expect(page2.getByTestId("headline-finding").getByTestId("trend-value")).toHaveText(trend);
+  expect(page2.url()).not.toContain(code);
+  const results = await (await page2.request.post("/api/exports", { data: { format: "csv", code } })).text();
+  expect(results).toContain("# run_id:");
+  const report = await page2.request.post("/api/exports", { data: { format: "pdf", code } });
+  expect(report.headers()["content-type"]).toBe("application/pdf");
+  expect((await report.body()).subarray(0, 5).toString()).toBe("%PDF-");
+  await other.close();
+
+  // Back to setup keeps the selection.
+  await page.getByTestId("back-to-setup").first().click();
+  await expect(page.getByTestId("plan")).toBeVisible();
+  await expect(page.getByTestId("plan-period")).toContainText("Jan 2015");
+  await expect(page.getByTestId("plan-location")).toContainText("Colombia");
+});

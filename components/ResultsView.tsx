@@ -13,10 +13,11 @@ import { coverageSentence, EVIDENCE_LABEL, evidenceOf, magnitudeSentence, qValue
 import { anomalyChart, decimalsOf, seasonalCycleChart, seriesChart } from "./charts";
 import { DiscoveryTable } from "./DiscoveryTable";
 import { Plot } from "./Plot";
+import { TableWrap } from "./TableWrap";
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-function EvidenceBadge({ v, qValue }: { v: VariableResult; qValue: number | null }) {
+export function EvidenceBadge({ v, qValue }: { v: VariableResult; qValue: number | null }) {
   const level = evidenceOf(v, qValue);
   const strong = level === "significant";
   return (
@@ -29,26 +30,18 @@ function EvidenceBadge({ v, qValue }: { v: VariableResult; qValue: number | null
   );
 }
 
-function VariableCard({ v, result, index }: { v: VariableResult; result: RunResult; index: number }) {
+/** Headline numbers, plain-language finding and the annotated main chart for one variable. */
+export function MainFinding({ v, result }: { v: VariableResult; result: RunResult }) {
   const a = v.analysis;
   const d = decimalsOf(v);
   const source = result.sources.find((s) => s.collection === v.collection);
   const fetchedTo = source?.fetchedTo ?? null;
-  const series = useMemo(() => seriesChart(v, fetchedTo), [v, fetchedTo]);
-  const anomalies = useMemo(() => anomalyChart(v, fetchedTo), [v, fetchedTo]);
-  const cycle = useMemo(() => seasonalCycleChart(v, fetchedTo), [v, fetchedTo]);
   const region = regionLabel(result);
+  const series = useMemo(() => seriesChart(v, fetchedTo), [v, fetchedTo]);
   const trend = a.trend.status === "ok" ? a.trend : null;
   const magnitude = magnitudeSentence(v);
-
   return (
-    <article className="card" aria-labelledby={`var-${index}`} data-testid={`variable-${v.key}`}>
-      <p className="step-label">
-        {v.product} v{v.version} · {v.dapName.replace(/^.*\//, "")}
-      </p>
-      <h3 id={`var-${index}`}>
-        {v.name.en} · {region}
-      </h3>
+    <>
       <div className="headline stack">
         {trend ? (
           <>
@@ -103,10 +96,28 @@ function VariableCard({ v, result, index }: { v: VariableResult; result: RunResu
       </div>
       <p className="field-help">{coverageSentence(v)}</p>
 
-      <details>
-        <summary>Seasonal cycle</summary>
-        <Plot {...cycle} ariaLabel={`Average ${v.name.en} for each calendar month in ${region}.`} />
-        <div className="table-wrap">
+    </>
+  );
+}
+
+/** The other planned analyses for one variable: seasonal cycle, anomalies, seasonal trends, comparison, ranking, values. */
+export function VariableAnalyses({ v, result }: { v: VariableResult; result: RunResult }) {
+  const a = v.analysis;
+  const d = decimalsOf(v);
+  const source = result.sources.find((s) => s.collection === v.collection);
+  const fetchedTo = source?.fetchedTo ?? null;
+  const region = regionLabel(result);
+  const anomalies = useMemo(() => anomalyChart(v, fetchedTo), [v, fetchedTo]);
+  const cycle = useMemo(() => seasonalCycleChart(v, fetchedTo), [v, fetchedTo]);
+  return (
+    <>
+      <div className="dash-grid">
+        <section className="dash-panel" aria-label={`Seasonal cycle of ${v.name.en}`}>
+          <h4>Seasonal cycle</h4>
+          <Plot {...cycle} ariaLabel={`Average ${v.name.en} for each calendar month in ${region}.`} />
+          <details>
+            <summary>Monthly means table</summary>
+        <TableWrap label="Mean of each calendar month">
           <table className="data">
             <caption className="visually-hidden">Mean of each calendar month</caption>
             <thead>
@@ -130,11 +141,11 @@ function VariableCard({ v, result, index }: { v: VariableResult; result: RunResu
               ))}
             </tbody>
           </table>
-        </div>
-      </details>
-
-      <details>
-        <summary>Monthly anomalies</summary>
+        </TableWrap>
+          </details>
+        </section>
+        <section className="dash-panel" aria-label={`Monthly anomalies of ${v.name.en}`}>
+          <h4>Monthly anomalies</h4>
         <Plot {...anomalies} ariaLabel={`Monthly anomalies of ${v.name.en} relative to each calendar month's mean. Warm bars are above, blue bars below.`} />
         <p className="field-help">
           Longest run of positive anomalies:{" "}
@@ -143,11 +154,11 @@ function VariableCard({ v, result, index }: { v: VariableResult; result: RunResu
             : "none"}
           ; current run: {a.streaks.currentPositiveAnomalyMonths} months.
         </p>
-      </details>
-
-      <details>
-        <summary>Seasonal trends, ranking and period comparison</summary>
-        <div className="table-wrap">
+        </section>
+      </div>
+      <section className="dash-panel" aria-label={`Seasonal trends, period comparison and ranking of ${v.name.en}`}>
+        <h4>Seasonal trends, period comparison and ranking</h4>
+        <TableWrap label="Trend per season">
           <table className="data">
             <caption className="visually-hidden">Trend per season</caption>
             <thead>
@@ -187,7 +198,7 @@ function VariableCard({ v, result, index }: { v: VariableResult; result: RunResu
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
         {a.periodComparison && (
           <p>
             Mean {a.periodComparison.firstPeriod.join("–")}: <strong>{fmt(a.periodComparison.firstMean, d)}</strong> {a.units}; mean {a.periodComparison.secondPeriod.join("–")}:{" "}
@@ -201,11 +212,10 @@ function VariableCard({ v, result, index }: { v: VariableResult; result: RunResu
             {a.streaks.longestAboveMeanYears ? ` Longest run of years above the period mean: ${a.streaks.longestAboveMeanYears.length} (${a.streaks.longestAboveMeanYears.start}–${a.streaks.longestAboveMeanYears.end}).` : ""}
           </p>
         )}
-      </details>
-
+      </section>
       <details>
         <summary>Values table (annual and monthly)</summary>
-        <div className="table-wrap" style={{ maxHeight: 360 }}>
+        <TableWrap label="Annual means used for the trend" style={{ maxHeight: 360 }}>
           <table className="data">
             <caption className="visually-hidden">Annual means used for the trend</caption>
             <thead>
@@ -235,8 +245,8 @@ function VariableCard({ v, result, index }: { v: VariableResult; result: RunResu
               ))}
             </tbody>
           </table>
-        </div>
-        <div className="table-wrap" style={{ maxHeight: 360, marginTop: 10 }}>
+        </TableWrap>
+        <TableWrap label="Monthly regional means" style={{ maxHeight: 360, marginTop: 10 }}>
           <table className="data">
             <caption className="visually-hidden">Monthly regional means</caption>
             <thead>
@@ -262,14 +272,29 @@ function VariableCard({ v, result, index }: { v: VariableResult; result: RunResu
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       </details>
+    </>
+  );
+}
+
+/** One variable: main finding and its analyses. The dashboard's primary variable shows only the analyses here. */
+export function VariableCard({ v, result, index, showMain = true }: { v: VariableResult; result: RunResult; index: number; showMain?: boolean }) {
+  return (
+    <article className="card" aria-labelledby={`var-${index}`} data-testid={`variable-${v.key}`}>
+      <p className="step-label">
+        {v.product} v{v.version} · {v.dapName.replace(/^.*\//, "")}
+      </p>
+      <h3 id={`var-${index}`}>
+        {v.name.en} · {regionLabel(result)}
+      </h3>
+      {showMain && <MainFinding v={v} result={result} />}
+      <VariableAnalyses v={v} result={result} />
     </article>
   );
 }
 
 export function ResultsView({ result }: { result: RunResult }) {
-  const regionKnown = result.selection.region.regionId ? getRegion(result.selection.region.regionId) : undefined;
   return (
     <div className="stack" data-testid="results">
       {result.warnings.length > 0 && (
@@ -290,80 +315,106 @@ export function ResultsView({ result }: { result: RunResult }) {
         <VariableCard key={v.key} v={v} result={result} index={i} />
       ))}
 
-      <section className="card" aria-labelledby="provenance-title" data-testid="provenance">
-        <h3 id="provenance-title">Sources, method and provenance</h3>
-        <dl className="kv">
-          <dt>Run</dt>
-          <dd className="mono">{result.runId}</dd>
-          <dt>Region</dt>
-          <dd>
-            {regionKnown?.names.en ?? result.region.name ?? "Custom box"} · {fmtBBox(result.region.bbox)}
-          </dd>
-          <dt>Period</dt>
-          <dd>
-            {fmtMonth(result.selection.start)} – {fmtMonth(result.selection.end)}
-          </dd>
-          <dt>Method</dt>
-          <dd>{result.variables[0]?.analysis.method}. Regional values are cosine-latitude weighted means of valid grid cells; years need 12 valid months.</dd>
-          <dt>Timings</dt>
-          <dd>
-            discovery {fmtDuration(result.timings.discoveryMs)} · reads {fmtDuration(result.timings.readWallMs)} wall ({result.timings.concurrency} workers) · analysis {fmtDuration(result.timings.analysisMs)} · total{" "}
-            {fmtDuration(result.timings.totalMs)} · {result.timings.invocations} invocation(s)
-          </dd>
-          <dt>Completed</dt>
-          <dd>{fmtUtc(result.completedAt)}</dd>
-        </dl>
-        {result.sources.map((s) => (
-          <details key={s.collection} open>
-            <summary>
-              {s.collection} v{s.version} — {s.provider}
-            </summary>
-            <dl className="kv">
-              <dt>Product</dt>
-              <dd>{s.title}</dd>
-              <dt>CMR collection</dt>
-              <dd>
-                <a href={`https://cmr.earthdata.nasa.gov/search/concepts/${s.conceptId}.html`} target="_blank" rel="noreferrer">
-                  {s.conceptId}
-                </a>
-                {s.doi && (
-                  <>
-                    {" "}
-                    · DOI{" "}
-                    <a href={`https://doi.org/${s.doi}`} target="_blank" rel="noreferrer">
-                      {s.doi}
-                    </a>
-                  </>
-                )}
-              </dd>
-              <dt>Data received</dt>
-              <dd>
-                {s.monthsRead} of {s.monthsRequested} months read · {s.monthsFailed} failed · {s.monthsMissing} not published · {fmtBytes(s.bytes)}
-              </dd>
-              <dt>Granules</dt>
-              <dd className="mono">
-                {s.firstGranule ?? "—"} → {s.lastGranule ?? "—"}
-              </dd>
-              <dt>Fetched</dt>
-              <dd>
-                {fmtUtc(s.fetchedFrom)} → {fmtUtc(s.fetchedTo)} (median read {fmtDuration(s.readMs.median)}, p95 {fmtDuration(s.readMs.p95)})
-              </dd>
-              <dt>Grid window</dt>
-              <dd>
-                {s.window.cells} cells per month at {s.window.resolution}
-                {s.window.stride > 1 ? `, every ${s.window.stride} cells` : ""} · lat index {s.window.lat.start}–{s.window.lat.stop} · lon pieces{" "}
-                {s.window.lon.map((p) => `${p.start}–${p.stop}`).join(" + ")}
-              </dd>
-              <dt>Access</dt>
-              <dd>{s.access}</dd>
-              <dt>Example request</dt>
-              <dd className="mono">{s.exampleRequest ?? "—"}</dd>
-              <dt>Citation</dt>
-              <dd>{s.citation}</dd>
-            </dl>
-          </details>
-        ))}
-      </section>
+      <ProvenancePanel result={result} />
+    </div>
+  );
+}
+
+/** Sources, versions, request times, valid months and cells, method and timings. */
+export function ProvenancePanel({ result }: { result: RunResult }) {
+  const regionKnown = result.selection.region.regionId ? getRegion(result.selection.region.regionId) : undefined;
+  return (
+    <section className="card" aria-labelledby="provenance-title" data-testid="provenance">
+      <h3 id="provenance-title">Sources, method and provenance</h3>
+      <dl className="kv">
+        <dt>Run</dt>
+        <dd className="mono">{result.runId}</dd>
+        <dt>Region</dt>
+        <dd>
+          {regionKnown?.names.en ?? result.region.name ?? "Custom box"} · {fmtBBox(result.region.bbox)}
+        </dd>
+        <dt>Period</dt>
+        <dd>
+          {fmtMonth(result.selection.start)} – {fmtMonth(result.selection.end)}
+        </dd>
+        <dt>Method</dt>
+        <dd>{result.variables[0]?.analysis.method}. Regional values are cosine-latitude weighted means of valid grid cells; years need 12 valid months.</dd>
+        <dt>Timings</dt>
+        <dd>
+          discovery {fmtDuration(result.timings.discoveryMs)} · reads {fmtDuration(result.timings.readWallMs)} wall ({result.timings.concurrency} workers) · analysis {fmtDuration(result.timings.analysisMs)} · total{" "}
+          {fmtDuration(result.timings.totalMs)} · {result.timings.invocations} invocation(s)
+        </dd>
+        <dt>Completed</dt>
+        <dd>{fmtUtc(result.completedAt)}</dd>
+      </dl>
+      {result.sources.map((s) => (
+        <details key={s.collection} open>
+          <summary>
+            {s.collection} v{s.version} — {s.provider}
+          </summary>
+          <dl className="kv">
+            <dt>Product</dt>
+            <dd>{s.title}</dd>
+            <dt>CMR collection</dt>
+            <dd>
+              <a href={`https://cmr.earthdata.nasa.gov/search/concepts/${s.conceptId}.html`} target="_blank" rel="noreferrer">
+                {s.conceptId}
+              </a>
+              {s.doi && (
+                <>
+                  {" "}
+                  · DOI{" "}
+                  <a href={`https://doi.org/${s.doi}`} target="_blank" rel="noreferrer">
+                    {s.doi}
+                  </a>
+                </>
+              )}
+            </dd>
+            <dt>Data received</dt>
+            <dd>
+              {s.monthsRead} of {s.monthsRequested} months read · {s.monthsFailed} failed · {s.monthsMissing} not published · {fmtBytes(s.bytes)}
+            </dd>
+            <dt>Granules</dt>
+            <dd className="mono">
+              {s.firstGranule ?? "—"} → {s.lastGranule ?? "—"}
+            </dd>
+            <dt>Fetched</dt>
+            <dd>
+              {fmtUtc(s.fetchedFrom)} → {fmtUtc(s.fetchedTo)} (median read {fmtDuration(s.readMs.median)}, p95 {fmtDuration(s.readMs.p95)})
+            </dd>
+            <dt>Grid window</dt>
+            <dd>
+              {s.window.cells} cells per month at {s.window.resolution}
+              {s.window.stride > 1 ? `, every ${s.window.stride} cells` : ""} · lat index {s.window.lat.start}–{s.window.lat.stop} · lon pieces{" "}
+              {s.window.lon.map((p) => `${p.start}–${p.stop}`).join(" + ")}
+            </dd>
+            <dt>Access</dt>
+            <dd>{s.access}</dd>
+            <dt>Example request</dt>
+            <dd className="mono">{s.exampleRequest ?? "—"}</dd>
+            <dt>Citation</dt>
+            <dd>{s.citation}</dd>
+          </dl>
+        </details>
+      ))}
+    </section>
+  );
+}
+
+/** Coverage notes produced by the run (missing months, stride, snapped boxes). */
+export function CoverageWarnings({ result }: { result: RunResult }) {
+  if (result.warnings.length === 0) return null;
+  return (
+    <div className="alert alert-warn" role="status">
+      <span aria-hidden="true">⚠</span>
+      <div>
+        <strong>Notes on coverage</strong>
+        <ul style={{ margin: "4px 0 0", paddingLeft: 18 }}>
+          {result.warnings.map((w) => (
+            <li key={w}>{w}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
