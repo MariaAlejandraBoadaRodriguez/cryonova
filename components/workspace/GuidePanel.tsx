@@ -15,6 +15,8 @@ export interface ProgressItem {
   label: string;
   done: boolean;
   detail: string;
+  /** Optional items (the question) never hold back the summary. */
+  optional?: boolean;
 }
 
 interface GuidePanelProps {
@@ -103,9 +105,9 @@ export function GuidePanel(props: GuidePanelProps) {
               <ul>
                 {progress.map((p) => (
                   <li key={p.label} className={p.done ? "check-ok" : "check-info"}>
-                    <span aria-hidden="true">{p.done ? "✓" : "○"}</span>
+                    <span aria-hidden="true">{p.done ? "✓" : p.optional ? "–" : "○"}</span>
                     <span>
-                      <span className="visually-hidden">{p.done ? "Done: " : "Missing: "}</span>
+                      <span className="visually-hidden">{p.done ? "Done: " : p.optional ? "Optional: " : "Missing: "}</span>
                       <strong>{p.label}</strong> — {p.detail}
                     </span>
                   </li>
@@ -118,7 +120,7 @@ export function GuidePanel(props: GuidePanelProps) {
               )}
               {canShowPlan && (
                 <button type="button" className="ws-btn ws-btn-primary" onClick={() => props.onView("plan")}>
-                  Back to the plan
+                  Review summary
                 </button>
               )}
             </section>
@@ -141,7 +143,7 @@ export function GuidePanel(props: GuidePanelProps) {
           </ul>
         </>
       ) : (
-        <section className={plan.blockers.length > 0 ? "plan plan-card has-blockers" : "plan plan-card"} aria-labelledby={`${id}-plan`} data-testid="plan">
+        <section className={plan.blockers.length > 0 ? "plan plan-card has-blockers" : "plan plan-card"} aria-labelledby={`${id}-plan`} tabIndex={-1} data-testid="plan">
           <div className="plan-head">
             <p className="ws-step" style={{ margin: 0 }} id={`${id}-plan`}>
               <span className="ws-step-num">03 / </span>Investigation plan
@@ -151,10 +153,23 @@ export function GuidePanel(props: GuidePanelProps) {
             </button>
           </div>
           <label className="plan-label" htmlFor={`${id}-question`}>
-            Question to answer
+            Question or working title (optional)
           </label>
-          <AutoGrowTextarea id={`${id}-question`} minRows={2} maxLength={600} value={plan.question} onChange={(e) => props.onQuestion(e.target.value)} data-testid="plan-question" />
-          {!plan.question && suggestedQuestion && (
+          <AutoGrowTextarea
+            id={`${id}-question`}
+            minRows={2}
+            maxLength={600}
+            value={plan.question}
+            onChange={(e) => props.onQuestion(e.target.value)}
+            aria-describedby={plan.questionIsWorkingTitle ? `${id}-title-help` : undefined}
+            data-testid="plan-question"
+          />
+          {plan.questionIsWorkingTitle && (
+            <p className="field-help" id={`${id}-title-help`}>
+              Working title generated from your selection. Edit it or write your own question.
+            </p>
+          )}
+          {plan.questionIsWorkingTitle && suggestedQuestion && (
             <button type="button" className="ws-btn ws-btn-link" onClick={() => props.onQuestion(suggestedQuestion)}>
               Use “{suggestedQuestion}”
             </button>
