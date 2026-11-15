@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { regionByNumeric } from "@/src/catalog/regions";
 import { EXAMPLE, FOLLOW_UPS, samplePlaces } from "@/src/plan/examples";
-import { buildPlan, lastCompleteYear, looksLikeQuestion, MIN_TREND_YEARS, type PlanDraft, suggestedPeriod, suggestQuestion, topicFor } from "@/src/plan/plan";
+import { MAX_VARIABLES } from "@/src/jobs/selection";
+import { addVariable, buildPlan, keepDerived, lastCompleteYear, looksLikeQuestion, MIN_TREND_YEARS, periodYearRange, type PlanDraft, suggestedPeriod, suggestQuestion, topicFor, workingTitle } from "@/src/plan/plan";
 import { draftFromParams, setupHref } from "@/src/plan/url";
 
 const colombia = { mode: "country" as const, regionId: "country:CO", customBBox: null };
@@ -23,21 +24,72 @@ describe("investigation plan", () => {
     expect(plan.checks.some((c) => /ongoing/.test(c.text))).toBe(true);
   });
 
-  it("explains every reason Start analysis is disabled", () => {
+  it("explains every reason Start analysis is disabled (a missing question is not one)", () => {
     const plan = buildPlan(draft({ question: " ", variables: [], location: { mode: "country", regionId: null, customBBox: null } }));
     expect(plan.ready).toBe(false);
-    expect(plan.blockers).toEqual(expect.arrayContaining([expect.stringMatching(/question/), expect.stringMatching(/at least one variable/), expect.stringMatching(/country or territory/)]));
+    expect(plan.blockers).toEqual([expect.stringMatching(/at least one variable/), expect.stringMatching(/country or territory/)]);
+    expect(plan.blockers.some((b) => /question/i.test(b))).toBe(false);
     expect(buildPlan(draft({ start: "2024-12", end: "2005-01" })).blockers).toContain("The end month must not be before the start month.");
     expect(buildPlan(draft({ start: "2024-01", end: "2024-06" })).blockers).toContain("Choose at least 12 months.");
     expect(buildPlan(draft({ location: { mode: "custom", regionId: "country:CO", customBBox: null } })).blockers).toContain("Draw or type the custom area.");
+  });
+
+  it("uses an editable working title as the question in manual mode", () => {
+    const plan = buildPlan(draft({ question: "", start: "2000-01", end: "2020-12" }));
+    expect(plan.ready).toBe(true);
+    expect(plan.blockers).toEqual([]);
+    expect(plan.questionIsWorkingTitle).toBe(true);
+    expect(plan.question).toBe("Trend in near-surface air temperature (2 m), Colombia, 2000–2020");
+    expect(plan.selection?.question).toBe(plan.question);
+    // A typed question replaces it; the working title never triggers the year-mismatch warning.
+    expect(buildPlan(draft({ question: "Is Colombia warming?" }))).toMatchObject({ question: "Is Colombia warming?", questionIsWorkingTitle: false });
+    expect(plan.checks.some((c) => c.text.includes("outside the selected period"))).toBe(false);
+    expect(workingTitle({ variables: ["merra2.T2M", "merra2.PRECTOTCORR"], start: "2010-01", end: "2010-12", location: { mode: "custom", regionId: null, customBBox: { west: -80, south: -5, east: -66, north: 13 } } })).toMatch(
+      /^Trend in near-surface air temperature \(2 m\) and .+, custom area, 2010$/,
+    );
+    expect(workingTitle({ variables: ["merra2.T2M", "merra2.TS", "merra2.QV2M"], start: "2010-01", end: "2019-12", location: colombia })).toContain("and 2 more variables, Colombia, 2010–2019");
   });
 
   it("warns when the period is too short for the trend and the period comparison", () => {
     const plan = buildPlan(draft({ start: "2020-01", end: "2024-12" }));
     expect(plan.ready).toBe(true);
     expect(plan.checks.filter((c) => c.level === "warn").map((c) => c.text)).toEqual(
-      expect.arrayContaining([expect.stringContaining(`at least ${MIN_TREND_YEARS}`), expect.stringContaining("Period comparison needs at least 6")]),
+      expect.arrayContaining([expect.stringContaining(`Fewer than ${MIN_TREND_YEARS} complete years (5): the trend will be uncertain`), expect.stringContaining("Period comparison needs at least 6")]),
     );
+  });
+
+  it("flags a period outside the archive without rewriting it", () => {
+    // SeaWiFS ends in 2010-12: the dates stay as chosen, a warning explains, and the schema keeps Start analysis disabled.
+    const plan = buildPlan(draft({ variables: ["seawifs.chlor_a"], start: "2005-01", end: "2024-12" }));
+    expect(plan.period).toMatchObject({ start: "2005-01", end: "2024-12" });
+    expect(plan.checks.some((c) => c.level === "warn" && c.text.includes("after the archive coverage") && c.text.includes("Dec 2010"))).toBe(true);
+    expect(plan.ready).toBe(false);
+    const reversed = buildPlan(draft({ start: "2024-12", end: "2005-01" }));
+    expect(reversed.period).toMatchObject({ start: "2024-12", end: "2005-01", months: 0 });
+  });
+
+  it("offers every year of the selected variables' archive, plus the years already chosen", () => {
+    const thisYear = new Date().getUTCFullYear();
+    expect(periodYearRange([], "2006-01", "2025-12")).toEqual({ min: 1980, max: thisYear });
+    expect(periodYearRange(["merra2.T2M"], "2006-01", "2025-12")).toEqual({ min: 1980, max: thisYear });
+    expect(periodYearRange(["era5.t2m"], "2006-01", "2025-12").min).toBe(1940);
+    expect(periodYearRange(["seawifs.chlor_a"], "2000-01", "2009-12")).toEqual({ min: 1997, max: 2010 });
+    // A chosen year outside the archive stays visible in the select instead of being replaced.
+    expect(periodYearRange(["seawifs.chlor_a"], "2006-01", "2025-12")).toEqual({ min: 1997, max: 2025 });
+  });
+
+  it("adds exactly the variable picked, never related ones", () => {
+    expect(addVariable(["merra2.TS"], "merra2.T2M")).toEqual(["merra2.TS", "merra2.T2M"]);
+    const same = ["merra2.T2M"];
+    expect(addVariable(same, "merra2.T2M")).toBe(same);
+    expect(addVariable(same, "not.a.variable")).toBe(same);
+    const full = ["merra2.T2M", "merra2.TS", "merra2.QV2M", "merra2.T2MDEW", "merra2.PS", "merra2.SLP", "merra2.U10M", "merra2.V10M", "merra2.U2M", "merra2.V2M", "merra2.TQV", "merra2.PRECTOTCORR"];
+    expect(full).toHaveLength(MAX_VARIABLES);
+    expect(addVariable(full, "merra2.GWETTOP")).toBe(full);
+    // Selecting both inputs of a derived series does not add it; removing an input drops it.
+    expect(keepDerived(["merra2.TS", "merra2.T2M"], [])).toEqual([]);
+    expect(keepDerived(["merra2.T2M"], ["derived.TS-T2M"])).toEqual([]);
+    expect(keepDerived(["merra2.TS", "merra2.T2M"], ["derived.TS-T2M"])).toEqual(["derived.TS-T2M"]);
   });
 
   it("flags a question whose years fall outside the period", () => {
@@ -105,6 +157,16 @@ describe("setup links", () => {
     expect(href.startsWith("/?")).toBe(true);
     const params = Object.fromEntries(new URLSearchParams(href.slice(2)));
     expect(draftFromParams(params)).toEqual({ question: sel.question, variables: ["merra2.TS", "merra2.T2M"], derived: ["derived.TS-T2M"], start: "2005-01", end: "2024-12", location: colombia });
+  });
+
+  it("leaves a generated working title out of the link, so it keeps following the selection", () => {
+    const generated = buildPlan(draft({ question: "" })).selection!;
+    expect(generated.question).toBe("Trend in near-surface air temperature (2 m), Colombia, 2005–2024");
+    const href = setupHref(generated);
+    expect(new URLSearchParams(href.slice(2)).has("q")).toBe(false);
+    expect(draftFromParams(Object.fromEntries(new URLSearchParams(href.slice(2))))?.question).toBe("");
+    const typed = buildPlan(draft({ question: "Is Colombia warming?" })).selection!;
+    expect(new URLSearchParams(setupHref(typed).slice(2)).get("q")).toBe("Is Colombia warming?");
   });
 
   it("round-trips a custom box and drops unknown or invalid values", () => {

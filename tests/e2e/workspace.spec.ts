@@ -57,22 +57,198 @@ test("example pre-fills the setup; edits update the plan; Start analysis explain
   await page.getByLabel("Start year").selectOption("2015");
   await expect(page.getByTestId("plan-period")).toContainText("120 months · 10 complete years");
   await page.getByLabel("Start year").selectOption("2021");
-  await expect(page.getByTestId("plan-checks")).toContainText("the annual trend needs at least 10");
+  await expect(page.getByTestId("plan-checks")).toContainText("Fewer than 10 complete years (4): the trend will be uncertain");
+  await expect(page.getByTestId("setup")).toContainText("Fewer than 10 complete years");
   await expect(page.getByTestId("setup")).toContainText("Period comparison needs at least 6 complete years.");
 
-  // An impossible period keeps the plan visible and disables Start analysis with the reason.
+  // An impossible period keeps the plan visible and disables Start analysis with the reason; the input is not rewritten.
   await page.getByLabel("End year").selectOption("2019");
   await expect(page.getByTestId("plan-blockers")).toContainText("The end month must not be before the start month.");
+  await expect(page.getByTestId("setup")).toContainText("The end month must not be before the start month.");
+  await expect(page.getByLabel("Start year")).toHaveValue("2021");
+  await expect(page.getByLabel("End year")).toHaveValue("2019");
   const start = page.getByTestId("start-analysis");
   await expect(start).toBeDisabled();
   await expect(start).toHaveAttribute("aria-describedby", /.+/);
 
-  // Back to a valid edit, with an extra variable from the catalog.
+  // Back to a valid edit, with an extra variable from the search suggestions (the catalog checkbox list is gone).
   await page.getByRole("button", { name: /Use suggested \d+ years/ }).click();
-  await page.getByLabel("Browse or search the catalog").fill("dew point");
-  await page.getByRole("checkbox", { name: /Dew point temperature \(2 m\)/ }).check();
+  await page.getByTestId("variable-search").fill("dew point");
+  await page.getByTestId("variable-option-merra2.T2MDEW").click();
+  await expect(page.getByTestId("variable-tag-merra2.T2MDEW")).toBeVisible();
   await expect(page.getByTestId("plan-variables")).toContainText("Dew point temperature (2 m)");
   await expect(start).toBeEnabled();
+  await expectAccessible(page);
+});
+
+test("variables: choosing one adds exactly that one; search by mouse or keyboard; every tag is removable", async ({ page }) => {
+  await page.goto("/");
+  const tags = page.locator('[data-testid^="variable-tag-"]');
+  const search = page.getByTestId("variable-search");
+  await expect(page.getByRole("checkbox", { name: /temperature/i })).toHaveCount(0);
+
+  // Mouse: "wind" suggests wind variables; picking the eastward component adds only it (no northward pair, no derived speed).
+  await search.fill("wind");
+  await expect(page.getByRole("listbox", { name: "Matching variables" })).toBeVisible();
+  await expect(search).toHaveAttribute("aria-expanded", "true");
+  await page.getByTestId("variable-option-merra2.U10M").click();
+  await expect(page.getByTestId("variable-tag-merra2.U10M")).toBeVisible();
+  await expect(tags).toHaveCount(1);
+  await expect(page.locator('[data-testid^="derived-tag-"]')).toHaveCount(0);
+  await expect(search).toHaveValue("");
+
+  // Keyboard: type, ArrowDown to the first suggestion, Enter adds exactly one more.
+  await search.fill("rain");
+  await search.press("ArrowDown");
+  await expect(search).toHaveAttribute("aria-activedescendant", /.+/);
+  await search.press("Enter");
+  await expect(tags).toHaveCount(2);
+  const suggestions = page.getByRole("listbox", { name: "Matching variables" });
+  await search.fill("temperature");
+  await expect(suggestions.getByRole("option").first()).toBeVisible();
+  await search.press("Escape");
+  await expect(suggestions).toBeHidden();
+  await search.press("Escape");
+  await expect(search).toHaveValue("");
+
+  // Tags are removable one by one.
+  await page.getByRole("button", { name: "Remove Eastward wind at 10 m" }).click();
+  await expect(page.getByTestId("variable-tag-merra2.U10M")).toHaveCount(0);
+  await expect(tags).toHaveCount(1);
+
+  // A case fills several variables only because it was picked, and each one stays removable.
+  await page.getByLabel("Investigation case").selectOption("surface");
+  await expect(page.getByTestId("variable-tag-merra2.TS")).toBeVisible();
+  await expect(page.getByTestId("variable-tag-merra2.T2M")).toBeVisible();
+  await expect(page.getByTestId("derived-tag-derived.TS-T2M")).toBeVisible();
+  await page.getByTestId("variable-tag-merra2.TS").getByRole("button").click();
+  await expect(page.getByTestId("variable-tag-merra2.TS")).toHaveCount(0);
+  await expect(page.getByTestId("derived-tag-derived.TS-T2M")).toHaveCount(0);
+  await expect(tags).toHaveCount(1);
+
+  // The full catalog opens in a new tab.
+  const browse = page.getByTestId("browse-catalog");
+  await expect(browse).toHaveAttribute("href", "/catalog");
+  await expect(browse).toHaveAttribute("target", "_blank");
+  await expectAccessible(page);
+});
+
+test("period: years stay editable after the suggestion, after changing variables and after picking a case", async ({ page }) => {
+  await page.goto("/");
+  const startYear = page.getByLabel("Start year");
+  const endYear = page.getByLabel("End year");
+  const thisYear = String(new Date().getUTCFullYear());
+  await expect(startYear.locator("option", { hasText: "1980" })).toHaveCount(1);
+  await expect(endYear.locator("option", { hasText: thisYear })).toHaveCount(1);
+
+  await page.getByTestId("variable-search").fill("temperature");
+  await page.getByTestId("variable-option-merra2.T2M").click();
+  await page.getByTestId("suggested-period").click();
+  const last = String(new Date().getUTCFullYear() - 1);
+  await expect(endYear).toHaveValue(last);
+
+  // After the suggestion, both years still change freely, by select and by keyboard.
+  await startYear.selectOption("2001");
+  await endYear.selectOption("2018");
+  await expect(startYear).toHaveValue("2001");
+  await expect(endYear).toHaveValue("2018");
+  await startYear.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(startYear).toHaveValue("2000");
+
+  // Adding a variable and picking a case never overwrite the dates the user set.
+  await page.getByTestId("variable-search").fill("rain");
+  await page.getByTestId("variable-option-merra2.PRECTOTCORR").click();
+  await expect(page.getByTestId("variable-tag-merra2.PRECTOTCORR")).toBeVisible();
+  await expect(startYear).toHaveValue("2000");
+  await expect(endYear).toHaveValue("2018");
+  await page.getByLabel("Investigation case").selectOption("air");
+  await expect(startYear).toHaveValue("2000");
+  await expect(endYear).toHaveValue("2018");
+  await startYear.selectOption("1995");
+  await expect(startYear).toHaveValue("1995");
+
+  // A short period only warns; nothing is rewritten.
+  await startYear.selectOption("2014");
+  await expect(page.getByTestId("setup")).toContainText("Fewer than 10 complete years (5): the trend will be uncertain");
+  await expect(startYear).toHaveValue("2014");
+});
+
+test("period: the year range follows the archive of the selected variables (ERA5 from 1940)", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("variable-search").fill("era5 temperature");
+  await page.getByTestId("variable-option-era5.t2m").click();
+  const startYear = page.getByLabel("Start year");
+  await expect(startYear.locator("option", { hasText: "1940" })).toHaveCount(1);
+  await startYear.selectOption("1950");
+  await expect(startYear).toHaveValue("1950");
+});
+
+test("manual path: variables, period and location → Review summary → Start analysis enabled without a question", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("review-summary")).toHaveCount(0);
+  await page.getByTestId("variable-search").fill("temperature");
+  await page.getByTestId("variable-option-merra2.T2M").click();
+  await page.getByLabel("Start year").selectOption("2000");
+  await page.getByLabel("End year").selectOption("2020");
+  await expect(page.getByTestId("review-summary")).toHaveCount(0);
+  await page.getByRole("combobox", { name: "Country or territory" }).selectOption({ label: "Colombia" });
+
+  // The checklist on the right is in sync: every required item done, the question marked optional; no plan until asked.
+  const progress = page.getByTestId("guide-progress");
+  await expect(progress).toContainText("Optional: Question");
+  await expect(progress).toContainText("Done: Variables");
+  await expect(progress).toContainText("Done: Period");
+  await expect(progress).toContainText("Done: Location");
+  await expect(page.getByTestId("plan")).toHaveCount(0);
+
+  await page.getByTestId("review-summary").click();
+  const plan = page.getByTestId("plan");
+  await expect(plan).toBeVisible();
+  await expect(plan).toBeFocused();
+  await expect(page.getByTestId("plan-question")).toHaveValue("Trend in near-surface air temperature (2 m), Colombia, 2000–2020");
+  await expect(page.getByTestId("plan-period")).toContainText("Jan 2000 → Dec 2020");
+  await expect(page.getByTestId("plan-location")).toContainText("Colombia");
+  await expect(page.getByTestId("plan-variables")).toContainText("Near-surface air temperature (2 m)");
+  await expect(plan).toContainText("Annual trend: OLS on complete-year means");
+  await expect(page.getByTestId("plan-blockers")).toHaveCount(0);
+  await expect(page.getByTestId("start-analysis")).toBeEnabled();
+  await expectAccessible(page);
+  await page.screenshot({ path: test.info().outputPath(`manual-summary-${test.info().project.name}.png`), fullPage: false });
+
+  // The working title is editable, and the summary stays ready.
+  await page.getByTestId("plan-question").fill("Did Colombia warm between 2000 and 2020?");
+  await expect(page.getByTestId("plan-question")).toHaveValue("Did Colombia warm between 2000 and 2020?");
+  await expect(page.getByTestId("start-analysis")).toBeEnabled();
+});
+
+test("catalog bridge: a variable posted from another tab is added once; unknown keys and duplicates are ignored", async ({ page }) => {
+  await page.goto("/");
+  const catalogTab = await page.context().newPage();
+  await catalogTab.goto("/open");
+  // The same message format as postAddVariable in src/lib/catalog-bridge.ts (BroadcastChannel plus the storage fallback).
+  const post = (key: string) =>
+    catalogTab.evaluate((k) => {
+      const message = { type: "add-variable", key: k, at: Date.now() };
+      const channel = new BroadcastChannel("cryonova-catalog");
+      channel.postMessage(message);
+      channel.close();
+      window.localStorage.setItem("cryonova:catalog:add", JSON.stringify(message));
+    }, key);
+  const tags = page.locator('[data-testid^="variable-tag-"]');
+
+  // Retried until the workspace has hydrated and subscribed; a repeated key is ignored, so retrying is safe.
+  await expect(async () => {
+    await post("merra2.T2M");
+    await expect(page.getByTestId("variable-tag-merra2.T2M")).toBeVisible({ timeout: 1_000 });
+  }).toPass({ timeout: 20_000 });
+  await expect(page.getByTestId("setup").getByRole("status").filter({ hasText: "from the catalog" })).toContainText("Added Near-surface air temperature (2 m) from the catalog.");
+  await post("merra2.T2M");
+  await post("not.a.variable");
+  await post("imerg.precipitation");
+  await expect(page.getByTestId("variable-tag-imerg.precipitation")).toBeVisible();
+  await expect(tags).toHaveCount(2);
+  await catalogTab.close();
   await expectAccessible(page);
 });
 
