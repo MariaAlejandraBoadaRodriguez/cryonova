@@ -13,9 +13,10 @@ import { getVariable, TOPICS } from "@/src/catalog";
 import { getDerived } from "@/src/catalog/derived";
 import { type BBox, getRegion, regionByNumeric } from "@/src/catalog/regions";
 import type { PublicRun } from "@/src/jobs/service";
+import { subscribeAddVariable } from "@/src/lib/catalog-bridge";
 import { fmtBBox, fmtMonth } from "@/src/lib/format";
 import { type ExampleInvestigation, samplePlaces } from "@/src/plan/examples";
-import { activeLocation, buildPlan, lastCompleteYear, type LocationState, looksLikeQuestion, type PlanDraft, suggestedPeriod, suggestQuestion } from "@/src/plan/plan";
+import { activeLocation, addVariable, buildPlan, keepDerived, lastCompleteYear, type LocationState, looksLikeQuestion, type PlanDraft, suggestedPeriod, suggestQuestion } from "@/src/plan/plan";
 import { AssistantPanel, type ThreadMessage } from "./AssistantPanel";
 import { Globe, type GlobeMarker } from "./Globe";
 import { GuidePanel, type ProgressItem } from "./GuidePanel";
@@ -32,8 +33,9 @@ function matchTopic(variables: string[]): string {
 }
 
 /**
- * Derived series after the variables change: keep the chosen ones whose inputs
- * are still selected and add those of a topic the selection now matches.
+ * Derived series for a proposal or an example the user loads: keep the chosen
+ * ones whose inputs are still selected and add those of a topic the selection
+ * matches. Manual edits use keepDerived, which never adds anything.
  */
 function reconcileDerived(variables: string[], previous: string[]): string[] {
   const kept = previous.filter((key) => getDerived(key)?.inputs.every((k) => variables.includes(k)));
@@ -88,7 +90,11 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
   const [ask, setAsk] = useState(initialDraft ? "" : initialQuestion);
   const [asking, setAsking] = useState(false);
   const [thread, setThread] = useState<ThreadMessage[]>([]);
-  const [preferGuide, setPreferGuide] = useState(false);
+  // Manual setup keeps the guide (with its checklist) until "Review summary"; examples, proposals and setup links open the plan.
+  const [preferGuide, setPreferGuide] = useState(!initialDraft);
+  const [notice, setNotice] = useState<string | null>(null);
+  const draftRef = useRef(draft);
+  const focusPlan = useRef(false);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
   const [focusKey, setFocusKey] = useState(() => (initialDraft ? "initial" : ""));
@@ -101,14 +107,23 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
   const markers = useMemo<GlobeMarker[]>(() => samplePlaces(), []);
 
   const progress: ProgressItem[] = [
-    { label: "Question", done: Boolean(draft.question.trim()), detail: draft.question.trim() ? `“${draft.question.trim().slice(0, 80)}${draft.question.trim().length > 80 ? "…" : ""}”` : "ask the assistant or use a suggested question" },
-    { label: "Variables", done: draft.variables.length > 0, detail: draft.variables.length > 0 ? `${draft.variables.length} selected` : "pick a case or browse the catalog" },
+    {
+      label: "Question",
+      optional: true,
+      done: Boolean(draft.question.trim()),
+      detail: draft.question.trim() ? `“${draft.question.trim().slice(0, 80)}${draft.question.trim().length > 80 ? "…" : ""}”` : `optional; the working title “${plan.question.slice(0, 80)}” is used until you write one`,
+    },
+    { label: "Variables", done: draft.variables.length > 0, detail: draft.variables.length > 0 ? `${draft.variables.length} selected` : "search, pick a case or browse all variables" },
     { label: "Period", done: plan.period.months > 0, detail: plan.period.months > 0 ? plan.period.label : "start must not be after end" },
     { label: "Location", done: plan.location !== null, detail: plan.location ? plan.location.label : "choose a country or draw an area" },
   ];
-  // The plan appears once the question, variables and location are set; period problems then show as blockers in it.
-  const canShowPlan = progress.filter((p) => p.label !== "Period").every((p) => p.done);
+  // The plan can be shown once the variables and location are set (the question is optional); period problems then show as blockers in it.
+  const canShowPlan = progress.filter((p) => !p.optional && p.label !== "Period").every((p) => p.done);
+  // "Review summary" appears when every required item of the checklist is done.
+  const canReview = progress.filter((p) => !p.optional).every((p) => p.done);
   const view = canShowPlan && !preferGuide ? "plan" : "guide";
+  // The case select shows the picked case while its variables are unchanged, else the case the selection matches (or "Custom selection").
+  const shownTopicId = TOPICS.some((t) => t.id === topicId && t.variables.length === draft.variables.length && t.variables.every((k) => draft.variables.includes(k))) ? topicId : matchTopic(draft.variables);
 
   const location = activeLocation(draft.location);
   const activeRegion = draft.location.mode === "country" && draft.location.regionId ? getRegion(draft.location.regionId) : undefined;
@@ -116,6 +131,37 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
   const activeBox = activeCountryNumeric ? null : (location?.bbox ?? null);
 
   const update = useCallback((patch: Partial<PlanDraft>) => setDraft((d) => ({ ...d, ...patch })), []);
+
+  useEffect(() => {
+    draftRef.current = draft;
+  }, [draft]);
+
+  /** Adds exactly one variable (search suggestion or catalog tab); unknown keys, duplicates and keys beyond the maximum are ignored. */
+  const addVariableKey = useCallback((key: string, from: "search" | "catalog") => {
+    const variable = getVariable(key);
+    if (!variable || addVariable(draftRef.current.variables, key) === draftRef.current.variables) return;
+    setDraft((d) => ({ ...d, variables: addVariable(d.variables, key) }));
+    setNotice(`Added ${variable.name.en}${from === "catalog" ? " from the catalog" : ""}.`);
+  }, []);
+
+  // Variables posted from the catalog page (/catalog, another tab) are added to this setup.
+  useEffect(() => subscribeAddVariable((key) => addVariableKey(key, "catalog")), [addVariableKey]);
+
+  // After "Review summary", move focus (and the viewport, on narrow screens) to the summary.
+  const [reviewRequest, setReviewRequest] = useState(0);
+  useEffect(() => {
+    if (!focusPlan.current || view !== "plan") return;
+    focusPlan.current = false;
+    const summary = document.querySelector<HTMLElement>('[data-testid="plan"]');
+    summary?.scrollIntoView({ block: "start" });
+    summary?.focus({ preventScroll: true });
+  }, [view, reviewRequest]);
+
+  const reviewSummary = useCallback(() => {
+    focusPlan.current = true;
+    setPreferGuide(false);
+    setReviewRequest((n) => n + 1);
+  }, []);
 
   const setLocation = useCallback((next: LocationState, refocus: boolean) => {
     setDraft((d) => ({ ...d, location: next }));
@@ -249,21 +295,26 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
       <SetupPanel
         draft={draft}
         plan={plan}
-        topicId={topicId}
+        topicId={shownTopicId}
         showOutlines={showOutlines}
         drawing={drawing}
+        canReview={canReview}
+        notice={notice}
         onTopic={(id) => {
           setTopicId(id);
           const topic = TOPICS.find((t) => t.id === id);
           if (!topic) return;
-          const period = suggestedPeriod(topic.variables);
-          update({ variables: [...topic.variables], derived: [...topic.derived], start: period.start, end: period.end });
-          setPeriodTouched(true);
+          // Picking a case fills its variables (each removable). Its suggested period only replaces
+          // the untouched default; dates the user has set are never overwritten.
+          const period = periodTouched ? null : suggestedPeriod(topic.variables);
+          update({ variables: [...topic.variables], derived: [...topic.derived], ...(period ? { start: period.start, end: period.end } : {}) });
         }}
         onVariables={(variables) => {
-          setDraft((d) => ({ ...d, variables, derived: reconcileDerived(variables, d.derived) }));
+          // Removing a variable drops the derived series that needed it; nothing is ever added here.
+          setDraft((d) => ({ ...d, variables, derived: keepDerived(variables, d.derived) }));
           setTopicId(matchTopic(variables));
         }}
+        onAddVariable={(key) => addVariableKey(key, "search")}
         onDerived={(derived) => update({ derived })}
         onPeriod={(start, end) => {
           update({ start, end });
@@ -277,6 +328,7 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
         onLocation={(next) => setLocation(next, true)}
         onToggleOutlines={setShowOutlines}
         onToggleDrawing={() => setDrawing((d) => !d)}
+        onReviewSummary={reviewSummary}
       />
 
       <section className="ws-area-globe" aria-label="World globe">
