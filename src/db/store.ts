@@ -4,8 +4,21 @@
  */
 import { and, eq, gte, inArray, isNull, lt, or, sql } from "drizzle-orm";
 import type { NewRun, RunError, RunProgress, RunRow, RunStatus, SampleRow, SampleStatus } from "@/src/jobs/types";
+import type { ProviderJobRow, ProviderJobStatus, RemoteProvider } from "@/src/providers/remote";
 import { getDb, hasDatabase } from "./client";
-import { runSamples, runs } from "./schema";
+import { connectorChecks, providerJobs, runSamples, runs } from "./schema";
+
+/** Last real value obtained from a connector (by a run or a live probe). */
+export interface ConnectorCheck {
+  connector: string;
+  checkedAt: Date;
+  ok: boolean;
+  value: number | null;
+  units: string | null;
+  label: string | null;
+  detail: Record<string, unknown> | null;
+  runId: string | null;
+}
 
 export interface FinishPatch {
   status: RunStatus;
@@ -27,6 +40,10 @@ export interface RunStore {
   listSamples(runId: string, statuses?: SampleStatus[]): Promise<SampleRow[]>;
   countRecentRuns(clientKey: string, since: Date): Promise<number>;
   setExplanation(id: string, explanation: unknown): Promise<void>;
+  listJobs(runId: string): Promise<ProviderJobRow[]>;
+  saveJob(job: ProviderJobRow): Promise<void>;
+  recordConnectorCheck(check: ConnectorCheck): Promise<void>;
+  listConnectorChecks(): Promise<ConnectorCheck[]>;
 }
 
 type RunRecord = typeof runs.$inferSelect;
@@ -38,6 +55,17 @@ function toRun(r: RunRecord): RunRow {
 
 function toSample(r: SampleRecord): SampleRow {
   return { ...r, status: r.status as SampleStatus, values: (r.values ?? null) as SampleRow["values"] };
+}
+
+type JobRecord = typeof providerJobs.$inferSelect;
+type CheckRecord = typeof connectorChecks.$inferSelect;
+
+function toJob(r: JobRecord): ProviderJobRow {
+  return { ...r, provider: r.provider as RemoteProvider, status: r.status as ProviderJobStatus, meta: (r.meta ?? null) as ProviderJobRow["meta"] };
+}
+
+function toCheck(r: CheckRecord): ConnectorCheck {
+  return { ...r, detail: (r.detail ?? null) as ConnectorCheck["detail"] };
 }
 
 export class NeonRunStore implements RunStore {
@@ -153,6 +181,7 @@ export class NeonRunStore implements RunStore {
           attempts: sql`excluded.attempts`,
           error: sql`excluded.error`,
           fetchedAt: sql`excluded.fetched_at`,
+          via: sql`excluded.via`,
         },
       });
   }
@@ -173,6 +202,29 @@ export class NeonRunStore implements RunStore {
 
   async setExplanation(id: string, explanation: unknown) {
     await this.db.update(runs).set({ explanation, updatedAt: sql`now()` }).where(eq(runs.id, id));
+  }
+
+  async listJobs(runId: string) {
+    const rows = await this.db.select().from(providerJobs).where(eq(providerJobs.runId, runId)).orderBy(providerJobs.collection, providerJobs.jobKey);
+    return rows.map(toJob);
+  }
+
+  async saveJob(job: ProviderJobRow) {
+    const set = {
+      provider: job.provider, jobRef: job.jobRef, status: job.status, request: job.request, meta: job.meta, message: job.message,
+      checkedAt: job.checkedAt, nextCheckAt: job.nextCheckAt, completedAt: job.completedAt, checks: job.checks,
+    };
+    await this.db.insert(providerJobs).values(job).onConflictDoUpdate({ target: [providerJobs.runId, providerJobs.collection, providerJobs.jobKey], set });
+  }
+
+  async recordConnectorCheck(check: ConnectorCheck) {
+    const set = { checkedAt: check.checkedAt, ok: check.ok, value: check.value, units: check.units, label: check.label, detail: check.detail, runId: check.runId };
+    await this.db.insert(connectorChecks).values(check).onConflictDoUpdate({ target: connectorChecks.connector, set });
+  }
+
+  async listConnectorChecks() {
+    const rows = await this.db.select().from(connectorChecks);
+    return rows.map(toCheck);
   }
 }
 
@@ -265,6 +317,25 @@ export class MemoryRunStore implements RunStore {
   async setExplanation(id: string, explanation: unknown) {
     const run = this.runs.get(id);
     if (run) run.explanation = structuredClone(explanation);
+  }
+
+  readonly jobs = new Map<string, ProviderJobRow>();
+  readonly checks = new Map<string, ConnectorCheck>();
+
+  async listJobs(runId: string) {
+    return [...this.jobs.values()].filter((j) => j.runId === runId).map((j) => structuredClone(j));
+  }
+
+  async saveJob(job: ProviderJobRow) {
+    this.jobs.set(`${job.runId}|${job.collection}|${job.jobKey}`, structuredClone(job));
+  }
+
+  async recordConnectorCheck(check: ConnectorCheck) {
+    this.checks.set(check.connector, structuredClone(check));
+  }
+
+  async listConnectorChecks() {
+    return [...this.checks.values()].map((c) => structuredClone(c));
   }
 }
 
