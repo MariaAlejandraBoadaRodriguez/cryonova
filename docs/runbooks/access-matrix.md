@@ -44,16 +44,18 @@ Notes:
 ### Asynchronous test jobs (2026-11-15)
 
 Submitted once each and then checked in separate calls of at most 30 s, at most
-one check every 2 minutes (no command waits on a job).
+one check every 2 minutes (no command waited on a job). Queue and run times are
+the provider's own `created` / `started` / `finished` timestamps (UTC).
 
-| Job | Provider job ID | Submitted (UTC) | Status | Real value obtained |
-|---|---|---|---|---|
-| ERA5 monthly `2m_temperature`, 2010-06, Colombia box, NetCDF | `6606ae41-09b3-4fbd-af83-32c684b0d9d7` | 05:30 | successful | NetCDF-4, 31,298 B; `t2m` 68 × 49 cells in K |
-| ERA5 monthly `2m_temperature`, 2010-06, Colombia box, GRIB | `7fc63848-a4fc-44db-88ad-e2c137d62923` | 05:31:44 | accepted (queued), last checked 05:47:45 | — |
-| ERA5 monthly, 10 variables, 2010-06, Colombia box, NetCDF (unit metadata) | `3895ff53-a006-4649-8ca9-bce28c29908a` | 05:47:46 | accepted | — |
-| Harmony / Giovanni area average, GLDAS 0–10 cm soil moisture, 2010, Colombia box, CSV | `90c61434-4582-409d-aa6a-3c7a67fe6c2c` | 05:32:00 | successful (12 s) | 2010-06: 36.234146 kg m⁻² |
-| Harmony / Giovanni area average, IMERG precipitation, 2010, Colombia box, CSV | `d2ea801d-6285-442a-b1d9-b5ed9ad0253a` | 05:47:47 | submitted | — |
-| Harmony / Giovanni point time series, GLDAS | `df08b22d-c875-40d7-92c4-a268701d2c18` | 05:31 | successful, but the result link points to the Giovanni API, which needs an interactive Earthdata Login (HTML login page returned); not usable server-side | — |
+| Job | Provider job ID | Created | Started | Finished | Status | Real value obtained |
+|---|---|---|---|---|---|---|
+| ERA5 monthly `2m_temperature`, 2010-06, Colombia box, NetCDF | `6606ae41-09b3-4fbd-af83-32c684b0d9d7` | 05:31:42 | 05:31:56 | 05:32:00 | successful | NetCDF-4, 31,298 B; `t2m` 68 × 49 cells in K |
+| ERA5 monthly `2m_temperature`, 2010-06, Colombia box, GRIB | `7fc63848-a4fc-44db-88ad-e2c137d62923` | 05:31:44 | 06:10:42 | 06:10:46 | **accepted, queued** at the 30-minute mark (last own check 05:54:47; the session worker restarted before the 06:01 check, and the provider's start time confirms it was still queued); successful at the next check (08:40:52) | GRIB, 6,772 B (format test only; the app requests NetCDF) |
+| ERA5 monthly, 10 variables, 2010-06, Colombia box, NetCDF (unit metadata) | `3895ff53-a006-4649-8ca9-bce28c29908a` | 05:47:46 | 06:48:32 | 06:48:36 | successful (queued 61 min) | ZIP of two NetCDF files (step types `avgua` and `avgad`), 185,046 B; units of all 10 variables read |
+| ERA5 run through the app executor (`era5.t2m`, `era5.tp`, 2010, Colombia box) | `61b3fdc0-ef05-4d3c-b394-99d454f26cbe` | 08:55:44 | 08:55:57 | 08:56:08 | successful; fetched at the run's first due check | 2010-06: 24.547 °C (t2m), 11.10 mm/day (tp); 192,410 B |
+| Harmony / Giovanni area average, GLDAS 0–10 cm soil moisture, 2010, Colombia box, CSV | `90c61434-4582-409d-aa6a-3c7a67fe6c2c` | 05:32:00 | — | 05:32:11 | successful (12 s) | 2010-06: 36.234146 kg m⁻² |
+| Harmony / Giovanni area average, IMERG precipitation, 2010, Colombia box, CSV | `d2ea801d-6285-442a-b1d9-b5ed9ad0253a` | 05:47:47 | — | before 05:49:55 | successful | 2010-06: 0.4215 mm/hr (10.12 mm/day) |
+| Harmony / Giovanni point time series, GLDAS | `df08b22d-c875-40d7-92c4-a268701d2c18` | 05:31 | — | — | successful, but the result link points to the Giovanni API, which needs an interactive Earthdata Login (HTML login page returned); not usable server-side | — |
 
 ## Repository and platforms
 
