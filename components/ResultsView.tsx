@@ -13,6 +13,7 @@ import { coverageSentence, EVIDENCE_LABEL, evidenceOf, magnitudeSentence, qValue
 import { anomalyChart, decimalsOf, seasonalCycleChart, seriesChart } from "./charts";
 import { DiscoveryTable } from "./DiscoveryTable";
 import { Plot } from "./Plot";
+import { TableWrap } from "./TableWrap";
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -116,7 +117,7 @@ export function VariableAnalyses({ v, result }: { v: VariableResult; result: Run
           <Plot {...cycle} ariaLabel={`Average ${v.name.en} for each calendar month in ${region}.`} />
           <details>
             <summary>Monthly means table</summary>
-        <div className="table-wrap">
+        <TableWrap label="Mean of each calendar month">
           <table className="data">
             <caption className="visually-hidden">Mean of each calendar month</caption>
             <thead>
@@ -140,7 +141,7 @@ export function VariableAnalyses({ v, result }: { v: VariableResult; result: Run
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
           </details>
         </section>
         <section className="dash-panel" aria-label={`Monthly anomalies of ${v.name.en}`}>
@@ -157,7 +158,7 @@ export function VariableAnalyses({ v, result }: { v: VariableResult; result: Run
       </div>
       <section className="dash-panel" aria-label={`Seasonal trends, period comparison and ranking of ${v.name.en}`}>
         <h4>Seasonal trends, period comparison and ranking</h4>
-        <div className="table-wrap">
+        <TableWrap label="Trend per season">
           <table className="data">
             <caption className="visually-hidden">Trend per season</caption>
             <thead>
@@ -197,7 +198,7 @@ export function VariableAnalyses({ v, result }: { v: VariableResult; result: Run
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
         {a.periodComparison && (
           <p>
             Mean {a.periodComparison.firstPeriod.join("–")}: <strong>{fmt(a.periodComparison.firstMean, d)}</strong> {a.units}; mean {a.periodComparison.secondPeriod.join("–")}:{" "}
@@ -214,7 +215,7 @@ export function VariableAnalyses({ v, result }: { v: VariableResult; result: Run
       </section>
       <details>
         <summary>Values table (annual and monthly)</summary>
-        <div className="table-wrap" style={{ maxHeight: 360 }}>
+        <TableWrap label="Annual means used for the trend" style={{ maxHeight: 360 }}>
           <table className="data">
             <caption className="visually-hidden">Annual means used for the trend</caption>
             <thead>
@@ -244,8 +245,8 @@ export function VariableAnalyses({ v, result }: { v: VariableResult; result: Run
               ))}
             </tbody>
           </table>
-        </div>
-        <div className="table-wrap" style={{ maxHeight: 360, marginTop: 10 }}>
+        </TableWrap>
+        <TableWrap label="Monthly regional means" style={{ maxHeight: 360, marginTop: 10 }}>
           <table className="data">
             <caption className="visually-hidden">Monthly regional means</caption>
             <thead>
@@ -271,7 +272,7 @@ export function VariableAnalyses({ v, result }: { v: VariableResult; result: Run
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       </details>
     </>
   );

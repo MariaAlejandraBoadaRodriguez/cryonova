@@ -41,7 +41,7 @@ function MonthYear({ id, label, value, minYear, maxYear, onChange }: { id: strin
   const years = Array.from({ length: maxYear - minYear + 1 }, (_, i) => String(maxYear - i));
   return (
     <fieldset className="rail-month">
-      <legend className="rail-label">{label}</legend>
+      <legend className="rail-label">{label} month</legend>
       <div className="ws-pair">
         <select id={`${id}-m`} aria-label={`${label} month`} value={month} onChange={(e) => onChange(`${year}-${e.target.value}`)}>
           {MONTHS.map((name, i) => (
@@ -298,8 +298,8 @@ export function SetupPanel(props: SetupPanelProps) {
 
       <fieldset className="rail-group">
         <legend>Trend period</legend>
-        <MonthYear id={`${id}-start`} label="Start month" value={draft.start} minYear={Number(coverage.start.slice(0, 4))} maxYear={thisYear} onChange={(v) => props.onPeriod(v, draft.end)} />
-        <MonthYear id={`${id}-end`} label="End month" value={draft.end} minYear={Number(coverage.start.slice(0, 4))} maxYear={thisYear} onChange={(v) => props.onPeriod(draft.start, v)} />
+        <MonthYear id={`${id}-start`} label="Start" value={draft.start} minYear={Number(coverage.start.slice(0, 4))} maxYear={thisYear} onChange={(v) => props.onPeriod(v, draft.end)} />
+        <MonthYear id={`${id}-end`} label="End" value={draft.end} minYear={Number(coverage.start.slice(0, 4))} maxYear={thisYear} onChange={(v) => props.onPeriod(draft.start, v)} />
         <p className="ws-archive">
           Archive: {fmtMonth(coverage.start)}–{archiveEnd}
         </p>

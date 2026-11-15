@@ -24,7 +24,10 @@ interface AssistantPanelProps {
 export function AssistantPanel({ value, asking, thread, contextLine, onChange, onAsk }: AssistantPanelProps) {
   const id = useId();
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ block: "nearest" }), [thread.length]);
+  // A block body: scrollIntoView returns a Promise in current Chromium, and an effect may only return a cleanup function.
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: "nearest" });
+  }, [thread.length]);
   return (
     <section className="ws-area-assistant" aria-labelledby={`${id}-label`} data-testid="assistant">
       <div className="ws-ask-wrap">

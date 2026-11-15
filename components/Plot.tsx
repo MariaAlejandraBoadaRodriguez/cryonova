@@ -2,7 +2,7 @@
 
 /**
  * Minimal Plotly wrapper. Plotly is loaded on the client only, on first use.
- * The wrapper exposes an accessible name; every chart also has a data table.
+ * The figure carries the accessible name; every chart also has a data table.
  */
 import { useEffect, useRef } from "react";
 
@@ -44,5 +44,10 @@ export function Plot({ data, layout, ariaLabel, className = "chart-frame", testI
     };
   }, [data, layout]);
 
-  return <div ref={ref} className={className} role="img" aria-label={ariaLabel} data-testid={testId} />;
+  // A named figure rather than role="img": Plotly adds focusable toolbar buttons, and an image may not contain controls.
+  return (
+    <figure className="chart-figure" aria-label={ariaLabel} data-testid={testId}>
+      <div ref={ref} className={className} />
+    </figure>
+  );
 }

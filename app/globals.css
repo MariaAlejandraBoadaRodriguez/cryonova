@@ -1067,10 +1067,15 @@ code,
   color: #dbe6ff;
 }
 
+/* The real radio covers its label, invisible, so pointer, touch and keyboard all reach it. */
 .ws-segment input {
   position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   opacity: 0;
-  pointer-events: none;
+  cursor: pointer;
 }
 
 .ws-segment label:has(input:checked) {
@@ -1783,6 +1788,10 @@ code,
 }
 
 /* ---------- Results dashboard ("Evidence lab") ---------- */
+.chart-figure {
+  margin: 0;
+}
+
 .dash {
   max-width: 1180px;
   margin: 0 auto;

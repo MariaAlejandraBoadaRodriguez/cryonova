@@ -12,6 +12,7 @@ import type { RunResult } from "@/src/jobs/types";
 import { fmt, fmtP, fmtSigned } from "@/src/lib/format";
 import { COLORS } from "./charts";
 import { Plot } from "./Plot";
+import { TableWrap } from "./TableWrap";
 
 type SortKey = "evidence" | "name" | "slope" | "q" | "snr";
 const LABEL: Record<DiscoveryRow["evidence"], string> = { significant: "Significant (FDR)", nominal: "Nominal only", inconclusive: "Inconclusive", insufficient: "Insufficient data" };
@@ -49,7 +50,7 @@ export function DiscoveryTable({ result }: { result: RunResult }) {
       <p className="field-help" style={{ margin: 0 }}>
         {discovery.evaluated} trends evaluated · {discovery.correction}. Statistical evidence and practical magnitude (fitted change divided by year-to-year variability) are shown separately; inconclusive results stay listed.
       </p>
-      <div className="table-wrap">
+      <TableWrap label="Trend per variable with uncertainty and multiple-comparison correction">
         <table className="data">
           <caption className="visually-hidden">Trend per variable with uncertainty and multiple-comparison correction</caption>
           <thead>
@@ -92,7 +93,7 @@ export function DiscoveryTable({ result }: { result: RunResult }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrap>
       {discovery.excluded.length > 0 && (
         <div className="alert alert-info">
           <div>

@@ -106,7 +106,8 @@ export function WorkspaceShell({ initialQuestion, initialDraft }: WorkspaceShell
     { label: "Period", done: plan.period.months > 0, detail: plan.period.months > 0 ? plan.period.label : "start must not be after end" },
     { label: "Location", done: plan.location !== null, detail: plan.location ? plan.location.label : "choose a country or draw an area" },
   ];
-  const canShowPlan = progress.every((p) => p.done);
+  // The plan appears once the question, variables and location are set; period problems then show as blockers in it.
+  const canShowPlan = progress.filter((p) => p.label !== "Period").every((p) => p.done);
   const view = canShowPlan && !preferGuide ? "plan" : "guide";
 
   const location = activeLocation(draft.location);
