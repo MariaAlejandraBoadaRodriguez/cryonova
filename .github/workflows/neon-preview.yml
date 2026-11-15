@@ -74,5 +74,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx tsx scripts/vercel-preview-env.ts unset --branch "${{ github.head_ref }}"
-      - run: npx tsx scripts/neon-branch.ts delete "$NEON_BRANCH"
+      - name: Delete the Neon branch
+        run: npx tsx scripts/neon-branch.ts delete "$NEON_BRANCH"
+      - name: Remove the branch-scoped Vercel variables
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ]; then
+            echo "::error title=Missing Actions secrets::Add VERCEL_TOKEN and VERCEL_ORG_ID as repository Actions secrets; the branch-scoped preview variables for ${{ github.head_ref }} were not removed."
+            exit 1
+          fi
+          npx tsx scripts/vercel-preview-env.ts unset --branch "${{ github.head_ref }}"
