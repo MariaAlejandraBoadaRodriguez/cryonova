@@ -8,15 +8,16 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { collectionOf, getCollection, getVariable, TOPICS } from "@/src/catalog";
-import { searchRegions } from "@/src/catalog/regions";
+import { getRegion, searchRegions } from "@/src/catalog/regions";
 import { searchCatalog } from "@/src/catalog/search";
 import { groupByCollection } from "@/src/jobs/selection";
 import { errorMessage } from "@/src/lib/log";
 import { findGranules } from "@/src/providers/cmr";
+import { validateBBox } from "@/src/providers/grid";
 import { POLICIES } from "@/src/providers/policies";
 import { anthropicClient, AGENT_BETAS, agentModel, AI_EFFORT, AgentUnavailableError } from "./client";
 import { addUsage, emptyUsage, estimateCostUsd } from "./pricing";
-import { finalizeProposal, lastCompleteYear, type Proposal, type RawProposal, type ToolTrace } from "./proposal";
+import { finalizeProposal, lastCompleteYear, type PlanContext, type Proposal, type RawProposal, type ToolTrace } from "./proposal";
 
 const MAX_TURNS = 6;
 
@@ -38,7 +39,8 @@ Rules:
 - Only propose variable keys returned by search_catalog. Prefer 1 to 3 variables; more only for open "which variables changed" questions.
 - If the question names no period, propose the last 20 complete years ending ${lastCompleteYear()}-12. Never end after ${lastCompleteYear()}-12.
 - If the region is ambiguous or missing, still propose your best default and put one short clarification question in "clarification"; otherwise leave it empty. Ask only what changes the investigation materially.
-- Use region_id when resolve_region found the place; set bbox only for explicit coordinates in the question (west, south, east, north in degrees), otherwise all zeros.
+- Use region_id when resolve_region found the place; set bbox only for explicit coordinates in the question or to keep a custom area from <current_setup> (west, south, east, north in degrees), otherwise all zeros.
+- The message may include <current_setup> (the user's own choices in the workspace, manual edits included) and <earlier_conversation>. Keep the current setup unless the new message asks for something different; when the message omits the place, period or variables, take them from the current setup or the earlier conversation. A short reply such as a place name answers your earlier clarification question.
 - Write rationales, analysis and assumptions in the user's language (English or Spanish) and keep each rationale under 25 words.
 - The analysis field states the method: live monthly regional means (cos-latitude weighted), complete-year annual means, OLS trend with HAC uncertainty, plus seasonal or anomaly views when relevant.
 
@@ -91,8 +93,9 @@ export const PLAN_TOOLS: Anthropic.Beta.BetaTool[] = [
         analysis: { type: "string" },
         assumptions: { type: "array", items: { type: "string" } },
         clarification: { type: "string", description: "One short question, or empty." },
+        question: { type: "string", description: "The investigation question restated in the user's language, naming the variable, place and period you propose." },
       },
-      required: ["language", "variables", "region_id", "region_name", "bbox", "start", "end", "analysis", "assumptions", "clarification"],
+      required: ["language", "variables", "region_id", "region_name", "bbox", "start", "end", "analysis", "assumptions", "clarification", "question"],
       additionalProperties: false,
     },
   },
@@ -109,6 +112,7 @@ interface ProposeInput {
   analysis: string;
   assumptions: string[];
   clarification: string;
+  question: string;
 }
 
 async function runTool(name: string, input: Record<string, unknown>, signal: AbortSignal): Promise<{ result: unknown; summary: string }> {
@@ -152,14 +156,42 @@ async function runTool(name: string, input: Record<string, unknown>, signal: Abo
   return { result: { error: `Unknown tool ${name}` }, summary: "unknown tool" };
 }
 
-export async function planWithClaude(question: string, options: { signal?: AbortSignal } = {}): Promise<Proposal> {
+/**
+ * Wraps the question with the optional workspace context. Only catalog keys,
+ * gazetteer regions and numeric boxes are echoed from the setup; conversation
+ * text is capped like the question itself.
+ */
+export function planMessage(question: string, context?: PlanContext): string {
+  const parts = [`<question>\n${question.slice(0, 600)}\n</question>`];
+  const history = (context?.history ?? []).slice(-6);
+  if (history.length > 0) {
+    parts.push(`<earlier_conversation>\n${history.map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.text.slice(0, 600)}`).join("\n")}\n</earlier_conversation>`);
+  }
+  const current = context?.current;
+  if (current) {
+    const lines: string[] = [];
+    const variables = current.variables.map((k) => getVariable(k)).filter((v) => v !== undefined);
+    if (variables.length > 0) lines.push(`- Variables: ${variables.map((v) => `${v.key} (${v.name.en})`).join(", ")}`);
+    if (current.start && current.end) lines.push(`- Period: ${current.start} to ${current.end}`);
+    const region = current.regionId ? getRegion(current.regionId) : undefined;
+    if (region) lines.push(`- Location: ${region.names.en} (region_id ${region.id})`);
+    else if (current.bbox && !validateBBox(current.bbox)) {
+      const b = current.bbox;
+      lines.push(`- Location: custom area west ${b.west}, south ${b.south}, east ${b.east}, north ${b.north}`);
+    }
+    if (lines.length > 0) parts.push(`<current_setup>\n${lines.join("\n")}\n</current_setup>`);
+  }
+  return parts.length === 1 ? question.slice(0, 600) : parts.join("\n\n");
+}
+
+export async function planWithClaude(question: string, options: { signal?: AbortSignal; context?: PlanContext } = {}): Promise<Proposal> {
   const client = anthropicClient();
   const model = agentModel();
   const usage = emptyUsage();
   const trace: ToolTrace[] = [];
   const started = Date.now();
   const signal = options.signal ?? AbortSignal.timeout(110_000);
-  const messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: question.slice(0, 600) }];
+  const messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: planMessage(question, options.context) }];
   let nudged = false;
 
   for (let turn = 0; turn < MAX_TURNS; turn += 1) {
@@ -197,6 +229,7 @@ export async function planWithClaude(question: string, options: { signal?: Abort
         analysis: p.analysis,
         assumptions: p.assumptions,
         clarification: p.clarification,
+        question: p.question,
       };
       const proposal = finalizeProposal(raw, "ai", question);
       proposal.trace = trace;

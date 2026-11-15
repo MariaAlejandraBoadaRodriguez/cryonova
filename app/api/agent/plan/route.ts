@@ -12,9 +12,31 @@ import { clientKeyFrom, json, problem, readJson } from "@/src/lib/request";
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
-const Body = z.object({ question: z.string().trim().min(3, "Write a question first.").max(600) });
+const YM = /^\d{4}-(0[1-9]|1[0-2])$/;
 
-/** Question -> editable proposal. Falls back to rule-based planning when AI is unavailable. */
+/** "context" is optional: clients that send only the question keep working. */
+const Body = z.object({
+  question: z.string().trim().min(2, "Write a question first.").max(600),
+  context: z
+    .object({
+      current: z
+        .object({
+          variables: z.array(z.string().max(60)).max(12).default([]),
+          start: z.string().regex(YM).optional(),
+          end: z.string().regex(YM).optional(),
+          regionId: z.string().max(80).optional(),
+          bbox: z.object({ west: z.number(), south: z.number(), east: z.number(), north: z.number() }).optional(),
+        })
+        .optional(),
+      history: z
+        .array(z.object({ role: z.enum(["user", "assistant"]), text: z.string().trim().max(1200) }))
+        .max(12)
+        .optional(),
+    })
+    .optional(),
+});
+
+/** Question (+ optional workspace context) -> editable proposal. Falls back to rule-based planning when AI is unavailable. */
 export async function POST(request: Request) {
   let body: z.infer<typeof Body>;
   try {
@@ -23,7 +45,7 @@ export async function POST(request: Request) {
     return problem(422, "Invalid question", error instanceof z.ZodError ? error.issues[0]?.message : "The request body is not valid JSON.");
   }
   const clientKey = clientKeyFrom(request);
-  const rules = (status: string): Proposal => ({ ...finalizeProposal(planWithRules(body.question), "rules", body.question), aiStatus: status });
+  const rules = (status: string): Proposal => ({ ...finalizeProposal(planWithRules(body.question, body.context), "rules", body.question), aiStatus: status });
 
   if (!config.anthropicKey) return json(rules("AI is not configured on this deployment; showing a rule-based proposal."));
   const quota = await checkAiQuota(clientKey);
@@ -31,7 +53,7 @@ export async function POST(request: Request) {
 
   const started = Date.now();
   try {
-    const proposal = await planWithClaude(body.question);
+    const proposal = await planWithClaude(body.question, { context: body.context });
     await recordAiUsage({
       kind: "plan",
       model: proposal.ai?.model ?? config.anthropicModel,

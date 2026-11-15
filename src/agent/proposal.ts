@@ -24,6 +24,18 @@ export interface RawProposal {
   analysis: string;
   assumptions: string[];
   clarification: string;
+  /** The investigation question restated by the planner (optional; the asked text is used otherwise). */
+  question?: string;
+}
+
+/**
+ * Optional context sent with a question (backward compatible: older clients
+ * send only the question). "current" is the workspace setup as the user left
+ * it, manual edits included; "history" is the earlier conversation.
+ */
+export interface PlanContext {
+  current?: { variables: string[]; start?: string; end?: string; regionId?: string; bbox?: BBox };
+  history?: Array<{ role: "user" | "assistant"; text: string }>;
 }
 
 export interface ToolTrace {
@@ -103,7 +115,7 @@ export function finalizeProposal(raw: RawProposal, source: Proposal["source"], q
   }
 
   const selection = {
-    question: question.trim().slice(0, 600) || undefined,
+    question: (raw.question?.trim() || question.trim()).slice(0, 600) || undefined,
     region: bbox ? { bbox, name: regionName || undefined, regionId, source: "agent" as const } : undefined,
     start,
     end,
