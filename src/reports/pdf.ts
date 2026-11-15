@@ -8,7 +8,9 @@ import { discover } from "@/src/analytics/discovery";
 import type { Explanation } from "@/src/agent/explain";
 import type { RunResult, VariableResult } from "@/src/jobs/types";
 import { decimalsFor, fmt, fmtBBox, fmtMonth, fmtP, fmtSigned } from "@/src/lib/format";
-import { coverageSentence, EVIDENCE_LABEL, evidenceOf, magnitudeSentence, qValuesFor, regionLabel, trendSentence } from "./narrative";
+import { seriesCaption } from "./captions";
+import { adjustedPCell, changeVsVariability, trendWithInterval } from "./comparison";
+import { coverageSentence, EVIDENCE_NAME, evidenceMeaning, evidenceOf, magnitudeSentence, NO_CLEAR_TREND_NOTE, qValuesFor, regionLabel, trendSentence } from "./narrative";
 
 const PAGE: [number, number] = [595.28, 841.89];
 const MARGIN = 48;
@@ -241,13 +243,16 @@ export async function buildPdf(result: RunResult, options: PdfOptions = {}): Pro
     w.text(trendSentence(v, region), { size: 10, gap: 2 });
     const magnitude = magnitudeSentence(v);
     if (magnitude) w.text(magnitude, { size: 9, color: C.muted, gap: 2 });
-    w.text(`Evidence: ${EVIDENCE_LABEL[evidenceOf(v, qValues.get(v.key) ?? null)]}. ${coverageSentence(v)}`, { size: 9, color: C.muted, gap: 8 });
+    const q = qValues.get(v.key) ?? null;
+    const level = evidenceOf(v, q);
+    w.text(`Evidence: ${EVIDENCE_NAME[level]}. ${evidenceMeaning(level, q !== null)} ${coverageSentence(v)}`, { size: 9, color: C.muted, gap: 8 });
   }
 
   for (const v of result.variables) {
     const source = result.sources.find((s) => s.collection === v.collection);
     w.heading(v.name.en, 12);
     drawSeriesChart(w, v, `Source: NASA ${v.product} v${v.version} (${v.dapName.replace(/^.*\//, "")}), fetched ${source?.fetchedTo?.slice(0, 10) ?? "-"}; cosine-latitude weighted regional mean of valid cells.`);
+    w.text(seriesCaption(v), { size: 8.5, color: C.muted, gap: 6 });
     const st = v.analysis.seasonalTrends
       .map(({ season, trend }) => (trend.status === "ok" ? `${season} ${fmtSigned(trend.slopePerDecade, decimalsFor(v.unitGroup))} (p ${fmtP(trend.pValue)})` : `${season} insufficient`))
       .join("; ");
@@ -258,14 +263,17 @@ export async function buildPdf(result: RunResult, options: PdfOptions = {}): Pro
 
   if (result.variables.length > 1) {
     const discovery = discover(result);
-    w.heading("Trend discovery across variables");
-    w.text(`${discovery.evaluated} trends evaluated; ${discovery.correction}.`, { size: 9, color: C.muted });
+    w.heading("Trend comparison across variables");
+    w.text(`${discovery.evaluated} trends evaluated; ${discovery.correction}. Trend per decade with its 95% interval in parentheses; adjusted p is the Benjamini-Hochberg q.`, { size: 9, color: C.muted });
     for (const r of discovery.rows) {
+      const trend = trendWithInterval(r);
+      const magnitude = changeVsVariability(r);
       w.text(
-        `${r.name} (${r.product}): ${r.slopePerDecade === null ? "no trend estimate" : `${fmtSigned(r.slopePerDecade, 3)} ${r.trendUnits}, 95% CI ${fmtSigned(r.ci95?.[0], 3)} to ${fmtSigned(r.ci95?.[1], 3)}, p ${fmtP(r.pValue)}, q ${fmtP(r.qValue)}`} - ${r.evidence}`,
+        `${r.name} (${r.product}): ${trend ? `${trend.text}; adjusted p ${adjustedPCell(r).text} (raw p ${fmtP(r.pValue)})${magnitude ? `; change ${magnitude}` : ""}` : "no trend estimate"} - ${EVIDENCE_NAME[r.evidence]}`,
         { size: 9, gap: 1 },
       );
     }
+    w.text(NO_CLEAR_TREND_NOTE, { size: 8.5, color: C.muted, gap: 2 });
     for (const e of discovery.excluded) w.text(`Excluded: ${e.name} - ${e.reason}`, { size: 9, color: C.muted, gap: 1 });
     w.y -= 6;
   }

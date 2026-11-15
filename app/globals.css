@@ -1906,6 +1906,165 @@ code,
   margin: 24px auto;
 }
 
+/* Chart captions (generated from the computed numbers) */
+.chart-caption {
+  margin: 6px 0 0;
+  max-width: 80ch;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.chart-frame-compact {
+  width: 100%;
+  min-height: 0;
+}
+
+/* Evidence label with its "How to read this" hint */
+.evidence {
+  position: relative;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-possible {
+  background: #fff8e1;
+  border-color: #8a6100;
+}
+
+.evidence-help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--electric);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--electric);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.evidence-help:hover,
+.evidence-help[aria-expanded="true"] {
+  background: var(--electric);
+  color: var(--white);
+}
+
+.evidence-tip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  width: max-content;
+  max-width: min(340px, calc(100vw - 48px));
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--deep);
+  color: var(--white);
+  box-shadow: var(--shadow);
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.45;
+  white-space: normal;
+  text-align: left;
+}
+
+.evidence-tip[hidden] {
+  display: none;
+}
+
+/* Inside a scrollable table the hint opens in place so it is never clipped. */
+.table-wrap .evidence-tip {
+  position: static;
+  flex-basis: 100%;
+  width: auto;
+  max-width: 26rem;
+}
+
+/* Comparison table: fits a 1366 px laptop without horizontal scrolling. */
+table.data.discovery-table th,
+table.data.discovery-table td {
+  white-space: normal;
+  vertical-align: top;
+}
+
+.discovery-table .col-variable {
+  min-width: 11rem;
+  overflow-wrap: break-word;
+}
+
+.discovery-table .col-evidence {
+  min-width: 10.5rem;
+}
+
+.discovery-table .col-trend {
+  min-width: 10rem;
+}
+
+table.data.discovery-table .col-years,
+table.data.discovery-table .col-details {
+  white-space: nowrap;
+}
+
+.discovery-details > td {
+  background: var(--ice);
+}
+
+.discovery-details dl.kv {
+  font-size: 0.875rem;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.sort-button {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.row-details-button {
+  min-height: 28px;
+  padding: 2px 10px;
+  border: 1px solid var(--electric);
+  border-radius: 6px;
+  background: var(--white);
+  color: var(--electric);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.row-details-button[aria-expanded="true"] {
+  background: var(--electric);
+  color: var(--white);
+}
+
+/* Save and download: one row, wrapping only on narrow screens */
+.actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1199px) {
   .ws {

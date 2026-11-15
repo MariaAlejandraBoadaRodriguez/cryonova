@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
@@ -367,4 +369,87 @@ test("live flow: example → edit → plan → Start analysis → dashboard → 
   await expect(page.getByTestId("plan")).toBeVisible();
   await expect(page.getByTestId("plan-period")).toContainText("Jan 2015");
   await expect(page.getByTestId("plan-location")).toContainText("Colombia");
+});
+
+/** Checks shared by the stored-result and live comparison dashboards (several variables). */
+async function checkComparisonDashboard(page: Page, desktop: boolean, screenshot: string) {
+  const discovery = page.getByTestId("discovery");
+  await expect(discovery).toBeVisible();
+
+  // Trend and 95% interval in one column; only the adjusted p, with the raw p as a hint; magnitude in the details.
+  await expect(discovery.getByTestId("discovery-trend").first()).toHaveText(/^[+-]?\d+\.\d+ °C\/decade \([+-]?\d+\.\d+ to [+-]?\d+\.\d+\)$/);
+  await expect(discovery.getByTestId("discovery-q").first()).toHaveAttribute("title", /^Raw p [=<] /);
+  await expect(discovery.getByRole("columnheader")).toHaveText([/^Variable/, /^Evidence/, /^Trend per decade \(95% interval\)/, /^Adjusted p \(BH q\)/, /^Years/, /^Details/]);
+  const details = discovery.getByRole("button", { name: /^Details for / }).first();
+  await details.focus();
+  await page.keyboard.press("Enter");
+  await expect(details).toHaveAttribute("aria-expanded", "true");
+  await expect(discovery.getByText("Change vs. variability").first()).toBeVisible();
+
+  // Every evidence label has a "How to read this" hint that works from the keyboard.
+  await expect(discovery.locator("[data-level]").first()).toContainText(/Clear trend|Possible trend, not confirmed|No clear trend yet|Not enough data/);
+  const help = discovery.getByRole("button", { name: /^How to read this: / }).first();
+  await help.focus();
+  await page.keyboard.press("Enter");
+  await expect(help).toHaveAttribute("aria-expanded", "true");
+  await expect(discovery.locator(".evidence-tip").first()).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(help).toHaveAttribute("aria-expanded", "false");
+  await expect(page.getByTestId("no-clear-trend-note")).toHaveText(/^No clear trend yet means the data cannot separate the change from natural year-to-year variation/);
+
+  // One compact comparison chart and a caption under every chart.
+  await expect(page.getByTestId("comparison-chart")).toHaveCount(1);
+  await expect(page.getByTestId("comparison-chart").getByTestId("chart-caption")).toContainText("Each dot is a variable's estimated change per decade");
+  await expect(page.getByTestId("headline-finding").getByTestId("series-chart").getByTestId("chart-caption")).toContainText("How to read it:");
+  expect(await page.getByTestId("chart-caption").count()).toBeGreaterThanOrEqual(6);
+
+  // Save and the three downloads on one row; the old note is gone.
+  const actions = page.getByTestId("actions-row").getByRole("button");
+  await expect(actions).toHaveText(["Save investigation", "Download CSV (results)", "Download CSV (monthly series)", "Download PDF report"]);
+  await expect(page.getByText("Stores this exact result, method and interpretation")).toHaveCount(0);
+  if (desktop) {
+    const tops = await actions.evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
+    expect(new Set(tops).size).toBe(1);
+    const table = await discovery.locator(".table-wrap").evaluate((el) => ({ scrollWidth: el.scrollWidth, clientWidth: el.clientWidth }));
+    expect(table.scrollWidth).toBeLessThanOrEqual(table.clientWidth);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await expect(page.locator('[data-testid="comparison-chart"] .main-svg').first()).toBeVisible();
+  await expectAccessible(page);
+  await discovery.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: shot(screenshot), fullPage: false });
+  await page.getByTestId("result-actions").scrollIntoViewIfNeeded();
+  await page.screenshot({ path: shot(`${screenshot}-actions`), fullPage: false });
+}
+
+test("comparison dashboard from a stored result: compact table at 1366 px, explained labels, captions, one row of actions", async ({ page }) => {
+  const run = JSON.parse(readFileSync(join(__dirname, "../fixtures/dashboard-run.json"), "utf8")) as { id: string };
+  await page.route(`**/api/runs/${run.id}`, (route) => route.fulfill({ json: run }));
+  await page.route(`**/api/runs/${run.id}/explanation**`, (route) => route.fulfill({ status: 503, json: { error: { title: "The explanation is not available in this test." } } }));
+  const desktop = test.info().project.name === "desktop";
+  if (desktop) await page.setViewportSize({ width: 1366, height: 900 });
+  await page.goto(`/investigations/${run.id}`);
+  await expect(page.getByTestId("dashboard")).toBeVisible();
+  await expect(page.getByTestId("discovery-row-merra2.T2M").locator("[data-level]")).toHaveAttribute("data-level", "significant");
+  await expect(page.getByTestId("discovery-row-merra2.T2MDEW")).toContainText("Possible trend, not confirmed");
+  await expect(page.getByTestId("discovery-row-merra2.QV2M")).toContainText("No clear trend yet");
+  await checkComparisonDashboard(page, desktop, "dashboard-comparison");
+});
+
+test("live comparison: the table fits a 1366 px laptop, labels explain themselves, charts have captions, actions share one row", async ({ page }) => {
+  test.skip(!process.env.LIVE_E2E, "Live provider journey: set LIVE_E2E=1 (queries NASA).");
+  test.setTimeout(300_000);
+  const desktop = test.info().project.name === "desktop";
+  if (desktop) await page.setViewportSize({ width: 1366, height: 900 });
+  await page.goto("/");
+  await page.getByTestId("use-example").click();
+  await page.getByLabel("Start year").selectOption("2015");
+  await page.getByLabel("Browse or search the catalog").fill("dew point");
+  await page.getByRole("checkbox", { name: /Dew point temperature \(2 m\)/ }).check();
+  await expect(page.getByTestId("plan-variables")).toContainText("Dew point temperature (2 m)");
+  await page.getByTestId("start-analysis").click();
+
+  await expect(page).toHaveURL(/\/investigations\/[0-9a-f-]{36}$/);
+  await expect(page.getByTestId("dashboard")).toBeVisible({ timeout: 240_000 });
+  await checkComparisonDashboard(page, desktop, "dashboard-comparison-live");
 });
