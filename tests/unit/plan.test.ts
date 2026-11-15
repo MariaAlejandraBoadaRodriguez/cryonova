@@ -40,6 +40,12 @@ describe("investigation plan", () => {
     );
   });
 
+  it("flags a question whose years fall outside the period", () => {
+    const edited = buildPlan({ ...EXAMPLE, start: "2015-01" });
+    expect(edited.checks.some((c) => c.level === "warn" && c.text.includes("mentions 2005, outside the selected period (2015–2024)"))).toBe(true);
+    expect(buildPlan(EXAMPLE).checks.some((c) => c.text.includes("outside the selected period"))).toBe(false);
+  });
+
   it("uses the custom rectangle when that mode is active and notes the 180° crossing", () => {
     const plan = buildPlan(draft({ location: { mode: "custom", regionId: "country:CO", customBBox: { west: 170, south: -20, east: -170, north: -10 } } }));
     expect(plan.ready).toBe(true);

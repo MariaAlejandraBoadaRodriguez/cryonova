@@ -173,6 +173,16 @@ export function buildPlan(draft: PlanDraft): Plan {
     if (complete < 6) checks.push({ level: "warn", text: "Period comparison needs at least 6 complete years." });
   }
 
+  // A question that names years outside the period usually means one of them was edited and not the other.
+  if (question && validPeriod) {
+    const firstYear = Number(draft.start.slice(0, 4));
+    const lastYear = Number(draft.end.slice(0, 4));
+    const outside = [...new Set([...question.matchAll(/\b(19[89]\d|20\d{2})\b/g)].map((m) => Number(m[1])))].filter((y) => y < firstYear || y > lastYear);
+    if (outside.length > 0) {
+      checks.push({ level: "warn", text: `The question mentions ${outside.join(" and ")}, outside the selected period (${firstYear}–${lastYear}). Update the question or the period so they match.` });
+    }
+  }
+
   const collections = groupByCollection({ variables: draft.variables });
   const reads = months * collections.size;
   if (reads > MAX_PROVIDER_READS) blockers.push(`This plan needs ${reads} live reads; the limit is ${MAX_PROVIDER_READS}. Shorten the period or use fewer products.`);

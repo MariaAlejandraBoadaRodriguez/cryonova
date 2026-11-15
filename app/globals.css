@@ -1838,6 +1838,10 @@ code,
   border-left: 4px solid var(--sa-electric);
 }
 
+.dash .headline {
+  border-left-color: var(--sa-electric);
+}
+
 .dash-headline .value {
   font-family: var(--font-heading);
   font-weight: 900;
