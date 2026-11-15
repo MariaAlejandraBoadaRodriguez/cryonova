@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CHART_KINDS } from "@/src/agent/ask-chart";
 import { explainRun } from "@/src/agent/explain-service";
 import { clientKeyFrom, json, problem, readJson } from "@/src/lib/request";
 
@@ -8,7 +9,7 @@ export const maxDuration = 90;
 const Body = z.object({
   runId: z.string().uuid(),
   followUp: z.string().trim().min(2).max(400).optional(),
-  chart: z.enum(["series", "anomalies", "seasonal"]).default("series"),
+  chart: z.enum(CHART_KINDS).default("series"),
   language: z.enum(["en", "es"]).optional(),
 });
 
