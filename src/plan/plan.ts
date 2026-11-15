@@ -2,12 +2,14 @@
  * Investigation plan: turns the workspace draft into a validated selection,
  * the list of planned analyses and sufficiency/coverage checks, plus the
  * reasons why "Start analysis" is still disabled. Pure and unit-tested.
+ * The question is optional: without one, a working title generated from the
+ * selection is used, and the user can edit it.
  */
 import { monthsBetween } from "@/src/analytics/series";
 import { accessOf, collectionOf, getCollection, getVariable, productLabel, TOPICS } from "@/src/catalog";
 import { getDerived } from "@/src/catalog/derived";
 import { type BBox, getRegion } from "@/src/catalog/regions";
-import { groupByCollection, MAX_PROVIDER_READS, type Selection, SelectionSchema } from "@/src/jobs/selection";
+import { groupByCollection, MAX_PROVIDER_READS, MAX_VARIABLES, type Selection, SelectionSchema } from "@/src/jobs/selection";
 import { fmtBBox, fmtMonth } from "@/src/lib/format";
 import { windowForBBox } from "@/src/providers/grid";
 import { era5GridStep, minStationMonths, NOAA_MAX_CANDIDATES as MAX_CANDIDATES, NOAA_MAX_STATIONS, OBDAAC_FILE_FALLBACK_MONTHS } from "@/src/providers/limits";
@@ -38,7 +40,10 @@ export interface PlanCheck {
 export interface Plan {
   ready: boolean;
   blockers: string[];
+  /** The typed question, or the working title when none was typed. */
   question: string;
+  /** True when `question` is the generated working title (nothing typed yet). */
+  questionIsWorkingTitle: boolean;
   period: { start: string; end: string; months: number; years: number; completeYears: number; label: string };
   location: { label: string; bbox: BBox; mode: LocationMode; detail: string } | null;
   variables: Array<{ key: string; name: string; product: string; source: string; units: string; coverage: string; domain: string }>;
@@ -67,18 +72,65 @@ export function activeLocation(location: LocationState): Plan["location"] {
   return { label: "Custom area", bbox: location.customBBox, mode: "custom", detail: fmtBBox(location.customBBox) };
 }
 
-/** Archive coverage shared by all selected variables (latest start, earliest end). */
+/**
+ * Archive coverage shared by all selected variables (latest start, earliest end).
+ * With no variable selected it is the MERRA-2 span (1980 to now).
+ */
 export function sharedCoverage(variables: string[], now = new Date()): { start: string; end: string } {
-  let start = "1980-01";
+  const known = variables.map((key) => getVariable(key)).filter((v) => v !== undefined);
+  let start = known.length > 0 ? "0000-01" : "1980-01";
   let end = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
-  for (const key of variables) {
-    const v = getVariable(key);
-    if (!v) continue;
+  for (const v of known) {
     const c = collectionOf(v).temporal;
     if (c.start > start) start = c.start;
     if (c.end && c.end < end) end = c.end;
   }
   return { start, end };
+}
+
+/**
+ * Years offered by the period selects: the archive coverage of the selected
+ * variables, widened to include the current start and end so the selects always
+ * show the value the user chose (an out-of-coverage year is flagged, never rewritten).
+ */
+export function periodYearRange(variables: string[], start: string, end: string, now = new Date()): { min: number; max: number } {
+  const coverage = sharedCoverage(variables, now);
+  const years = [start, end].filter((ym) => YM.test(ym)).map((ym) => Number(ym.slice(0, 4)));
+  return { min: Math.min(Number(coverage.start.slice(0, 4)), ...years), max: Math.max(Number(coverage.end.slice(0, 4)), ...years) };
+}
+
+/** Adds exactly one catalog variable. Unknown keys, duplicates and keys beyond MAX_VARIABLES leave the list as it is. */
+export function addVariable(variables: string[], key: string): string[] {
+  if (!getVariable(key) || variables.includes(key) || variables.length >= MAX_VARIABLES) return variables;
+  return [...variables, key];
+}
+
+/** The chosen derived series whose inputs are all still selected. Nothing is ever added. */
+export function keepDerived(variables: string[], derived: string[]): string[] {
+  return derived.filter((key) => getDerived(key)?.inputs.every((k) => variables.includes(k)));
+}
+
+/** "Near-surface air temperature (2 m)" → "near-surface air temperature (2 m)"; names starting with an acronym keep their case. */
+function inSentence(name: string): string {
+  return /^[A-Z][a-z]/.test(name) ? name[0]!.toLowerCase() + name.slice(1) : name;
+}
+
+/**
+ * Editable working title generated from the selection, used as the plan's
+ * question when none was typed, e.g. "Trend in near-surface air temperature (2 m), Colombia, 2000–2020".
+ */
+export function workingTitle(draft: Pick<PlanDraft, "variables" | "start" | "end" | "location">): string {
+  const names = draft.variables
+    .map((key) => getVariable(key))
+    .filter((v) => v !== undefined)
+    .map((v) => inSentence(v.name.en));
+  const subject = names.length === 0 ? "the selected variables" : names.length === 1 ? names[0] : names.length === 2 ? `${names[0]} and ${names[1]}` : `${names[0]} and ${names.length - 1} more variables`;
+  const location = activeLocation(draft.location);
+  const place = location ? (location.mode === "custom" ? "custom area" : location.label) : null;
+  const first = draft.start.slice(0, 4);
+  const last = draft.end.slice(0, 4);
+  const years = YM.test(draft.start) && YM.test(draft.end) && draft.start <= draft.end ? (first === last ? first : `${first}–${last}`) : null;
+  return [`Trend in ${subject}`, place, years].filter(Boolean).join(", ");
 }
 
 /** The topic matching the variables exactly, else the smallest topic that contains all of them. */
@@ -156,8 +208,9 @@ export function accessChecks(collectionNames: string[], months: number, bbox: BB
 export function buildPlan(draft: PlanDraft): Plan {
   const blockers: string[] = [];
   const checks: PlanCheck[] = [];
-  const question = draft.question.trim();
-  if (!question) blockers.push("Write the question this investigation answers (or use the suggested one).");
+  // The question is optional: without one, the working title stands in for it (and stays editable).
+  const typed = draft.question.trim();
+  const question = typed || workingTitle(draft);
 
   const variables = draft.variables
     .map((key) => getVariable(key))
@@ -187,6 +240,7 @@ export function buildPlan(draft: PlanDraft): Plan {
   const validPeriod = YM.test(draft.start) && YM.test(draft.end) && draft.start <= draft.end;
   const months = validPeriod ? monthsBetween(draft.start, draft.end).length : 0;
   const complete = validPeriod ? completeYears(draft.start, draft.end) : 0;
+  // Hard rules only disable Start analysis; the dates the user chose are never rewritten.
   if (!validPeriod) blockers.push("The end month must not be before the start month.");
   else if (months < 12) blockers.push("Choose at least 12 months.");
 
@@ -197,15 +251,18 @@ export function buildPlan(draft: PlanDraft): Plan {
   });
   if (variables.length > 0) {
     checks.push({ level: "info", text: `Archive coverage for the selected variables: ${fmtMonth(coverage.start)} – ${ongoing ? "ongoing (latest month the provider has published)" : fmtMonth(coverage.end)}.` });
+    // Outside the archive is flagged, never corrected: the user's dates stay as chosen.
+    if (validPeriod && draft.start < coverage.start) checks.push({ level: "warn", text: `The start (${fmtMonth(draft.start)}) is before the archive coverage of the selected variables, which begins in ${fmtMonth(coverage.start)}.` });
+    if (validPeriod && draft.end > coverage.end) checks.push({ level: "warn", text: `The end (${fmtMonth(draft.end)}) is after the archive coverage of the selected variables, which ends in ${fmtMonth(coverage.end)}.` });
   }
   if (validPeriod && months >= 12) {
-    if (complete < MIN_TREND_YEARS) checks.push({ level: "warn", text: `Only ${complete} complete calendar years: the annual trend needs at least ${MIN_TREND_YEARS}. Extend the period or use the suggested one.` });
+    if (complete < MIN_TREND_YEARS) checks.push({ level: "warn", text: `Fewer than ${MIN_TREND_YEARS} complete years (${complete}): the trend will be uncertain. Extend the period or use the suggested one.` });
     else checks.push({ level: "ok", text: `${complete} complete years: enough for the annual trend and seasonal trends.` });
     if (complete < 6) checks.push({ level: "warn", text: "Period comparison needs at least 6 complete years." });
   }
 
   // A question that names years outside the period usually means one of them was edited and not the other.
-  if (question && validPeriod) {
+  if (typed && validPeriod) {
     const firstYear = Number(draft.start.slice(0, 4));
     const lastYear = Number(draft.end.slice(0, 4));
     const outside = [...new Set([...question.matchAll(/\b(19[89]\d|20\d{2})\b/g)].map((m) => Number(m[1])))].filter((y) => y < firstYear || y > lastYear);
@@ -262,6 +319,7 @@ export function buildPlan(draft: PlanDraft): Plan {
     ready: blockers.length === 0 && selection !== null,
     blockers,
     question,
+    questionIsWorkingTitle: !typed,
     period: { start: draft.start, end: draft.end, months, years: Math.round((months / 12) * 10) / 10, completeYears: complete, label: validPeriod ? `${fmtMonth(draft.start)} → ${fmtMonth(draft.end)}` : "—" },
     location,
     variables,
