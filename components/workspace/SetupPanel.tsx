@@ -6,7 +6,7 @@
  * same draft, so everything here is a keyboard path for the map actions.
  */
 import { useId, useMemo, useState } from "react";
-import { collectionOf, getVariable, TOPICS, VARIABLES } from "@/src/catalog";
+import { collectionOf, getCollection, getVariable, TOPICS, VARIABLES } from "@/src/catalog";
 import { type BBox, countryOptions, REGIONS } from "@/src/catalog/regions";
 import { type DerivedMetric, DERIVED, getDerived } from "@/src/catalog/derived";
 import { searchCatalog } from "@/src/catalog/search";
@@ -94,6 +94,21 @@ function DerivedRow({ metric, group, checked, onToggle }: { metric: DerivedMetri
   );
 }
 
+const SOURCE_LABELS: Record<string, string> = {
+  imerg: "GPM IMERG",
+  gldas: "GLDAS Noah",
+  seawifs: "SeaWiFS (OB.DAAC)",
+  era5: "ERA5 (Copernicus CDS)",
+  noaa: "NOAA weather stations",
+  giovanni: "NASA Giovanni (Harmony)",
+};
+
+/** Short source name for a collection, e.g. "MERRA-2 SLV" or "ERA5 (Copernicus CDS)". */
+function sourceLabel(shortName: string): string {
+  const source = getCollection(shortName)?.source;
+  return source && SOURCE_LABELS[source] ? SOURCE_LABELS[source] : `MERRA-2 ${shortName.slice(6)}`;
+}
+
 /**
  * Catalog groups: each variable appears once, under the first topic (in
  * catalog order) that requests it; a topic's derived series are listed with it.
@@ -103,7 +118,7 @@ function catalogGroups(): Array<{ id: string; title: string; source: string; var
   const groups = TOPICS.map((t) => {
     const variables = t.variables.filter((k) => !seen.has(k));
     for (const k of variables) seen.add(k);
-    const source = t.collections.map((c) => (c.startsWith("GPM") ? "GPM IMERG" : `MERRA-2 ${c.slice(6)}`)).join(", ");
+    const source = t.collections.map(sourceLabel).join(", ");
     return { id: t.id, title: t.title.en, source, variables, derived: t.derived };
   }).filter((g) => g.variables.length > 0 || g.derived.length > 0);
   const rest = VARIABLES.map((v) => v.key).filter((k) => !seen.has(k));
