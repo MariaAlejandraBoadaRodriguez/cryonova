@@ -66,6 +66,12 @@ export async function readCloudFile(opendapUrl: string, collection: CollectionSp
   };
 }
 
+/** Shared by the reads of one invocation: after repeated 429s OPeNDAP is not asked again, so months do not each wait through the full backoff. */
+export interface RateLimitBreaker {
+  rateLimited: number;
+  threshold: number;
+}
+
 export interface ObdaacOptions extends ReadOptions {
   /**
    * Asked only when OPeNDAP failed: reserves one full-file fallback read for this
@@ -73,14 +79,20 @@ export interface ObdaacOptions extends ReadOptions {
    * fallback is attempted.
    */
   allowCloudFile?: () => boolean;
+  breaker?: RateLimitBreaker;
 }
 
 export async function readObdaacGranule(opendapUrl: string, collection: CollectionSpec, variables: CatalogVariable[], window: GridWindow, options: ObdaacOptions): Promise<ObdaacRead> {
   try {
+    if (options.breaker && options.breaker.rateLimited >= options.breaker.threshold) {
+      throw new ProviderError("rate_limited", `OB.DAAC OPeNDAP answered HTTP 429 to ${options.breaker.rateLimited} reads in a row; not asked again in this invocation`, new URL(opendapUrl).host, 0, 429);
+    }
     const read = await readGranule(opendapUrl, collection, variables, window, options);
+    if (options.breaker) options.breaker.rateLimited = 0;
     return { ...read, via: "opendap" };
   } catch (error) {
     if (error instanceof ProviderError && error.kind === "cancelled") throw error;
+    if (options.breaker && error instanceof ProviderError && error.kind === "rate_limited" && error.attempts > 0) options.breaker.rateLimited += 1;
     const reason = error instanceof ProviderError ? `${error.kind}${error.status ? ` (HTTP ${error.status})` : ""}` : "decode error";
     if (!options.allowCloudFile?.()) {
       const host = error instanceof ProviderError ? error.host : "oceandata.sci.gsfc.nasa.gov";

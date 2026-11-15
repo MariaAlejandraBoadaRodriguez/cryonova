@@ -6,21 +6,24 @@
  * period of record overlapping the selection, ranked by overlap x data
  * coverage. Observations: one request per station and window of at most ten
  * years (the CDO limit for monthly data), units=metric, paginated. The regional
- * series of each variable is the mean of the stations with at least half of
- * the months; every station's own values are kept for the map and table.
+ * series of each variable is the mean of the stations with at least a quarter
+ * of the months; every station's own values are kept for the map and table.
  */
 import type { BBox } from "@/src/catalog/regions";
 import type { CatalogVariable } from "@/src/catalog/types";
 import { lastDayOfMonth } from "@/src/providers/cmr";
 import { parseJson, ProviderError, requestWithPolicy } from "@/src/lib/http";
 import type { VariableMonthValue } from "./gridded";
+import { minStationMonths, NOAA_MAX_CANDIDATES, NOAA_MAX_STATIONS } from "./limits";
 import { POLICIES, withSignal } from "./policies";
+
+export { minStationMonths };
 import type { CheckOutcome, FetchedMonth, FetchOutcome, ProviderJobRow, RemoteConnector, RemoteContext, SubmitOutcome } from "./remote";
 
 export const CDO = "https://www.ncei.noaa.gov/cdo-web/api/v2";
 const HOST = "www.ncei.noaa.gov";
-export const MAX_CANDIDATES = 12;
-export const MAX_STATIONS = 8;
+export const MAX_CANDIDATES = NOAA_MAX_CANDIDATES;
+export const MAX_STATIONS = NOAA_MAX_STATIONS;
 const PAGE = 1000;
 
 export interface CdoStation {
@@ -110,8 +113,9 @@ export interface StationSeries {
 
 /**
  * Combines per-station records into monthly values per variable. Stations with
- * at least half of the months for a variable form the regional mean; a month's
- * mean needs at least half of those stations reporting.
+ * at least a quarter of the months (minStationMonths) form the regional mean; a
+ * month's mean needs at least half of those stations reporting. Every
+ * station's own values are kept as point data either way.
  */
 export function aggregateStations(records: StationSeries[], variables: CatalogVariable[], stations: StationInfo[], months: string[], maxStations = MAX_STATIONS): { months: FetchedMonth[]; used: Record<string, string[]> } {
   const values = new Map<string, number>();
@@ -120,7 +124,7 @@ export function aggregateStations(records: StationSeries[], variables: CatalogVa
   for (const variable of variables) {
     const counts = stations.map((s) => ({ id: s.id, n: months.filter((m) => values.has(`${s.id}|${variable.dapName}|${m}`)).length }));
     used[variable.key] = counts
-      .filter((c) => c.n >= Math.ceil(months.length / 2))
+      .filter((c) => c.n >= minStationMonths(months.length))
       .sort((a, b) => b.n - a.n)
       .slice(0, maxStations)
       .map((c) => c.id);

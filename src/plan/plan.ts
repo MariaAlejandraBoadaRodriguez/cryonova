@@ -4,12 +4,13 @@
  * reasons why "Start analysis" is still disabled. Pure and unit-tested.
  */
 import { monthsBetween } from "@/src/analytics/series";
-import { collectionOf, getCollection, getVariable, TOPICS } from "@/src/catalog";
+import { accessOf, collectionOf, getCollection, getVariable, productLabel, TOPICS } from "@/src/catalog";
 import { getDerived } from "@/src/catalog/derived";
 import { type BBox, getRegion } from "@/src/catalog/regions";
 import { groupByCollection, MAX_PROVIDER_READS, type Selection, SelectionSchema } from "@/src/jobs/selection";
 import { fmtBBox, fmtMonth } from "@/src/lib/format";
 import { windowForBBox } from "@/src/providers/grid";
+import { era5GridStep, minStationMonths, NOAA_MAX_CANDIDATES as MAX_CANDIDATES, OBDAAC_FILE_FALLBACK_MONTHS } from "@/src/providers/limits";
 
 export type LocationMode = "country" | "custom";
 
@@ -122,6 +123,36 @@ function completeYears(start: string, end: string): number {
   return Math.max(0, endYear - startYear + 1);
 }
 
+/** What each kind of provider access means for this plan: queued jobs, station data, OB.DAAC limits. */
+export function accessChecks(collectionNames: string[], months: number, bbox: BBox | null): PlanCheck[] {
+  const checks: PlanCheck[] = [];
+  for (const name of collectionNames) {
+    const collection = getCollection(name);
+    if (!collection) continue;
+    const access = accessOf(collection);
+    if (access === "obdaac") {
+      checks.push({ level: "info", text: `${name}: ocean cells only, ${fmtMonth(collection.temporal.start)} – ${fmtMonth(collection.temporal.end ?? collection.temporal.start)}; 2008-02, 2008-03 and 2009-05 were never produced.` });
+      if (months > OBDAAC_FILE_FALLBACK_MONTHS) {
+        checks.push({
+          level: "warn",
+          text: `${name}: ${months} months is too long for the full-file fallback. Months are read as small OPeNDAP subsets from OB.DAAC; if OB.DAAC rate-limits the server, at most ${OBDAAC_FILE_FALLBACK_MONTHS} months per run can be read from whole monthly files (about 10.7 MB each), and the rest would be reported as failed. Choose ${OBDAAC_FILE_FALLBACK_MONTHS} months or fewer to be sure every month can be read.`,
+        });
+      }
+    } else if (access === "cds") {
+      checks.push({ level: "info", text: `${name}: requested from Copernicus CDS as one queued job. CDS queues take from minutes to hours; the dashboard shows the job and keeps checking while it is open (nothing waits on a server request).` });
+      if (bbox) {
+        const step = era5GridStep(bbox, months, collectionNames.length);
+        if (step > 0.25) checks.push({ level: "warn", text: `${name}: large request, ERA5 is requested on a ${step.toFixed(2)}° grid instead of 0.25° to keep the result small.` });
+      }
+    } else if (access === "harmony") {
+      checks.push({ level: "info", text: `${name}: NASA Giovanni computes the area average (one NASA Harmony job, usually ready within a minute).` });
+    } else if (access === "noaa-cdo") {
+      checks.push({ level: "info", text: `${name}: point data from weather stations. Up to ${MAX_CANDIDATES} stations with the best record inside the area are read; those with at least ${minStationMonths(months)} months form the regional mean, and every station is shown on the map.` });
+    }
+  }
+  return checks;
+}
+
 export function buildPlan(draft: PlanDraft): Plan {
   const blockers: string[] = [];
   const checks: PlanCheck[] = [];
@@ -136,7 +167,7 @@ export function buildPlan(draft: PlanDraft): Plan {
       return {
         key: v.key,
         name: v.name.en,
-        product: `${c.shortName} v${c.version}`,
+        product: productLabel(c),
         source: c.provider,
         units: v.display.units,
         coverage: `${c.temporal.start} → ${c.temporal.end ?? "ongoing"}`,
@@ -165,7 +196,7 @@ export function buildPlan(draft: PlanDraft): Plan {
     return !v || collectionOf(v).temporal.end === null;
   });
   if (variables.length > 0) {
-    checks.push({ level: "info", text: `Archive coverage for the selected variables: ${fmtMonth(coverage.start)} – ${ongoing ? "ongoing (latest month NASA has published)" : fmtMonth(coverage.end)}.` });
+    checks.push({ level: "info", text: `Archive coverage for the selected variables: ${fmtMonth(coverage.start)} – ${ongoing ? "ongoing (latest month the provider has published)" : fmtMonth(coverage.end)}.` });
   }
   if (validPeriod && months >= 12) {
     if (complete < MIN_TREND_YEARS) checks.push({ level: "warn", text: `Only ${complete} complete calendar years: the annual trend needs at least ${MIN_TREND_YEARS}. Extend the period or use the suggested one.` });
@@ -186,10 +217,11 @@ export function buildPlan(draft: PlanDraft): Plan {
   const collections = groupByCollection({ variables: draft.variables });
   const reads = months * collections.size;
   if (reads > MAX_PROVIDER_READS) blockers.push(`This plan needs ${reads} live reads; the limit is ${MAX_PROVIDER_READS}. Shorten the period or use fewer products.`);
+  checks.push(...accessChecks([...collections.keys()], months, location?.bbox ?? null));
   if (location) {
     for (const name of collections.keys()) {
       const collection = getCollection(name);
-      if (!collection) continue;
+      if (!collection || accessOf(collection) !== "opendap" && accessOf(collection) !== "obdaac") continue;
       const window = windowForBBox(collection.grid, location.bbox);
       if (window.stride > 1) checks.push({ level: "warn", text: `${name}: large area, sampled every ${window.stride} grid cells (${window.cells} cells per month).` });
       if (window.snapped) checks.push({ level: "warn", text: `${name}: the area is smaller than one grid cell; the nearest cell is used.` });

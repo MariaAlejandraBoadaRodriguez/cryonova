@@ -17,11 +17,12 @@ import type { RunStore } from "@/src/db/store";
 import { ProviderError } from "@/src/lib/http";
 import { config } from "@/src/lib/env";
 import { errorMessage, type Logger, logger as rootLogger } from "@/src/lib/log";
-import { cdsConnector, era5GridStep } from "@/src/providers/cds";
+import { cdsConnector } from "@/src/providers/cds";
 import { findGranules } from "@/src/providers/cmr";
 import type { GridWindow } from "@/src/providers/grid";
 import { planWindow, readGranule } from "@/src/providers/gridded";
 import { harmonyConnector } from "@/src/providers/harmony";
+import { era5GridStep, OBDAAC_FILE_FALLBACK_MONTHS } from "@/src/providers/limits";
 import { noaaConnector, type StationInfo } from "@/src/providers/noaa";
 import { readObdaacGranule } from "@/src/providers/obdaac";
 import { POLICIES, withSignal } from "@/src/providers/policies";
@@ -59,8 +60,6 @@ export interface RunnerDeps {
 
 const DEFAULT_BUDGET_MS = 240_000;
 const DEFAULT_LEASE_MS = 60_000;
-/** OPeNDAP subsets are the normal OB.DAAC path; whole monthly files (~10.7 MB each) are a bounded fallback. */
-export const OBDAAC_FILE_FALLBACK_MONTHS = 12;
 const OBDAAC_CONCURRENCY = 2;
 
 const REMOTE: AccessKind[] = ["cds", "harmony", "noaa-cdo"];
@@ -331,6 +330,7 @@ export async function executeRun(runId: string, deps: RunnerDeps): Promise<RunRo
         cloudFiles += 1;
         return true;
       };
+      const breaker = { rateLimited: 0, threshold: 2 };
       progress.tasksTotal = all.length;
       progress.tasksMissing = all.filter((s) => s.status === "missing").length;
       progress.tasksDone = all.filter((s) => s.status === "ok").length;
@@ -365,7 +365,7 @@ export async function executeRun(runId: string, deps: RunnerDeps): Promise<RunRo
             const window = windows.get(task.collection)!;
             const read =
               accessOf(collection) === "obdaac"
-                ? await readObdaacGranule(task.opendapUrl!, collection, variables, window, { token: token!, policy: withSignal(POLICIES.obdaacOpendap, controller.signal), fetchImpl: deps.fetchImpl, allowCloudFile })
+                ? await readObdaacGranule(task.opendapUrl!, collection, variables, window, { token: token!, policy: withSignal(POLICIES.obdaacOpendap, controller.signal), fetchImpl: deps.fetchImpl, allowCloudFile, breaker })
                 : { ...(await readGranule(task.opendapUrl!, collection, variables, window, { token: token!, policy: withSignal(POLICIES.opendapRead, controller.signal), fetchImpl: deps.fetchImpl })), via: "opendap" as const };
             buffer.push({ ...task, status: "ok", values: read.values, bytes: read.bytes, durationMs: read.durationMs, attempts: task.attempts + read.attempts, error: null, fetchedAt: new Date(), via: read.via });
             progress.tasksDone = (progress.tasksDone ?? 0) + 1;
@@ -530,7 +530,7 @@ export function buildResult(run: RunRow, selection: Selection, samples: SampleRo
     if (failed.length > 0) warnings.push(`${collectionName}: ${failed.length} monthly reads failed and are treated as missing.${remote && ownJobs.some((j) => j.status === "failed") ? ` ${ownJobs.find((j) => j.status === "failed")?.message ?? ""}` : ""}`.trim());
     if (missing.length > 0) warnings.push(remote ? `${collectionName}: the provider returned no value for ${missing.length} requested months.` : `${collectionName}: ${missing.length} requested months have no published granule.`);
     if (cloudFile > 0) warnings.push(`${collectionName}: ${cloudFile} months were read from full OB.DAAC files because the OPeNDAP subset service was unavailable.`);
-    if (access === "noaa-cdo" && window.cells === 0) warnings.push(`${collectionName}: no station inside the area reported at least half of the months.`);
+    if (access === "noaa-cdo" && window.cells === 0) warnings.push(`${collectionName}: no station inside the area reported at least a quarter of the months, so there is no regional series; the stations' own values are shown as point data.`);
 
     const firstJob = ownJobs[0];
     const jobRequest = (firstJob?.request ?? {}) as { url?: string; urls?: string[] };
@@ -616,14 +616,16 @@ export function buildResult(run: RunRow, selection: Selection, samples: SampleRo
     });
   }
 
-  const anyValid = variables.some((v) => v.analysis.coverage.monthsValid > 0);
+  // Station observations count as data even when no regional series could be formed.
+  const anyValid = variables.some((v) => v.analysis.coverage.monthsValid > 0 || (v.stations?.length ?? 0) > 0);
+  const stationOnly = variables.some((v) => v.analysis.coverage.monthsValid === 0 && (v.stations?.length ?? 0) > 0);
   const anyGap = sources.some((s) => s.monthsFailed > 0);
   const now = Date.now();
   const readSumMs = samples.reduce((sum, s) => sum + (s.status === "ok" ? (s.durationMs ?? 0) : 0), 0);
   return {
     schemaVersion: 1,
     runId: run.id,
-    status: !anyValid ? "failed" : anyGap ? "partial" : "succeeded",
+    status: !anyValid ? "failed" : anyGap || stationOnly ? "partial" : "succeeded",
     createdAt: run.createdAt.toISOString(),
     completedAt: new Date(now).toISOString(),
     selection,

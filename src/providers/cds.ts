@@ -27,22 +27,16 @@ import {
   type RemoteContext,
   type SubmitOutcome,
 } from "./remote";
+import { era5GridStep } from "./limits";
 import { isZip, unzip } from "./zip";
+
+export { era5GridStep };
 
 const NATIVE_STEP = 0.25;
 const DEFAULT_CDS_URL = "https://cds.climate.copernicus.eu/api";
 
 export function cdsBase(url?: string): string {
   return (url || DEFAULT_CDS_URL).replace(/\/+$/, "");
-}
-
-/** Grid spacing for the request: native 0.25°, coarsened so one result stays below ~20 M values. */
-export function era5GridStep(bbox: BBox, months: number, variables: number, maxValues = 20_000_000, maxCells = 12_000): number {
-  const width = bbox.west <= bbox.east ? bbox.east - bbox.west : bbox.east + 360 - bbox.west;
-  const height = bbox.north - bbox.south;
-  const native = (Math.floor(height / NATIVE_STEP) + 1) * (Math.floor(width / NATIVE_STEP) + 1);
-  const cap = Math.max(400, Math.min(maxCells, Math.floor(maxValues / Math.max(1, months * variables))));
-  return native <= cap ? NATIVE_STEP : NATIVE_STEP * Math.ceil(Math.sqrt(native / cap));
 }
 
 export function cdsInputs(ctx: Pick<RemoteContext, "variables" | "bbox" | "months">) {
